@@ -6,6 +6,7 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -34,12 +35,19 @@ class UserResource extends Resource
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
-                    ->hiddenOn('edit')
+                TextInput::make('password')
+                    ->label('Contraseña')
                     ->password()
-                    ->required()
-                    ->maxLength(255),
+                    ->confirmed()
+                    ->dehydrated(fn($state) => filled($state))
+                    ->required(fn(string $context): bool => $context === 'create')
+                    ->minLength(8),
+                TextInput::make('password_confirmation')
+                    ->label('Confirmar contraseña')
+                    ->password()
+                    ->dehydrated(fn($state) => filled($state))
+                    ->required(fn(string $context): bool => $context === 'create')
+                    ->minLength(8),
                 Forms\Components\CheckboxList::make('roles')
                     ->relationship('roles', 'name')
                     ->searchable(),
@@ -105,6 +113,7 @@ class UserResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])
+            ->where('id', '!=', 1);
     }
 }

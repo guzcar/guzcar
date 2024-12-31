@@ -2,7 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Services\CustomBreezyCore;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Forms\Components\FileUpload;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -29,6 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->passwordReset()
             ->colors([
                 'primary' => Color::Blue,
             ])
@@ -57,14 +60,14 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                BreezyCore::make()
+                CustomBreezyCore::make()
                 ->myProfile(
-                    shouldRegisterUserMenu: true, // Sets the 'account' link in the panel User Menu (default = true)
-                    shouldRegisterNavigation: false, // Adds a main navigation item for the My Profile page (default = false)
-                    navigationGroup: 'Settings', // Sets the navigation group for the My Profile page (default = null)
-                    hasAvatars: false, // Enables the avatar upload form component (default = false)
-                    slug: 'my-profile' // Sets the slug for the profile page (default = 'my-profile')
-                ),
+                    hasAvatars: true,
+                    slug: 'profile'
+                )
+                ->avatarUploadComponent(static fn (FileUpload $fileUpload): FileUpload => $fileUpload->directory('avatar'))
+                ->enableBrowserSessions()
+                ->enableTwoFactorAuthentication(),
                 FilamentShieldPlugin::make(),
             ]);
     }
