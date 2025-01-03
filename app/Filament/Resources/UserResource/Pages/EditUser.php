@@ -18,9 +18,4 @@ class EditUser extends EditRecord
             Actions\RestoreAction::make(),
         ];
     }
-
-    protected function getRedirectUrl(): string
-    {
-        return $this->previousUrl ?? $this->getResource()::getUrl('index');
-    }
 }

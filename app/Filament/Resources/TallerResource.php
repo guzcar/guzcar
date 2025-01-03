@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ClienteResource\Pages;
-use App\Filament\Resources\ClienteResource\RelationManagers;
-use App\Models\Cliente;
+use App\Filament\Resources\TallerResource\Pages;
+use App\Filament\Resources\TallerResource\RelationManagers;
+use App\Models\Taller;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -15,6 +15,7 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -22,28 +23,30 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
-class ClienteResource extends Resource
+class TallerResource extends Resource
 {
-    protected static ?string $model = Cliente::class;
+    protected static ?string $model = Taller::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    // protected static ?string $navigationGroup = 'Usuarios';
 
-    protected static ?string $modelLabel = 'Cliente';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $pluralModelLabel = 'Clientes';
+    protected static ?string $modelLabel = 'Taller';
+
+    protected static ?string $pluralModelLabel = 'Talleres';
+
+    protected static ?string $slug = 'talleres';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('identificador')
-                    ->label('RUC / DNI')
+                TextInput::make('nombre')
                     ->unique(ignoreRecord: true)
                     ->required()
-                    ->maxLength(12),
-                TextInput::make('nombre')
+                    ->maxLength(255),
+                TextInput::make('ubicacion')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -53,11 +56,10 @@ class ClienteResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('identificador')
-                    ->label('RUC / DNI')
+                TextColumn::make('nombre')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('nombre')
+                TextColumn::make('ubicacion')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
@@ -76,7 +78,6 @@ class ClienteResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('created_at', 'desc')
             ->filters([
                 TrashedFilter::make(),
             ])
@@ -88,8 +89,8 @@ class ClienteResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    ExportBulkAction::make(),
                     DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
             ]);
@@ -105,9 +106,9 @@ class ClienteResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListClientes::route('/'),
-            // 'create' => Pages\CreateCliente::route('/create'),
-            // 'edit' => Pages\EditCliente::route('/{record}/edit'),
+            'index' => Pages\ListTallers::route('/'),
+            // 'create' => Pages\CreateTaller::route('/create'),
+            // 'edit' => Pages\EditTaller::route('/{record}/edit'),
         ];
     }
 

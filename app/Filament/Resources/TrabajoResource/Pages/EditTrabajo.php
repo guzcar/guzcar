@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\VehiculoResource\Pages;
+namespace App\Filament\Resources\TrabajoResource\Pages;
 
-use App\Filament\Resources\VehiculoResource;
+use App\Filament\Resources\TrabajoResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditVehiculo extends EditRecord
+class EditTrabajo extends EditRecord
 {
-    protected static string $resource = VehiculoResource::class;
+    protected static string $resource = TrabajoResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -16,6 +16,7 @@ class EditVehiculo extends EditRecord
             Actions\DeleteAction::make(),
             Actions\ForceDeleteAction::make(),
             Actions\RestoreAction::make(),
+            Actions\ViewAction::make(),
         ];
     }
 }

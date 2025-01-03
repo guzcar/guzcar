@@ -23,7 +23,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             TipoVehiculoSeeder::class,
             VehiculoSeeder::class,
-            ClienteSeeder::class
+            ClienteSeeder::class,
+            TallerSeeder::class
         ]);
     }
 }
