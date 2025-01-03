@@ -82,7 +82,7 @@ class TrabajoResource extends Resource
                                             ->simple(
                                                 Select::make('cliente_id')
                                                     ->label('Seleccionar Cliente')
-                                                    ->relationship('cliente', 'nombre')
+                                                    ->relationship('cliente', 'nombre_completo', fn ($query) => $query->withTrashed())
                                                     ->distinct()
                                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                                     ->searchable()
@@ -109,7 +109,10 @@ class TrabajoResource extends Resource
                                                             ->required()
                                                             ->maxLength(255),
                                                     ])
-                                                    ->getOptionLabelUsing(fn($value): ?string => Cliente::find($value)?->nombre)
+                                                    ->getOptionLabelUsing(function ($value): ?string {
+                                                        $cliente = Cliente::withTrashed()->find($value);
+                                                        return $cliente ? $cliente->nombre_completo : 'Cliente eliminado';
+                                                    })
                                                     ->required()
                                             )
                                             ->defaultItems(0)
@@ -146,7 +149,7 @@ class TrabajoResource extends Resource
                                             ->simple(
                                                 Select::make('cliente_id')
                                                     ->label('Seleccionar Cliente')
-                                                    ->relationship('cliente', 'nombre_completo')
+                                                    ->relationship('cliente', 'nombre_completo', fn ($query) => $query->withTrashed())
                                                     ->distinct()
                                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                                     ->searchable()
@@ -173,7 +176,10 @@ class TrabajoResource extends Resource
                                                             ->required()
                                                             ->maxLength(255),
                                                     ])
-                                                    ->getOptionLabelUsing(fn($value): ?string => Cliente::find($value)?->nombre_completo)
+                                                    ->getOptionLabelUsing(function ($value): ?string {
+                                                        $cliente = Cliente::withTrashed()->find($value);
+                                                        return $cliente ? $cliente->nombre_completo : 'Cliente eliminado';
+                                                    })
                                                     ->required()
                                             )
                                             ->defaultItems(0)
@@ -217,7 +223,7 @@ class TrabajoResource extends Resource
                                     ->simple(
                                         Select::make('mecanico_id') // Campo mecanico_id
                                             ->label('Seleccionar Mecánico')
-                                            ->relationship('mecanico', 'name') // Relación hacia User desde TrabajoMecanico
+                                            ->relationship('mecanico', 'name', fn ($query) => $query->withTrashed()) // Relación hacia User desde TrabajoMecanico
                                             ->distinct()
                                             ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                             ->searchable()
@@ -273,7 +279,10 @@ class TrabajoResource extends Resource
                                                     ->dehydrated(fn($state) => filled($state))
                                                     ->minLength(8),
                                             ])
-                                            ->getOptionLabelUsing(fn($value): ?string => User::find($value)?->name)
+                                            ->getOptionLabelUsing(function ($value): ?string {
+                                                $user = User::withTrashed()->find($value);
+                                                return $user ? $user->name : 'Usuario eliminado';
+                                            })
                                             ->required()
                                     )
                             ])
