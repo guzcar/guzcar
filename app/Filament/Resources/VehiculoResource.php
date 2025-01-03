@@ -19,6 +19,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -49,6 +50,7 @@ class VehiculoResource extends Resource
                         Section::make()
                             ->schema([
                                 TextInput::make('placa')
+                                    ->unique(ignoreRecord: true)
                                     ->maxLength(7),
                                 TextInput::make('marca')
                                     ->required()
@@ -83,12 +85,13 @@ class VehiculoResource extends Resource
                                     ->simple(
                                         Select::make('cliente_id')
                                             ->label('Seleccionar Cliente')
-                                            ->relationship('cliente', 'nombre')
+                                            ->relationship('cliente', 'nombre_completo')
                                             ->distinct()
                                             ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                             ->searchable()
                                             ->createOptionForm([
                                                 TextInput::make('identificador')
+                                                    ->label('RUC / DNI')
                                                     ->required()
                                                     ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                     ->maxLength(12),
@@ -101,6 +104,7 @@ class VehiculoResource extends Resource
                                             })
                                             ->editOptionForm([
                                                 TextInput::make('identificador')
+                                                    ->label('RUC / DNI')
                                                     ->required()
                                                     ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                     ->maxLength(12),
@@ -108,9 +112,10 @@ class VehiculoResource extends Resource
                                                     ->required()
                                                     ->maxLength(255),
                                             ])
-                                            ->getOptionLabelUsing(fn($value): ?string => Cliente::find($value)?->nombre)
+                                            ->getOptionLabelUsing(fn($value): ?string => Cliente::find($value)?->nombre_completo)
                                             ->required()
                                     )
+                                    ->defaultItems(0)
                             ])
                             ->heading('Clientes')
                             ->columnSpan(1)
@@ -136,16 +141,22 @@ class VehiculoResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('tipoVehiculo.nombre')
+                    ->label('Tipo')
                     ->numeric()
+                    ->searchable()
                     ->sortable(),
+                TextColumn::make('clientes.nombre')
+                    ->searchable()
+                    ->badge()
+                    ->wrap(),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->label('Fecha de edición')
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -156,7 +167,8 @@ class VehiculoResource extends Resource
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
-                RestoreAction::make()
+                RestoreAction::make(),
+                ForceDeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

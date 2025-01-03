@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\VehiculoResource\Pages;
+namespace App\Filament\Resources\TallerResource\Pages;
 
-use App\Filament\Resources\VehiculoResource;
+use App\Filament\Resources\TallerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditVehiculo extends EditRecord
+class EditTaller extends EditRecord
 {
-    protected static string $resource = VehiculoResource::class;
+    protected static string $resource = TallerResource::class;
 
     protected function getHeaderActions(): array
     {

@@ -18,6 +18,17 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+
+        DB::statement("
+            ALTER TABLE clientes
+            ADD COLUMN nombre_completo VARCHAR(255)
+            GENERATED ALWAYS AS (
+                CONCAT(
+                    identificador, ' - ',
+                    nombre
+                )
+            ) VIRTUAL;
+        ");
     }
 
     /**

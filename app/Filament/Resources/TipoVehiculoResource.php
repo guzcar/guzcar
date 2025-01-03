@@ -14,6 +14,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -31,9 +32,11 @@ class TipoVehiculoResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $modelLabel = 'Tipo de Vehículo';
+    protected static ?string $modelLabel = 'Tipo de vehículo';
 
-    protected static ?string $pluralModelLabel = 'Tipos de Vehículo';
+    protected static ?string $pluralModelLabel = 'Tipos de vehículo';
+
+    protected static ?string $navigationLabel = 'Tipos de vehículo';
 
     public static function form(Form $form): Form
     {
@@ -54,18 +57,17 @@ class TipoVehiculoResource extends Resource
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->label('Fecha de edición')
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('deleted_at')
-                    ->label('Eliminación')
                     ->label('Fecha de eliminación')
-                    ->dateTime()
+                    ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -76,7 +78,8 @@ class TipoVehiculoResource extends Resource
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
-                RestoreAction::make()
+                RestoreAction::make(),
+                ForceDeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

@@ -12,11 +12,11 @@ return new class extends Migration {
     {
         Schema::create('trabajo_mecanicos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_mecanico')
+            $table->foreignId('mecanico_id')
                 ->constrained('users')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
-            $table->foreignId('id_trabajo')
+            $table->foreignId('trabajo_id')
                 ->constrained('trabajos')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
