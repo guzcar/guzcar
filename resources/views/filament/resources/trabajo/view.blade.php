@@ -1,11 +1,5 @@
 <x-filament::page>
     
-<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"
-/>
-
     <x-filament::card>
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white pb-6">
             Información del Trabajo

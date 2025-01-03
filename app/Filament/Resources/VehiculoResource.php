@@ -85,7 +85,7 @@ class VehiculoResource extends Resource
                                     ->simple(
                                         Select::make('cliente_id')
                                             ->label('Seleccionar Cliente')
-                                            ->relationship('cliente', 'nombre_completo')
+                                            ->relationship('cliente', 'nombre_completo', fn ($query) => $query->withTrashed())
                                             ->distinct()
                                             ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                             ->searchable()
@@ -112,7 +112,10 @@ class VehiculoResource extends Resource
                                                     ->required()
                                                     ->maxLength(255),
                                             ])
-                                            ->getOptionLabelUsing(fn($value): ?string => Cliente::find($value)?->nombre_completo)
+                                            ->getOptionLabelUsing(function ($value): ?string {
+                                                $cliente = Cliente::withTrashed()->find($value);
+                                                return $cliente ? $cliente->nombre_completo : 'Cliente eliminado';
+                                            })
                                             ->required()
                                     )
                                     ->defaultItems(0)
