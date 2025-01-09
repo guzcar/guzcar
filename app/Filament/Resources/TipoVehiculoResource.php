@@ -15,6 +15,7 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -28,7 +29,9 @@ class TipoVehiculoResource extends Resource
 {
     protected static ?string $model = TipoVehiculo::class;
 
-    // protected static ?string $navigationGroup = 'Usuarios';
+    protected static ?string $navigationGroup = 'Configuración';
+
+    protected static ?int $navigationSort = 200;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -85,6 +88,7 @@ class TipoVehiculoResource extends Resource
                 BulkActionGroup::make([
                     ExportBulkAction::make(),
                     DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
             ]);

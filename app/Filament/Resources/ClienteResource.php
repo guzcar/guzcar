@@ -15,6 +15,7 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -27,6 +28,10 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 class ClienteResource extends Resource
 {
     protected static ?string $model = Cliente::class;
+
+    protected static ?string $navigationGroup = 'Core';
+
+    protected static ?int $navigationSort = 30;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
@@ -90,6 +95,7 @@ class ClienteResource extends Resource
                 BulkActionGroup::make([
                     ExportBulkAction::make(),
                     DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
             ]);

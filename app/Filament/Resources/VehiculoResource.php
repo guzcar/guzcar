@@ -20,6 +20,7 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -33,7 +34,9 @@ class VehiculoResource extends Resource
 {
     protected static ?string $model = Vehiculo::class;
 
-    // protected static ?string $navigationGroup = 'Usuarios';
+    protected static ?string $navigationGroup = 'Core';
+
+    protected static ?int $navigationSort = 20;
 
     protected static ?string $navigationIcon = 'heroicon-o-truck';
 
@@ -49,19 +52,11 @@ class VehiculoResource extends Resource
                     ->schema([
                         Section::make()
                             ->schema([
-                                TextInput::make('placa')
-                                    ->unique(ignoreRecord: true)
-                                    ->maxLength(7),
-                                TextInput::make('marca')
-                                    ->required()
-                                    ->maxLength(255),
-                                TextInput::make('modelo')
-                                    ->maxLength(255),
-                                TextInput::make('color')
-                                    ->required()
-                                    ->maxLength(255),
                                 Select::make('tipo_vehiculo_id')
+                                    ->label('Tipo de vehículo')
                                     ->relationship('tipoVehiculo', 'nombre')
+                                    ->searchable()
+                                    ->preload()
                                     ->createOptionForm([
                                         TextInput::make('nombre')
                                             ->unique(ignoreRecord: true)
@@ -75,6 +70,17 @@ class VehiculoResource extends Resource
                                             ->maxLength(50),
                                     ])
                                     ->required(),
+                                TextInput::make('placa')
+                                    ->unique(ignoreRecord: true)
+                                    ->maxLength(7),
+                                TextInput::make('marca')
+                                    ->required()
+                                    ->maxLength(255),
+                                TextInput::make('modelo')
+                                    ->maxLength(255),
+                                TextInput::make('color')
+                                    ->required()
+                                    ->maxLength(255),
                             ])
                             ->heading('Vehículo')
                             ->columnSpan(1),
@@ -177,6 +183,7 @@ class VehiculoResource extends Resource
                 BulkActionGroup::make([
                     ExportBulkAction::make(),
                     DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
             ]);
