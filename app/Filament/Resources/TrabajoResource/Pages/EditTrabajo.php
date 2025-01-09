@@ -16,7 +16,13 @@ class EditTrabajo extends EditRecord
             Actions\DeleteAction::make(),
             Actions\ForceDeleteAction::make(),
             Actions\RestoreAction::make(),
-            Actions\ViewAction::make(),
+            Actions\ViewAction::make()
+                ->icon('heroicon-o-eye'),
         ];
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->previousUrl ?? $this->getResource()::getUrl('index');
     }
 }

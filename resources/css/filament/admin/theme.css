@@ -1,0 +1,50 @@
+@import '/vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+:root {
+    --primary-admin-uns: #2563EB;
+    --light-gray: #FAFAFA;
+    --white: #FFFFFF;
+}
+
+div.fi-topbar nav {
+    background-color: var(--primary-admin-uns);
+}
+
+header.fi-sidebar-header {
+    background-color: var(--primary-admin-uns);
+}
+
+header.fi-sidebar-header .fi-logo {
+    color: var(--white);
+}
+
+div.fi-topbar button.fi-icon-btn,
+header.fi-sidebar-header button.fi-icon-btn {
+    color: var(--white);
+    background-color: transparent;
+    border: none;
+    transition: color 0.3s;
+}
+
+div.fi-topbar button.fi-icon-btn:hover,
+header.fi-sidebar-header button.fi-icon-btn:hover {
+    color: var(--light-gray) !important;
+}
+
+div.fi-topbar button.fi-icon-btn .fi-icon-btn-icon,
+header.fi-sidebar-header button.fi-icon-btn .fi-icon-btn-icon {
+    color: inherit;
+}
+
+div.fi-topbar button.fi-icon-btn:focus-visible .fi-icon-btn-icon,
+header.fi-sidebar-header button.fi-icon-btn:focus-visible .fi-icon-btn-icon {
+    outline: 2px solid var(--primary-admin-uns);
+    outline-offset: 2px;
+}
+
+div.fi-topbar button.fi-icon-btn:disabled .fi-icon-btn-icon,
+header.fi-sidebar-header button.fi-icon-btn:disabled .fi-icon-btn-icon {
+    color: var(--light-gray);
+}

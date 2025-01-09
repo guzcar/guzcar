@@ -23,12 +23,15 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class TallerResource extends Resource
 {
     protected static ?string $model = Taller::class;
 
-    // protected static ?string $navigationGroup = 'Usuarios';
+    protected static ?string $navigationGroup = 'Configuración';
+
+    protected static ?int $navigationSort = 201;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -89,6 +92,7 @@ class TallerResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    ExportBulkAction::make(),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),

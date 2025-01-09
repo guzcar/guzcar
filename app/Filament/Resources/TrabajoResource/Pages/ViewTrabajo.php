@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\TrabajoResource\Pages;
 
 use App\Filament\Resources\TrabajoResource;
-use Filament\Actions;
 use Filament\Actions\Action;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewTrabajo extends ViewRecord
@@ -34,7 +34,8 @@ class ViewTrabajo extends ViewRecord
                 ->url(TrabajoResource::getUrl())
                 ->icon('heroicon-o-arrow-left')
                 ->color('gray'),
-            Actions\EditAction::make(),
+            EditAction::make()
+                ->icon('heroicon-o-pencil-square'),
         ];
     }
 }

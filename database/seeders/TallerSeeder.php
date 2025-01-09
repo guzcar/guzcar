@@ -15,7 +15,7 @@ class TallerSeeder extends Seeder
     {
         Taller::create([
             'nombre' => 'Taller 1',
-            'ubicacion' => 'Chimbote, ...',
+            'ubicacion' => 'Prolongacion Leoncio Prado 1540, Chimbote 02801',
         ]);
 
         Taller::create([

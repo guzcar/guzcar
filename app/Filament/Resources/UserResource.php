@@ -21,7 +21,9 @@ use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,6 +33,8 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
+
+    protected static ?int $navigationSort = 100;
 
     protected static ?string $navigationGroup = 'Usuarios';
 
@@ -97,6 +101,10 @@ class UserResource extends Resource
                 TextColumn::make('email')
                     ->label('Correo electrónico')
                     ->searchable(),
+                ToggleColumn::make('is_admin')
+                    ->label('Administrativo')
+                    ->onIcon('heroicon-s-user')
+                    ->alignCenter(),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')
@@ -127,6 +135,7 @@ class UserResource extends Resource
                 BulkActionGroup::make([
                     ExportBulkAction::make(),
                     DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
             ]);
