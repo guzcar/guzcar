@@ -42,7 +42,6 @@ class Trabajo extends Model
 
     public function usuarios(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'trabajo_mecanicos', 'trabajo_id', 'mecanico_id')
-            ->select('users.name');
+        return $this->belongsToMany(User::class, 'trabajo_mecanicos', 'trabajo_id', 'mecanico_id');
     }
 }
