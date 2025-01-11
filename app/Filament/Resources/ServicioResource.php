@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ClienteResource\Pages;
-use App\Filament\Resources\ClienteResource\RelationManagers;
-use App\Models\Cliente;
+use App\Filament\Resources\ServicioResource\Pages;
+use App\Filament\Resources\ServicioResource\RelationManagers;
+use App\Models\Servicio;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -25,32 +25,28 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
-class ClienteResource extends Resource
+class ServicioResource extends Resource
 {
-    protected static ?string $model = Cliente::class;
+    protected static ?string $model = Servicio::class;
 
-    protected static ?string $navigationGroup = 'Core';
+    protected static ?string $navigationGroup = 'Configuración';
 
-    protected static ?int $navigationSort = 30;
+    protected static ?int $navigationSort = 200;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
-
-    protected static ?string $modelLabel = 'Cliente';
-
-    protected static ?string $pluralModelLabel = 'Clientes';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('identificador')
-                    ->label('RUC / DNI')
-                    ->unique(ignoreRecord: true)
-                    // ->required()
-                    ->maxLength(12),
                 TextInput::make('nombre')
+                    ->unique(ignoreRecord: true)
                     ->required()
                     ->maxLength(255),
+                TextInput::make('costo')
+                    ->numeric()
+                    ->prefix('S/ ')
+                    ->maxValue(42949672.95),
             ]);
     }
 
@@ -58,14 +54,11 @@ class ClienteResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('identificador')
-                    ->label('RUC / DNI')
-                    ->searchable()
-                    ->sortable()
-                    ->placeholder('Sin Identificador'),
                 TextColumn::make('nombre')
-                    ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('costo')
+                    ->prefix('S/ '),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')
@@ -82,7 +75,6 @@ class ClienteResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('created_at', 'desc')
             ->filters([
                 TrashedFilter::make(),
             ])
@@ -112,9 +104,9 @@ class ClienteResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListClientes::route('/'),
-            // 'create' => Pages\CreateCliente::route('/create'),
-            // 'edit' => Pages\EditCliente::route('/{record}/edit'),
+            'index' => Pages\ListServicios::route('/'),
+            // 'create' => Pages\CreateServicio::route('/create'),
+            // 'edit' => Pages\EditServicio::route('/{record}/edit'),
         ];
     }
 

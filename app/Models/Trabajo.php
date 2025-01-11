@@ -17,7 +17,8 @@ class Trabajo extends Model
         'taller_id',
         'fecha_ingreso',
         'fecha_salida',
-        'descripcion_servicio'
+        'descripcion_servicio',
+        'desembolso'
     ];
 
     public function taller()

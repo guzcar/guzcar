@@ -98,7 +98,7 @@ class VehiculoResource extends Resource
                                             ->createOptionForm([
                                                 TextInput::make('identificador')
                                                     ->label('RUC / DNI')
-                                                    ->required()
+                                                    // ->required()
                                                     ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                     ->maxLength(12),
                                                 TextInput::make('nombre')
@@ -111,7 +111,7 @@ class VehiculoResource extends Resource
                                             ->editOptionForm([
                                                 TextInput::make('identificador')
                                                     ->label('RUC / DNI')
-                                                    ->required()
+                                                    // ->required()
                                                     ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                     ->maxLength(12),
                                                 TextInput::make('nombre')
@@ -139,7 +139,8 @@ class VehiculoResource extends Resource
             ->columns([
                 TextColumn::make('placa')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('Sin Placa'),
                 TextColumn::make('marca')
                     ->searchable()
                     ->sortable(),

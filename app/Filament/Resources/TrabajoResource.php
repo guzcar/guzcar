@@ -31,6 +31,7 @@ use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ColumnGroup;
+use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -175,7 +176,7 @@ class TrabajoResource extends Resource
                                                     ->createOptionForm([
                                                         TextInput::make('identificador')
                                                             ->label('RUC / DNI')
-                                                            ->required()
+                                                            // ->required()
                                                             ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                             ->maxLength(12),
                                                         TextInput::make('nombre')
@@ -188,7 +189,7 @@ class TrabajoResource extends Resource
                                                     ->editOptionForm([
                                                         TextInput::make('identificador')
                                                             ->label('RUC / DNI')
-                                                            ->required()
+                                                            // ->required()
                                                             ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                             ->maxLength(12),
                                                         TextInput::make('nombre')
@@ -351,6 +352,7 @@ class TrabajoResource extends Resource
                     ->wrap()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('descripcion_servicio')
+                    ->searchable(isIndividual: true)
                     ->wrap()
                     ->lineClamp(2)
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -373,6 +375,13 @@ class TrabajoResource extends Resource
                             ? $record->fecha_salida
                             : $record->taller->nombre;
                     }),
+                SelectColumn::make('desembolso')
+                    ->placeholder('')
+                    ->options([
+                        'A CUENTA' => 'A CUENTA',
+                        'COBRADO' => 'COBRADO',
+                        'POR COBRAR' => 'POR COBRAR',
+                    ]),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')
@@ -392,7 +401,7 @@ class TrabajoResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->filters([
                 TernaryFilter::make('estado_trabajo')
-                    ->label('Estado del trabajo')
+                    ->label('Estado del Trabajo')
                     ->placeholder('Todos')
                     ->trueLabel('En taller')
                     ->falseLabel('Finalizados')
@@ -402,6 +411,15 @@ class TrabajoResource extends Resource
                         false: fn($query) => $query->whereNotNull('fecha_salida'),
                         blank: fn($query) => $query, // Mostrar todos sin filtrar
                     ),
+
+                SelectFilter::make('desembolso')
+                    ->label('Estado del Desembolso')
+                    ->options([
+                        'A CUENTA' => 'A Cuenta',
+                        'COBRADO' => 'Cobrado',
+                        'POR COBRAR' => 'Por Cobrar',
+                    ])
+                    ->placeholder('Todos'),
                 DateRangeFilter::make('fecha_ingreso'),
                 DateRangeFilter::make('fecha_salida'),
                 SelectFilter::make('taller_id')
@@ -417,7 +435,10 @@ class TrabajoResource extends Resource
                     ->icon('heroicon-s-check')
                     ->visible(fn(Trabajo $record) => is_null($record->fecha_salida)) // Visible solo si fecha_salida es null
                     ->action(function (Trabajo $record) {
-                        $record->update(['fecha_salida' => now()]);
+                        $record->update([
+                            'fecha_salida' => now(),
+                            'desembolso' => 'POR COBRAR'
+                        ]);
 
                         Notification::make()
                             ->title('El trabajo ha sido marcado como terminado.')
@@ -430,7 +451,10 @@ class TrabajoResource extends Resource
                     ->icon('heroicon-s-arrow-path')
                     ->visible(fn(Trabajo $record) => !is_null($record->fecha_salida)) // Visible solo si fecha_salida tiene valor
                     ->action(function (Trabajo $record) {
-                        $record->update(['fecha_salida' => null]);
+                        $record->update([
+                            'fecha_salida' => null,
+                            'desembolso' => null
+                        ]);
 
                         Notification::make()
                             ->title('El trabajo ha sido reabierto.')
@@ -450,7 +474,13 @@ class TrabajoResource extends Resource
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->recordClasses(fn(Trabajo $record) => match ($record->desembolso) {
+                'A CUENTA' => 'desembolso-a-cuenta',
+                'COBRADO' => 'desembolso-cobrado',
+                'POR COBRAR' => 'desembolso-por-cobrar',
+                default => null,
+            });
     }
 
     public static function getRelations(): array

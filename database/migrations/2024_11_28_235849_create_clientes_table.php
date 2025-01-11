@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('clientes', function (Blueprint $table) {
             $table->id();
-            $table->string('identificador', 12)->unique();
+            $table->string('identificador', 12)->unique()->nullable();
             $table->string('nombre');
             $table->timestamps();
             $table->softDeletes();
@@ -21,13 +20,13 @@ return new class extends Migration
 
         DB::statement("
             ALTER TABLE clientes
-            ADD COLUMN nombre_completo VARCHAR(255)
-            GENERATED ALWAYS AS (
-                CONCAT(
-                    identificador, ' - ',
-                    nombre
-                )
-            ) VIRTUAL;
+                ADD COLUMN nombre_completo VARCHAR(255)
+                GENERATED ALWAYS AS (
+                    CASE
+                        WHEN identificador IS NULL THEN nombre
+                        ELSE CONCAT(identificador, ' - ', nombre)
+                    END
+                ) VIRTUAL;
         ");
     }
 

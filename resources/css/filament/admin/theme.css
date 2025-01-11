@@ -3,17 +3,17 @@
 @config 'tailwind.config.js';
 
 :root {
-    --primary-admin-uns: #2563EB;
+    --primary-admin-guzcar: #2563EB;
     --light-gray: #FAFAFA;
     --white: #FFFFFF;
 }
 
 div.fi-topbar nav {
-    background-color: var(--primary-admin-uns);
+    background-color: var(--primary-admin-guzcar);
 }
 
 header.fi-sidebar-header {
-    background-color: var(--primary-admin-uns);
+    background-color: var(--primary-admin-guzcar);
 }
 
 header.fi-sidebar-header .fi-logo {
@@ -40,11 +40,61 @@ header.fi-sidebar-header button.fi-icon-btn .fi-icon-btn-icon {
 
 div.fi-topbar button.fi-icon-btn:focus-visible .fi-icon-btn-icon,
 header.fi-sidebar-header button.fi-icon-btn:focus-visible .fi-icon-btn-icon {
-    outline: 2px solid var(--primary-admin-uns);
+    outline: 2px solid var(--primary-admin-guzcar);
     outline-offset: 2px;
 }
 
 div.fi-topbar button.fi-icon-btn:disabled .fi-icon-btn-icon,
 header.fi-sidebar-header button.fi-icon-btn:disabled .fi-icon-btn-icon {
     color: var(--light-gray);
+}
+
+/* Modo claro - tonos más suaves */
+.desembolso-a-cuenta {
+    @apply bg-[#F8E6C1] text-black transition-colors ease-in-out duration-300;
+}
+
+.desembolso-a-cuenta:hover {
+    @apply bg-[#F6DDB5]; /* Cambio sutil */
+}
+
+.desembolso-cobrado {
+    @apply bg-[#E4F0DB] text-black transition-colors ease-in-out duration-300;
+}
+
+.desembolso-cobrado:hover {
+    @apply bg-[#DDE9D2]; /* Cambio sutil */
+}
+
+.desembolso-por-cobrar {
+    @apply bg-[#F9C9C9] text-black transition-colors ease-in-out duration-300;
+}
+
+.desembolso-por-cobrar:hover {
+    @apply bg-[#F7BFBF]; /* Cambio sutil */
+}
+
+/* Modo oscuro - tonos más oscuros */
+.dark .desembolso-a-cuenta {
+    @apply bg-[#4B3624] text-gray-300 transition-colors ease-in-out duration-300;
+}
+
+.dark .desembolso-a-cuenta:hover {
+    @apply bg-[#3E2C1F]; /* Cambio sutil */
+}
+
+.dark .desembolso-cobrado {
+    @apply bg-[#2F3C2F] text-gray-300 transition-colors ease-in-out duration-300;
+}
+
+.dark .desembolso-cobrado:hover {
+    @apply bg-[#273127]; /* Cambio sutil */
+}
+
+.dark .desembolso-por-cobrar {
+    @apply bg-[#3C2020] text-gray-300 transition-colors ease-in-out duration-300;
+}
+
+.dark .desembolso-por-cobrar:hover {
+    @apply bg-[#311A1A]; /* Cambio sutil */
 }
