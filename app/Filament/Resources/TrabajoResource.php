@@ -324,29 +324,29 @@ class TrabajoResource extends Resource
                 TextColumn::make('vehiculo.placa')
                     ->label('Placa')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 TextColumn::make('vehiculo.marca')
                     ->label('Marca')
                     ->sortable()
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('vehiculo.modelo')
                     ->label('Modelo')
                     ->sortable()
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('vehiculo.color')
                     ->label('Color')
                     ->sortable()
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('vehiculo.tipoVehiculo.nombre')
                     ->label('Tipo')
                     ->sortable()
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('vehiculo.clientes.nombre')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->badge()
                     ->wrap()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -356,7 +356,7 @@ class TrabajoResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('usuarios.name')
                     ->label('Mecánicos')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->badge()
                     ->wrap(),
                 // TextColumn::make('taller.nombre')

@@ -38,5 +38,41 @@ class UserSeeder extends Seeder
             'email' => 'elard@guzcar.com.pe',
             'password' => Hash::make('123456789'),
         ]);
+
+        User::create([
+            'name' => 'Elias',
+            'email' => 'elias@guzcar.com.pe',
+            'password' => Hash::make('123456789'),
+        ]);
+
+        User::create([
+            'name' => 'Moises',
+            'email' => 'moises@guzcar.com.pe',
+            'password' => Hash::make('123456789'),
+        ]);
+
+        User::create([
+            'name' => 'Jauregui',
+            'email' => 'jauregui@guzcar.com.pe',
+            'password' => Hash::make('123456789'),
+        ]);
+
+        User::create([
+            'name' => 'Yahir',
+            'email' => 'yahir@guzcar.com.pe',
+            'password' => Hash::make('123456789'),
+        ]);
+
+        User::create([
+            'name' => 'Jose',
+            'email' => 'jose@guzcar.com.pe',
+            'password' => Hash::make('123456789'),
+        ]);
+
+        User::create([
+            'name' => 'Cristofer',
+            'email' => 'cristofer@guzcar.com.pe',
+            'password' => Hash::make('123456789'),
+        ]);
     }
 }
