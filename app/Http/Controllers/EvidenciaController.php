@@ -16,7 +16,7 @@ class EvidenciaController extends Controller
     {
         $user = auth()->user();
 
-        if (!$trabajo->usuarios->contains(auth()->user()) || $trabajo->fecha_salida !== null) {
+        if (!$trabajo->usuarios->contains($user) || $trabajo->fecha_salida !== null) {
             abort(403, 'Forbidden');
         }
 
@@ -40,11 +40,16 @@ class EvidenciaController extends Controller
 
         $request->validate([
             'evidencia' => 'required|file|mimes:jpg,jpeg,png,mp4,mov',
-            'observacion' => 'nullable|string|max:255',
+            'observacion' => 'nullable|string',
         ]);
 
         $file = $request->file('evidencia');
         $path = $file->store('evidencia', 'public');
+
+        // Optimizar imágenes con GD
+        if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
+            $this->optimizeImage(Storage::disk('public')->path($path), $file->getMimeType());
+        }
 
         Evidencia::create([
             'trabajo_id' => $trabajo->id,
@@ -69,7 +74,7 @@ class EvidenciaController extends Controller
         }
 
         $request->validate([
-            'observacion' => 'nullable|string|max:255',
+            'observacion' => 'nullable|string',
             'evidencia' => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov|max:10240',
         ]);
 
@@ -77,6 +82,12 @@ class EvidenciaController extends Controller
             Storage::disk('public')->delete($evidencia->evidencia_url);
             $file = $request->file('evidencia');
             $path = $file->store('evidencia', 'public');
+
+            // Optimizar imágenes con GD
+            if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
+                $this->optimizeImage(Storage::disk('public')->path($path), $file->getMimeType());
+            }
+
             $evidencia->evidencia_url = $path;
             $evidencia->tipo = $file->getMimeType() === 'video/mp4' ? 'video' : 'imagen';
         }
@@ -102,5 +113,50 @@ class EvidenciaController extends Controller
         $evidencia->delete();
 
         return redirect()->route('evidencias.index', $trabajo)->with('success', 'Evidencia eliminada correctamente.');
+    }
+
+    /**
+     * Optimizar imagen utilizando GD.
+     */
+    private function optimizeImage($path, $mimeType)
+    {
+        $maxWidth = 1920;
+
+        // Crear la imagen a partir del archivo
+        if ($mimeType === 'image/jpeg') {
+            $image = imagecreatefromjpeg($path);
+        } elseif ($mimeType === 'image/png') {
+            $image = imagecreatefrompng($path);
+        } else {
+            return; // Si no es JPEG o PNG, no hacer nada
+        }
+
+        // Obtener dimensiones originales
+        $width = imagesx($image);
+        $height = imagesy($image);
+
+        // Calcular nuevas dimensiones manteniendo la proporción
+        if ($width > $maxWidth) {
+            $newWidth = $maxWidth;
+            $newHeight = floor($height * ($maxWidth / $width));
+        } else {
+            $newWidth = $width;
+            $newHeight = $height;
+        }
+
+        // Redimensionar la imagen
+        $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+        // Guardar la imagen optimizada
+        if ($mimeType === 'image/jpeg') {
+            imagejpeg($resizedImage, $path, 85); // Calidad 85%
+        } elseif ($mimeType === 'image/png') {
+            imagepng($resizedImage, $path, 8); // Nivel de compresión 8
+        }
+
+        // Liberar memoria
+        imagedestroy($image);
+        imagedestroy($resizedImage);
     }
 }
