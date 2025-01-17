@@ -6,6 +6,7 @@ use App\Filament\Resources\TrabajoResource\Pages;
 use App\Filament\Resources\TrabajoResource\RelationManagers;
 use App\Filament\Resources\TrabajoResource\RelationManagers\EvidenciasRelationManager;
 use App\Models\Cliente;
+use App\Models\Servicio;
 use App\Models\Trabajo;
 use App\Models\User;
 use Filament\Forms;
@@ -309,7 +310,69 @@ class TrabajoResource extends Resource
                                     )
                             ])
                             ->heading('Mecánicos')
-                            ->columnSpan(1)
+                            ->columnSpan(1),
+                        Section::make()
+                            ->schema([
+                                Repeater::make('servicios')
+                                    ->relationship()
+                                    ->defaultItems(0)
+                                    ->schema([
+                                        Select::make('servicio_id')
+                                            ->label('Servicio')
+                                            ->options(Servicio::query()->withTrashed()->pluck('nombre', 'id'))
+                                            ->searchable()
+                                            ->preload()
+                                            ->required()
+                                            ->reactive()
+                                            ->distinct()
+                                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                            ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                                $servicio = Servicio::find($state);
+                                                if ($servicio) {
+                                                    $set('precio', $servicio->costo);
+                                                }
+                                            })
+                                            ->createOptionForm([
+                                                TextInput::make('nombre')
+                                                    ->unique(table: 'servicios', column: 'nombre', ignoreRecord: true)
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                TextInput::make('costo')
+                                                    ->numeric()
+                                                    ->prefix('S/ ')
+                                                    ->maxValue(42949672.95),
+                                            ])
+                                            ->createOptionUsing(function (array $data): int {
+                                                return Servicio::create($data)->getKey();
+                                            })
+                                            // ->editOptionForm([
+                                            //     TextInput::make('nombre')
+                                            //         ->unique(table: 'servicios', column: 'nombre', ignoreRecord: true)
+                                            //         ->required()
+                                            //         ->maxLength(255),
+                                            //     TextInput::make('costo')
+                                            //         ->numeric()
+                                            //         ->prefix('S/ ')
+                                            //         ->maxValue(42949672.95),
+                                            // ])
+                                            // ->getOptionLabelUsing(function ($value): ?string {
+                                            //     $servicio = Servicio::withTrashed()->find($value);
+                                            //     return $servicio ? $servicio->nombre : 'Servicio eliminado';
+                                            // })
+                                            ->columnSpan(3),
+                                        TextInput::make('precio')
+                                            ->numeric()
+                                            ->prefix('S/ ')
+                                            ->maxValue(42949672.95)
+                                            ->required()
+                                            ->dehydrated()
+                                            ->columnSpan(1),
+                                    ])
+                                    ->orderColumn('sort')
+                                    ->columns(4)
+                                    ->hiddenLabel()
+                            ])
+                            ->heading('Servicios ejecutados'),
                     ])
                     ->columns(2),
             ]);
