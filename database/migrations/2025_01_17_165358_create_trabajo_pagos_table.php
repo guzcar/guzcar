@@ -10,19 +10,19 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('trabajo_servicios', function (Blueprint $table) {
+        Schema::create('trabajo_pagos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('sort')->default(0);
             $table->foreignId('trabajo_id')
                 ->constrained('trabajos')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
-            $table->foreignId('servicio_id')
-                ->constrained('servicios')
+            $table->decimal('monto');
+            $table->date('fecha_pago');
+            $table->string('observacion');
+            $table->foreignId('detalle_id')
+                ->constrained('trabajo_pago_detalles')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
-            $table->decimal('precio');
-            $table->unsignedInteger('cantidad')->default(1);
             $table->timestamps();
         });
     }
@@ -32,6 +32,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('trabajo_servicios');
+        Schema::dropIfExists('pagos');
     }
 };

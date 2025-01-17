@@ -14,7 +14,8 @@ class TrabajoServicio extends Model
         'sort',
         'trabajo_id',
         'servicio_id',
-        'precio'
+        'precio',
+        'cantidad',
     ];
 
     public function servicio(): BelongsTo

@@ -5,12 +5,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TrabajoResource\Pages;
 use App\Filament\Resources\TrabajoResource\RelationManagers;
 use App\Filament\Resources\TrabajoResource\RelationManagers\EvidenciasRelationManager;
+use App\Filament\Resources\TrabajoResource\RelationManagers\PagosRelationManager;
 use App\Models\Cliente;
 use App\Models\Servicio;
 use App\Models\Trabajo;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -238,79 +240,93 @@ class TrabajoResource extends Resource
                             ])
                             ->heading('Trabajo')
                             ->columnSpan(1),
-                        Section::make()
+                        Grid::make()
                             ->schema([
-                                Repeater::make('mecanicos')
-                                    ->relationship('mecanicos') // Relación hacia TrabajoMecanico en el modelo Trabajo
-                                    ->defaultItems(0)
-                                    ->simple(
-                                        Select::make('mecanico_id') // Campo mecanico_id
-                                            ->label('Seleccionar Mecánico')
-                                            ->relationship('mecanico', 'name', fn($query) => $query->withTrashed()) // Relación hacia User desde TrabajoMecanico
-                                            ->distinct()
-                                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
-                                            ->searchable()
-                                            ->createOptionForm([
-                                                TextInput::make('name')
-                                                    ->label('Nombre')
+                                Section::make()
+                                    ->schema([
+                                        Repeater::make('mecanicos')
+                                            ->relationship('mecanicos') // Relación hacia TrabajoMecanico en el modelo Trabajo
+                                            ->defaultItems(0)
+                                            ->simple(
+                                                Select::make('mecanico_id') // Campo mecanico_id
+                                                    ->label('Seleccionar Mecánico')
+                                                    ->relationship('mecanico', 'name', fn($query) => $query->withTrashed()) // Relación hacia User desde TrabajoMecanico
+                                                    ->distinct()
+                                                    ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                                    ->searchable()
+                                                    ->createOptionForm([
+                                                        TextInput::make('name')
+                                                            ->label('Nombre')
+                                                            ->required()
+                                                            ->maxLength(255),
+                                                        TextInput::make('email')
+                                                            ->label('Correo electrónico')
+                                                            ->unique(ignoreRecord: true)
+                                                            ->email()
+                                                            ->required()
+                                                            ->maxLength(255),
+                                                        TextInput::make('password')
+                                                            ->label('Contraseña')
+                                                            ->password()
+                                                            ->confirmed()
+                                                            ->dehydrated(fn($state) => filled($state))
+                                                            ->required()
+                                                            ->minLength(8),
+                                                        TextInput::make('password_confirmation')
+                                                            ->label('Confirmar contraseña')
+                                                            ->password()
+                                                            ->dehydrated(fn($state) => filled($state))
+                                                            ->required()
+                                                            ->minLength(8),
+                                                    ])
+                                                    ->createOptionUsing(function (array $data): int {
+                                                        $data['password'] = bcrypt($data['password']);
+                                                        return User::create($data)->getKey();
+                                                    })
+                                                    ->editOptionForm([
+                                                        TextInput::make('name')
+                                                            ->label('Nombre')
+                                                            ->required()
+                                                            ->maxLength(255),
+                                                        TextInput::make('email')
+                                                            ->label('Correo electrónico')
+                                                            ->unique(ignoreRecord: true)
+                                                            ->email()
+                                                            ->required()
+                                                            ->maxLength(255),
+                                                        TextInput::make('password')
+                                                            ->label('Contraseña')
+                                                            ->password()
+                                                            ->confirmed()
+                                                            ->dehydrated(fn($state) => filled($state))
+                                                            ->minLength(8),
+                                                        TextInput::make('password_confirmation')
+                                                            ->label('Confirmar contraseña')
+                                                            ->password()
+                                                            ->dehydrated(fn($state) => filled($state))
+                                                            ->minLength(8),
+                                                    ])
+                                                    ->getOptionLabelUsing(function ($value): ?string {
+                                                        $user = User::withTrashed()->find($value);
+                                                        return $user ? $user->name : 'Usuario eliminado';
+                                                    })
                                                     ->required()
-                                                    ->maxLength(255),
-                                                TextInput::make('email')
-                                                    ->label('Correo electrónico')
-                                                    ->unique(ignoreRecord: true)
-                                                    ->email()
-                                                    ->required()
-                                                    ->maxLength(255),
-                                                TextInput::make('password')
-                                                    ->label('Contraseña')
-                                                    ->password()
-                                                    ->confirmed()
-                                                    ->dehydrated(fn($state) => filled($state))
-                                                    ->required()
-                                                    ->minLength(8),
-                                                TextInput::make('password_confirmation')
-                                                    ->label('Confirmar contraseña')
-                                                    ->password()
-                                                    ->dehydrated(fn($state) => filled($state))
-                                                    ->required()
-                                                    ->minLength(8),
-                                            ])
-                                            ->createOptionUsing(function (array $data): int {
-                                                $data['password'] = bcrypt($data['password']);
-                                                return User::create($data)->getKey();
-                                            })
-                                            ->editOptionForm([
-                                                TextInput::make('name')
-                                                    ->label('Nombre')
-                                                    ->required()
-                                                    ->maxLength(255),
-                                                TextInput::make('email')
-                                                    ->label('Correo electrónico')
-                                                    ->unique(ignoreRecord: true)
-                                                    ->email()
-                                                    ->required()
-                                                    ->maxLength(255),
-                                                TextInput::make('password')
-                                                    ->label('Contraseña')
-                                                    ->password()
-                                                    ->confirmed()
-                                                    ->dehydrated(fn($state) => filled($state))
-                                                    ->minLength(8),
-                                                TextInput::make('password_confirmation')
-                                                    ->label('Confirmar contraseña')
-                                                    ->password()
-                                                    ->dehydrated(fn($state) => filled($state))
-                                                    ->minLength(8),
-                                            ])
-                                            ->getOptionLabelUsing(function ($value): ?string {
-                                                $user = User::withTrashed()->find($value);
-                                                return $user ? $user->name : 'Usuario eliminado';
-                                            })
-                                            ->required()
-                                    )
+                                            )
+                                    ])
+                                    ->heading('Mecánicos'),
+                                Section::make()
+                                    ->schema([
+                                        Repeater::make('archivos')
+                                            ->relationship()
+                                            ->simple(
+                                                FileUpload::make('archivo_url')
+                                                    ->directory('trabajo_archivo')
+                                            )
+                                    ])
+                                    ->heading('Archivos'),
                             ])
-                            ->heading('Mecánicos')
-                            ->columnSpan(1),
+                            ->columnspan(1)
+                            ->columns(1),
                         Section::make()
                             ->schema([
                                 Repeater::make('servicios')
@@ -359,17 +375,39 @@ class TrabajoResource extends Resource
                                             //     $servicio = Servicio::withTrashed()->find($value);
                                             //     return $servicio ? $servicio->nombre : 'Servicio eliminado';
                                             // })
-                                            ->columnSpan(3),
+                                            ->columnSpan(['xl'=> 3, 'lg'=>3, 'md' => 2, 'sm' => 1]),
                                         TextInput::make('precio')
+                                            // ->reactive()
                                             ->numeric()
                                             ->prefix('S/ ')
                                             ->maxValue(42949672.95)
                                             ->required()
                                             ->dehydrated()
+                                            // ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
+                                            //     $cantidad = $get('cantidad') ?? 0;
+                                            //     $set('total', $state * $cantidad);
+                                            // })
                                             ->columnSpan(1),
+                                        TextInput::make('cantidad')
+                                            // ->reactive()
+                                            ->numeric()
+                                            ->default('1')
+                                            ->required()
+                                            ->dehydrated()
+                                            // ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
+                                            //     $precio = $get('precio') ?? 0;
+                                            //     $set('total', $precio * $state);
+                                            // })
+                                            ->columnSpan(1),
+                                        // TextInput::make('total')
+                                        //     ->numeric()
+                                        //     ->prefix('S/ ')
+                                        //     ->disabled()
+                                        //     ->columnSpan(1)
                                     ])
                                     ->orderColumn('sort')
-                                    ->columns(4)
+                                    ->reorderableWithButtons()
+                                    ->columns(5)
                                     ->hiddenLabel()
                             ])
                             ->heading('Servicios ejecutados'),
@@ -549,7 +587,8 @@ class TrabajoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            EvidenciasRelationManager::class
+            EvidenciasRelationManager::class,
+            PagosRelationManager::class,
         ];
     }
 

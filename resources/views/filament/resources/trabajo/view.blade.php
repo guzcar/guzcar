@@ -75,6 +75,28 @@
                 @endforelse
             </ul>
         </x-filament::card>
+        <x-filament::card>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white pb-4">
+                Archivos
+            </h2>
+            <ul class="list-disc list-inside">
+                @forelse ($trabajo->archivos as $archivo)
+                <li>
+                    <a class="font-medium text-primary-600 dark:text-primary-500 max-w-full truncate"
+                       style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; text-decoration: none;"
+                       onmouseover="this.style.textDecoration='underline';"
+                       onmouseout="this.style.textDecoration='none';"
+                       href="{{ asset('storage/' . $archivo->archivo_url) }}"
+                       target="_blank"
+                       title="{{ basename($archivo->archivo_url) }}">
+                        {{ basename($archivo->archivo_url) }}
+                    </a>
+                </li>
+                @empty
+                    <p class="text-gray-500 dark:text-gray-400">No hay archivos.</p>
+                @endforelse
+            </ul>
+        </x-filament::card>
     </div>
 
     <h2 class="text-xl font-bold">Servicios ejecutados</h2>
@@ -106,6 +128,24 @@
                                         </span>
                                     </span>
                                 </th>
+                                <th class="fi-ta-header-cell px-6 py-3.5 fi-table-header-cell-costo">
+                                    <span
+                                        class="group flex w-full items-center gap-x-1 whitespace-nowrap justify-start">
+                                        <span
+                                            class="fi-ta-header-cell-label text-sm font-semibold text-gray-950 dark:text-white">
+                                            Cantidad
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="fi-ta-header-cell px-6 py-3.5 fi-table-header-cell-costo">
+                                    <span
+                                        class="group flex w-full items-center gap-x-1 whitespace-nowrap justify-start">
+                                        <span
+                                            class="fi-ta-header-cell-label text-sm font-semibold text-gray-950 dark:text-white">
+                                            Total
+                                        </span>
+                                    </span>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 whitespace-nowrap dark:divide-white/5">
@@ -117,18 +157,24 @@
                                     <td class="fi-ta-cell px-6 py-4 text-gray-700 dark:text-gray-300 truncate max-w-xs">
                                         S/ {{ $trabajoServicio->precio }}
                                     </td>
+                                    <td class="fi-ta-cell px-6 py-4 text-gray-700 dark:text-gray-300 truncate max-w-xs">
+                                        {{ $trabajoServicio->cantidad }}
+                                    </td>
+                                    <td class="fi-ta-cell px-6 py-4 text-gray-700 dark:text-gray-300 truncate max-w-xs">
+                                        S/ {{ number_format($trabajoServicio->cantidad * $trabajoServicio->precio, 2) }}
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="2" class="text-center px-3 py-6 break-words">
+                                    <td colspan="4" class="text-center px-3 py-6 break-words">
                                         <div
                                             class="fi-ta-empty-state-content mx-auto grid max-w-lg justify-items-center text-center">
                                             <div
                                                 class="fi-ta-empty-state-icon-ctn mb-4 rounded-full bg-gray-100 p-3 dark:bg-gray-500/20">
                                                 <svg class="fi-ta-empty-state-icon h-6 w-6 text-gray-500 dark:text-gray-400"
-                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                    stroke-width="1.5" stroke="currentColor" aria-hidden="true"
-                                                    data-slot="icon">
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                    aria-hidden="true" data-slot="icon">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         d="M6 18 18 6M6 6l12 12"></path>
                                                 </svg>

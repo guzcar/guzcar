@@ -31,7 +31,7 @@ class Trabajo extends Model
         return $this->belongsTo(Vehiculo::class);
     }
 
-    public function evidencias()
+    public function evidencias(): HasMany
     {
         return $this->hasMany(Evidencia::class);
     }
@@ -49,5 +49,15 @@ class Trabajo extends Model
     public function servicios(): HasMany
     {
         return $this->hasMany(TrabajoServicio::class, 'trabajo_id');
+    }
+
+    public function archivos(): HasMany
+    {
+        return $this->hasMany(TrabajoArchivo::class, 'trabajo_id', 'id');
+    }
+
+    public function pagos(): HasMany
+    {
+        return $this->hasMany(TrabajoPago::class, 'trabajo_id', 'id');
     }
 }
