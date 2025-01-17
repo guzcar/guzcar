@@ -45,4 +45,9 @@ class Trabajo extends Model
     {
         return $this->belongsToMany(User::class, 'trabajo_mecanicos', 'trabajo_id', 'mecanico_id');
     }
+
+    public function servicios(): HasMany
+    {
+        return $this->hasMany(TrabajoServicio::class, 'trabajo_id');
+    }
 }

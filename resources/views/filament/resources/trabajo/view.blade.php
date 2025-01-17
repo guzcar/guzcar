@@ -77,6 +77,77 @@
         </x-filament::card>
     </div>
 
+    <h2 class="text-xl font-bold">Servicios ejecutados</h2>
+
+    <section
+        class="fi-section rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10 overflow-hidden">
+        <div class="fi-section-content-ctn">
+            <div class="fi-section-content p-0">
+                <div class="overflow-x-auto">
+                    <table
+                        class="fi-ta-table w-full table-auto divide-y divide-gray-200 text-start dark:divide-white/5 rounded-lg">
+                        <thead class="divide-y divide-gray-200 dark:divide-white/5">
+                            <tr class="bg-gray-50 dark:bg-white/5">
+                                <th class="fi-ta-header-cell px-6 py-3.5 fi-table-header-cell-nombre">
+                                    <span
+                                        class="group flex w-full items-center gap-x-1 whitespace-nowrap justify-start">
+                                        <span
+                                            class="fi-ta-header-cell-label text-sm font-semibold text-gray-950 dark:text-white">
+                                            Servicios
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="fi-ta-header-cell px-6 py-3.5 fi-table-header-cell-costo">
+                                    <span
+                                        class="group flex w-full items-center gap-x-1 whitespace-nowrap justify-start">
+                                        <span
+                                            class="fi-ta-header-cell-label text-sm font-semibold text-gray-950 dark:text-white">
+                                            Costo
+                                        </span>
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 whitespace-nowrap dark:divide-white/5">
+                            @forelse($trabajo->servicios as $trabajoServicio)
+                                <tr class="fi-ta-row hover:bg-gray-50 dark:hover:bg-white/5 transition duration-75">
+                                    <td class="fi-ta-cell px-6 py-4 text-gray-700 dark:text-gray-300 truncate max-w-xs">
+                                        {{ $trabajoServicio->servicio->nombre }}
+                                    </td>
+                                    <td class="fi-ta-cell px-6 py-4 text-gray-700 dark:text-gray-300 truncate max-w-xs">
+                                        S/ {{ $trabajoServicio->precio }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="2" class="text-center px-3 py-6 break-words">
+                                        <div
+                                            class="fi-ta-empty-state-content mx-auto grid max-w-lg justify-items-center text-center">
+                                            <div
+                                                class="fi-ta-empty-state-icon-ctn mb-4 rounded-full bg-gray-100 p-3 dark:bg-gray-500/20">
+                                                <svg class="fi-ta-empty-state-icon h-6 w-6 text-gray-500 dark:text-gray-400"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    stroke-width="1.5" stroke="currentColor" aria-hidden="true"
+                                                    data-slot="icon">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M6 18 18 6M6 6l12 12"></path>
+                                                </svg>
+                                            </div>
+                                            <h4
+                                                class="fi-ta-empty-state-heading text-base font-semibold leading-6 text-gray-950 dark:text-white">
+                                                No se encontraron servicios
+                                            </h4>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <h2 class="text-xl font-bold">Evidencias Asociadas</h2>
     @if ($evidencias->isNotEmpty())
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -111,15 +182,17 @@
         </div>
     @else
         <x-filament::card>
-            <div class="flex flex-col items-center justify-center py-5 my-5">
-                <svg style="max-width: 80px" xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-400 mb-4"
-                    fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" />
-                </svg>
-                <p class="text-gray-500">Aún no se han subido fotos ni videos.</p>
+            <div class="fi-ta-empty-state-content mx-auto grid max-w-lg justify-items-center text-center">
+                <div class="fi-ta-empty-state-icon-ctn mb-4 rounded-full bg-gray-100 p-3 dark:bg-gray-500/20">
+                    <svg class="fi-ta-empty-state-icon h-6 w-6 text-gray-500 dark:text-gray-400"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" aria-hidden="true" data-slot="icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                    </svg>
+                </div>
+                <h4 class="fi-ta-empty-state-heading text-base font-semibold leading-6 text-gray-950 dark:text-white">
+                    No se encontraron evidencias
+                </h4>
             </div>
         </x-filament::card>
     @endif
