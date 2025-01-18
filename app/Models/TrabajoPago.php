@@ -22,4 +22,9 @@ class TrabajoPago extends Model
     {
         return $this->belongsTo(TrabajoPagoDetalle::class, 'detalle_id');
     }
+
+    public function trabajo(): BelongsTo
+    {
+        return $this->belongsTo(Trabajo::class, 'trabajo_id', 'id');
+    }
 }

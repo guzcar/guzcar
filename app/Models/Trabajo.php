@@ -60,4 +60,34 @@ class Trabajo extends Model
     {
         return $this->hasMany(TrabajoPago::class, 'trabajo_id', 'id');
     }
+
+    /**
+     * Obtiene el importe total sumando precios y cantidades de los servicios.
+     *
+     * @return float
+     */
+    public function getImporte(): float
+    {
+        return round($this->servicios->sum(fn($servicio) => $servicio->precio * $servicio->cantidad), 2);
+    }
+
+    /**
+     * Obtiene el monto total de los pagos realizados.
+     *
+     * @return float
+     */
+    public function getACuenta(): float
+    {
+        return round($this->pagos->sum('monto'), 2);
+    }
+
+    /**
+     * Calcula la diferencia entre el importe total y los pagos realizados.
+     *
+     * @return float
+     */
+    public function getPorCobrar(): float
+    {
+        return round($this->getImporte() - $this->getACuenta(), 2);
+    }
 }

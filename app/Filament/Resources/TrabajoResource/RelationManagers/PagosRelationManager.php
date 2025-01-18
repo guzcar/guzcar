@@ -67,7 +67,7 @@ class PagosRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                    ->label('Crear pago'),
+                    ->label('Nuevo pago'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -317,10 +317,12 @@ class TrabajoResource extends Resource
                                 Section::make()
                                     ->schema([
                                         Repeater::make('archivos')
+                                            ->defaultItems(0)
                                             ->relationship()
                                             ->simple(
                                                 FileUpload::make('archivo_url')
                                                     ->directory('trabajo_archivo')
+                                                    ->required()
                                             )
                                     ])
                                     ->heading('Archivos'),
@@ -375,7 +377,7 @@ class TrabajoResource extends Resource
                                             //     $servicio = Servicio::withTrashed()->find($value);
                                             //     return $servicio ? $servicio->nombre : 'Servicio eliminado';
                                             // })
-                                            ->columnSpan(['xl'=> 3, 'lg'=>3, 'md' => 2, 'sm' => 1]),
+                                            ->columnSpan(['xl' => 3, 'lg' => 3, 'md' => 2, 'sm' => 1]),
                                         TextInput::make('precio')
                                             // ->reactive()
                                             ->numeric()
@@ -483,6 +485,27 @@ class TrabajoResource extends Resource
                         'COBRADO' => 'COBRADO',
                         'POR COBRAR' => 'POR COBRAR',
                     ]),
+                TextColumn::make('.getImporte')
+                    ->label('Importe Total')
+                    ->getStateUsing(function (Trabajo $record): string {
+                        return number_format($record->getImporte(), 2, '.', '');
+                    })
+                    ->prefix('S/ ')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('.getACuenta')
+                    ->label('A Cuenta')
+                    ->getStateUsing(function (Trabajo $record): string {
+                        return number_format($record->getACuenta(), 2, '.', '');
+                    })
+                    ->prefix('S/ ')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('.getPorCobrar')
+                    ->label('Por cobrar')
+                    ->getStateUsing(function (Trabajo $record): string {
+                        return number_format($record->getPorCobrar(), 2, '.', '');
+                    })
+                    ->prefix('S/ ')
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')
@@ -536,10 +559,25 @@ class TrabajoResource extends Resource
                     ->icon('heroicon-s-check')
                     ->visible(fn(Trabajo $record) => is_null($record->fecha_salida)) // Visible solo si fecha_salida es null
                     ->action(function (Trabajo $record) {
-                        $record->update([
-                            'fecha_salida' => now(),
-                            'desembolso' => 'POR COBRAR'
-                        ]);
+                        $total = $record->getImporte();
+                        $cuenta = $record->getACuenta();
+
+                        if ($total == 0 || $cuenta == 0) {
+                            $record->update([
+                                'fecha_salida' => now(),
+                                'desembolso' => 'POR COBRAR'
+                            ]);
+                        } elseif ($cuenta < $total) {
+                            $record->update([
+                                'fecha_salida' => now(),
+                                'desembolso' => 'A CUENTA'
+                            ]);
+                        } elseif ($cuenta >= $total) {
+                            $record->update([
+                                'fecha_salida' => now(),
+                                'desembolso' => 'COBRADO'
+                            ]);
+                        }
 
                         Notification::make()
                             ->title('El trabajo ha sido marcado como terminado.')
