@@ -57,10 +57,21 @@ class PagosRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('monto')
                     ->prefix('S/ '),
-                TextColumn::make('fecha_pago'),
+                TextColumn::make('fecha_pago')
+                    ->date('d/m/Y'),
                 TextColumn::make('observacion')
                     ->wrap(),
                 TextColumn::make('detalle.nombre'),
+                TextColumn::make('created_at')
+                    ->label('Fecha de creación')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->label('Fecha de edición')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

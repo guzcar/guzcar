@@ -120,9 +120,16 @@ class EvidenciasRelationManager extends RelationManager
                     ->label('Observación')
                     ->wrap()
                     ->lineClamp(3),
-                TextColumn::make('updated_at')
-                    ->label('Última actualización')
+                TextColumn::make('created_at')
+                    ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('updated_at')
+                    ->label('Fecha de edición')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

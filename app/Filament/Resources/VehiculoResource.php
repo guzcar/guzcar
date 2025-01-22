@@ -29,6 +29,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class VehiculoResource extends Resource
 {
@@ -91,7 +92,7 @@ class VehiculoResource extends Resource
                                     ->simple(
                                         Select::make('cliente_id')
                                             ->label('Seleccionar Cliente')
-                                            ->relationship('cliente', 'nombre_completo', fn ($query) => $query->withTrashed())
+                                            ->relationship('cliente', 'nombre_completo', fn($query) => $query->withTrashed())
                                             ->distinct()
                                             ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                             ->searchable()
@@ -104,6 +105,7 @@ class VehiculoResource extends Resource
                                                 TextInput::make('nombre')
                                                     ->required()
                                                     ->maxLength(255),
+                                                PhoneInput::make('telefono')
                                             ])
                                             ->createOptionUsing(function (array $data): int {
                                                 return Cliente::create($data)->getKey();
@@ -117,6 +119,7 @@ class VehiculoResource extends Resource
                                                 TextInput::make('nombre')
                                                     ->required()
                                                     ->maxLength(255),
+                                                PhoneInput::make('telefono')
                                             ])
                                             ->getOptionLabelUsing(function ($value): ?string {
                                                 $cliente = Cliente::withTrashed()->find($value);
@@ -156,6 +159,7 @@ class VehiculoResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('clientes.nombre')
+                    ->placeholder('Sin Clientes')
                     ->searchable()
                     ->badge()
                     ->wrap(),

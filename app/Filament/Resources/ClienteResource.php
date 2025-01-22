@@ -24,6 +24,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
+use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
+use Ysfkaya\FilamentPhoneInput\Tables\PhoneColumn;
 
 class ClienteResource extends Resource
 {
@@ -51,6 +54,7 @@ class ClienteResource extends Resource
                 TextInput::make('nombre')
                     ->required()
                     ->maxLength(255),
+                PhoneInput::make('telefono')
             ]);
     }
 
@@ -62,10 +66,13 @@ class ClienteResource extends Resource
                     ->label('RUC / DNI')
                     ->searchable()
                     ->sortable()
-                    ->placeholder('Sin Identificador'),
+                    ->placeholder('Sin ID'),
                 TextColumn::make('nombre')
                     ->searchable()
                     ->sortable(),
+                PhoneColumn::make('telefono')
+                    ->searchable()
+                    ->placeholder('Sin telefono'),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')

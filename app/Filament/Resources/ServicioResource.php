@@ -24,14 +24,15 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
 class ServicioResource extends Resource
 {
     protected static ?string $model = Servicio::class;
 
-    protected static ?string $navigationGroup = 'Historial';
+    protected static ?string $navigationGroup = 'Histórico';
 
-    protected static ?int $navigationSort = 51;
+    protected static ?int $navigationSort = 0;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard';
 
@@ -77,6 +78,7 @@ class ServicioResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                ValueRangeFilter::make('costo'),
                 TrashedFilter::make(),
             ])
             ->actions([

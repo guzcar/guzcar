@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('identificador', 12)->unique()->nullable();
             $table->string('nombre');
+            $table->string('telefono')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

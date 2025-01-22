@@ -44,6 +44,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class TrabajoResource extends Resource
 {
@@ -185,6 +187,7 @@ class TrabajoResource extends Resource
                                                         TextInput::make('nombre')
                                                             ->required()
                                                             ->maxLength(255),
+                                                        PhoneInput::make('telefono')
                                                     ])
                                                     ->createOptionUsing(function (array $data): int {
                                                         return Cliente::create($data)->getKey();
@@ -198,6 +201,7 @@ class TrabajoResource extends Resource
                                                         TextInput::make('nombre')
                                                             ->required()
                                                             ->maxLength(255),
+                                                        PhoneInput::make('telefono')
                                                     ])
                                                     ->getOptionLabelUsing(function ($value): ?string {
                                                         $cliente = Cliente::withTrashed()->find($value);
@@ -435,10 +439,11 @@ class TrabajoResource extends Resource
                     ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('vehiculo.modelo')
+                    ->placeholder('Sin Modelo')
                     ->label('Modelo')
                     ->sortable()
                     ->searchable(isIndividual: true)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('vehiculo.color')
                     ->label('Color')
                     ->sortable()
@@ -450,6 +455,7 @@ class TrabajoResource extends Resource
                     ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('vehiculo.clientes.nombre')
+                    ->placeholder('Sin Clientes')
                     ->searchable(isIndividual: true)
                     ->badge()
                     ->wrap()
@@ -460,6 +466,7 @@ class TrabajoResource extends Resource
                     ->lineClamp(2)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('usuarios.name')
+                    ->placeholder('Sin Mecánicos')
                     ->label('Mecánicos')
                     ->searchable(isIndividual: true)
                     ->badge()

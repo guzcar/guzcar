@@ -9,17 +9,21 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ColumnGroup;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
+use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
 class TrabajoPagoResource extends Resource
 {
     protected static ?string $model = TrabajoPago::class;
 
-    protected static ?string $navigationGroup = 'Historial';
+    protected static ?string $navigationGroup = 'Histórico';
 
-    protected static ?int $navigationSort = 50;
+    protected static ?int $navigationSort = 51;
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
@@ -37,6 +41,7 @@ class TrabajoPagoResource extends Resource
                     ->required()
                     ->numeric(),
                 Forms\Components\TextInput::make('monto')
+                    ->prefix('S/ ')
                     ->required()
                     ->numeric(),
                 Forms\Components\DatePicker::make('fecha_pago')
@@ -54,31 +59,63 @@ class TrabajoPagoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('trabajo.vehiculo.placa')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('monto')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('fecha_pago')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('observacion')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('detalle.nombre')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                ColumnGroup::make('Vehiculo', [
+                    TextColumn::make('trabajo.vehiculo.placa')
+                        ->label('Placa')
+                        ->sortable()
+                        ->searchable(isIndividual: true),
+                    TextColumn::make('trabajo.vehiculo.marca')
+                        ->label('Marca')
+                        ->sortable()
+                        ->searchable(isIndividual: true),
+                    TextColumn::make('trabajo.vehiculo.modelo')
+                        ->label('Modelo')
+                        ->sortable()
+                        ->searchable(isIndividual: true)
+                        ->toggleable(isToggledHiddenByDefault: true),
+                    TextColumn::make('trabajo.vehiculo.color')
+                        ->label('Color')
+                        ->sortable()
+                        ->searchable(isIndividual: true)
+                        ->toggleable(isToggledHiddenByDefault: true),
+                    TextColumn::make('trabajo.vehiculo.clientes.nombre')
+                        ->placeholder('Sin Clientes')
+                        ->searchable(isIndividual: true)
+                        ->badge()
+                        ->wrap()
+                        ->toggleable(isToggledHiddenByDefault: true)
+                ]),
+                ColumnGroup::make('Pago', [
+                    TextColumn::make('monto')
+                        ->prefix('S/ ')
+                        ->sortable(),
+                    TextColumn::make('fecha_pago')
+                        ->date('d/m/Y')
+                        ->sortable(),
+                    TextColumn::make('observacion')
+                        ->wrap()
+                        ->lineClamp(3)
+                        ->searchable(isIndividual: true),
+                    TextColumn::make('detalle.nombre')
+                        ->numeric()
+                        ->sortable()
+                        ->searchable(isIndividual: true),
+                ]),
+                TextColumn::make('created_at')
+                    ->label('Fecha de creación')
+                    ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                TextColumn::make('updated_at')
+                    ->label('Fecha de edición')
+                    ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
-                //
+                ValueRangeFilter::make('monto'),
+                DateRangeFilter::make('fecha_pago'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -6,6 +6,7 @@ use App\Filament\Resources\TallerResource\Pages;
 use App\Filament\Resources\TallerResource\RelationManagers;
 use App\Models\Taller;
 use Filament\Forms;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -49,7 +50,7 @@ class TallerResource extends Resource
                     ->unique(ignoreRecord: true)
                     ->required()
                     ->maxLength(255),
-                TextInput::make('ubicacion')
+                Textarea::make('ubicacion')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -63,6 +64,8 @@ class TallerResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('ubicacion')
+                    ->wrap()
+                    ->lineClamp(3)
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
