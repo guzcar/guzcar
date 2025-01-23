@@ -15,6 +15,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
 class TrabajoPagoResource extends Resource
@@ -118,10 +119,11 @@ class TrabajoPagoResource extends Resource
                 DateRangeFilter::make('fecha_pago'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    ExportBulkAction::make(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
@@ -138,8 +140,8 @@ class TrabajoPagoResource extends Resource
     {
         return [
             'index' => Pages\ListTrabajoPagos::route('/'),
-            'create' => Pages\CreateTrabajoPago::route('/create'),
-            'edit' => Pages\EditTrabajoPago::route('/{record}/edit'),
+            // 'create' => Pages\CreateTrabajoPago::route('/create'),
+            // 'edit' => Pages\EditTrabajoPago::route('/{record}/edit'),
         ];
     }
 }

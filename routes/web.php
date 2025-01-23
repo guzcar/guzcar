@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TrabajoController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -42,4 +43,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'store'])->name('evidencias.store');
     Route::put('/trabajos/{trabajo}/evidencias/{evidencia}', [EvidenciaController::class, 'update'])->name('evidencias.update');
     Route::delete('/trabajos/{trabajo}/evidencias/{evidencia}', [EvidenciaController::class, 'destroy'])->name('evidencias.destroy');
+
+    // Editar perfil
+    Route::get('/profile/edit', [UserController::class, 'edit'])->name('user.edit');
+    Route::post('/profile/edit', [UserController::class, 'update'])->name('user.update');
+    Route::post('/profile/remove-avatar', [UserController::class, 'removeAvatar'])->name('user.remove-avatar');
 });

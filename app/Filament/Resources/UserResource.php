@@ -7,6 +7,7 @@ use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -22,6 +23,7 @@ use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\CheckboxColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\TrashedFilter;
@@ -77,17 +79,29 @@ class UserResource extends Resource
                                     ->minLength(8),
                             ])
                             ->heading('Información de Usuario')
-                            ->columnSpan(3),
-                        Section::make()
+                            ->columnSpan(['xl' => 2, 'lg' => 2, 'md' => 1, 'sm' => 1]),
+                        Grid::make()
                             ->schema([
-                                CheckboxList::make('roles')
-                                    ->relationship('roles', 'name')
-                                    ->searchable(),
+                                Section::make()
+                                    ->schema([
+                                        FileUpload::make('avatar_url')
+                                            ->label('')
+                                            ->directory('avatar')
+                                            ->avatar()
+                                            ->alignCenter()
+                                    ])
+                                    ->heading('Avatar'),
+                                Section::make()
+                                    ->schema([
+                                        CheckboxList::make('roles')
+                                            ->relationship('roles', 'name')
+                                            ->searchable(),
+                                    ])
+                                    ->heading('Roles'),
                             ])
-                            ->heading('Roles')
-                            ->columnSpan(2),
+                            ->columnSpan(['xl' => 1, 'lg' => 1, 'md' => 1, 'sm' => 1]),
                     ])
-                    ->columns(5),
+                    ->columns(['xl' => 3, 'lg' => 3, 'md' => 1, 'sm' => 1]),
             ]);
     }
 
@@ -101,6 +115,10 @@ class UserResource extends Resource
                 TextColumn::make('email')
                     ->label('Correo electrónico')
                     ->searchable(),
+                ImageColumn::make('avatar_url')
+                    ->label('Avatar')
+                    ->circular()
+                    ->alignCenter(),
                 ToggleColumn::make('is_admin')
                     ->label('Administrativo')
                     ->onIcon('heroicon-s-user')

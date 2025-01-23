@@ -29,9 +29,19 @@
                 <li><hr class="dropdown-divider" /></li>
                 --}}
                 <li>
-                    <form  action="{{ route('logout') }}" method="POST">
+                    <a class="dropdown-item" href="{{ route('user.edit') }}">
+                        <i class="fa-solid fa-circle-user me-2 text-secondary"></i>
+                        {{ auth()->user()->name }}
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                    <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button class="dropdown-item" type="submit">Cerrar Sesión</button>
+                        <button class="dropdown-item" type="submit">
+                            <i class="fa-solid fa-right-from-bracket me-2 text-secondary"></i>
+                            Cerrar Sesión
+                        </button>
                     </form>
                 </li>
             </ul>
