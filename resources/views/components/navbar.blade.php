@@ -9,7 +9,7 @@
         <li class="nav-item dropdown">
             <a class="" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 @if(auth()->user()->getFilamentAvatarUrl())
-                    <img src="{{ auth()->user()->getFilamentAvatarUrl() }}" alt="Perfil" class="rounded-circle" width="32" height="32">
+                    <img src="{{ auth()->user()->getFilamentAvatarUrl() }}" alt="Perfil" class="rounded-circle" width="32" height="32" style="object-fit: cover;">
                 @else
                     @php
                         $nameParts = explode(' ', auth()->user()->name);
