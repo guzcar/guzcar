@@ -117,6 +117,15 @@ class UserResource extends Resource
                     ->searchable(),
                 ImageColumn::make('avatar_url')
                     ->label('Avatar')
+                    ->defaultImageUrl(function ($record) {
+                        $nameParts = explode(' ', $record->name);
+                        $initials = '';
+                        foreach ($nameParts as $part) {
+                            $initials .= strtoupper(substr($part, 0, 1)) . ' ';
+                        }
+                        $initials = rtrim($initials);
+                        return 'https://ui-avatars.com/api/?name=' . urlencode($initials) . '&background=09090b&color=ffffff';
+                    })
                     ->circular()
                     ->alignCenter(),
                 ToggleColumn::make('is_admin')
