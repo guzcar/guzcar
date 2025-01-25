@@ -1,7 +1,7 @@
 <nav class="sb-sidenav accordion sb-sidenav-light shadow-sm" id="sidenavAccordion">
     <div class="sb-sidenav-menu">
         <div class="nav">
-            <div class="sb-sidenav-menu-heading"></div>
+            <div class="sb-sidenav-menu-heading py-2"></div>
             <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
                 <div class="sb-nav-link-icon"><i class="fa-solid fa-house"></i></div>
                 Inicio

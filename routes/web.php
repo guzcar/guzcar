@@ -47,5 +47,6 @@ Route::middleware(['auth'])->group(function () {
     // Editar perfil
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::post('/profile/edit', [UserController::class, 'update'])->name('user.update');
+    Route::post('/profile/add-avatar', [UserController::class,'addAvatar'])->name('user.add-avatar');
     Route::post('/profile/remove-avatar', [UserController::class, 'removeAvatar'])->name('user.remove-avatar');
 });
