@@ -1,20 +1,62 @@
 <x-layout>
 
-    <form id="miFormulario" action="{{ route('user.update') }}" method="POST" enctype="multipart/form-data">
+    @if (session('success'))
+        <div class="alert alert-light alert-dismissible border shadow-sm fade show">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
-        @csrf
+    <div class="row">
 
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    Avatar
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        @if(auth()->user()->getFilamentAvatarUrl())
+                            <img id="profile-preview" src="{{ auth()->user()->getFilamentAvatarUrl() }}" alt="Perfil"
+                                class="rounded-circle" width="120" height="120" style="object-fit: cover;">
+                        @else
+                            @php
+                                $nameParts = explode(' ', auth()->user()->name);
+                                $initials = '';
+                                foreach ($nameParts as $part) {
+                                    $initials .= strtoupper(substr($part, 0, 1)) . ' ';
+                                }
+                                $initials = rtrim($initials);
+                            @endphp
+                            <img id="profile-preview"
+                                src="https://ui-avatars.com/api/?name={{ urlencode($initials) }}&background=09090b&color=ffffff"
+                                alt="Perfil" class="rounded-circle" width="120" height="120" style="object-fit: cover;">
+                        @endif
+                    </div>
+                    <form action="{{ route('user.add-avatar') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3 text-center">
+                            <input type="file" id="avatar_url" name="avatar_url"
+                                class="form-control @error('avatar_url') is-invalid @enderror" accept="image/*"
+                                onchange="previewImage(event)">
+                            @error('avatar_url')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-3">Guardar Imagen</button>
+                    </form>
+                    <form action="{{ route('user.remove-avatar') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-light border w-100">Eliminar Imagen</button>
+                    </form>
+                </div>
             </div>
-        @endif
+        </div>
 
-        <div class="row">
-
-            <div class="col-md-8 mb-3">
-                <div class="card">
+        <div class="col-md-8">
+            <form action="{{ route('user.update') }}" method="POST">
+                @csrf
+                <div class="card shadow-sm">
                     <div class="card-header">
                         Editar Perfil
                     </div>
@@ -66,51 +108,12 @@
                         </div>
                     </div>
                     <div class="card-footer text-end">
-                        <button type="submit" class="btn btn-primary" id="boton2"
-                            onclick="setAction('{{ route('user.update') }}')">Guardar Cambios</button>
+                        <button type="submit" class="btn btn-primary">Actualizar Perfil</button>
                     </div>
                 </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        Avatar
-                    </div>
-                    <div class="card-body text-center">
-                        <div class="mb-3">
-                            @if(auth()->user()->getFilamentAvatarUrl())
-                                <img id="profile-preview" src="{{ auth()->user()->getFilamentAvatarUrl() }}" alt="Perfil"
-                                    class="rounded-circle" width="120" height="120" style="object-fit: cover;">
-                            @else
-                                @php
-                                    $nameParts = explode(' ', auth()->user()->name);
-                                    $initials = '';
-                                    foreach ($nameParts as $part) {
-                                        $initials .= strtoupper(substr($part, 0, 1)) . ' ';
-                                    }
-                                    $initials = rtrim($initials);
-                                @endphp
-                                <img id="profile-preview"
-                                    src="https://ui-avatars.com/api/?name={{ urlencode($initials) }}&background=09090b&color=ffffff"
-                                    alt="Perfil" class="rounded-circle" width="120" height="120" style="object-fit: cover;">
-                            @endif
-                        </div>
-                        <div class="mb-3 text-center">
-                            <input type="file" id="avatar_url" name="avatar_url"
-                                class="form-control @error('avatar_url') is-invalid @enderror" accept="image/*"
-                                onchange="previewImage(event)">
-                            @error('avatar_url')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <button type="submit" class="btn btn-light border w-100" id="boton1"
-                            onclick="setAction('{{ route('user.remove-avatar') }}')">Eliminar Imagen</button>
-                    </div>
-                </div>
-            </div>
+            </form>
         </div>
-    </form>
+    </div>
 
     @push('scripts')
         <script>
@@ -123,9 +126,6 @@
                     }
                 };
                 reader.readAsDataURL(event.target.files[0]);
-            }
-            function setAction(action) {
-                document.getElementById('miFormulario').action = action;
             }
         </script>
     @endpush
