@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('articulos', function (Blueprint $table) {
             $table->id();
             $table->string('marca');
-            $table->strinf('tamano_presentacion');
+            $table->string('tamano_presentacion');
             $table->text('descripcion')->nullable();
             $table->decimal('precio');
             $table->foreignId('sub_categoria_id')
