@@ -15,26 +15,26 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::create([
-            'name' => 'Admin',
+            'name' => 'Administrador',
             'email' => 'admin@guzcar.com.pe',
             'password' => Hash::make('123456789'),
             'is_admin' => true,
         ]);
 
         User::create([
-            'name' => 'Miluska',
+            'name' => 'Miluska Ygnacio',
             'email' => 'miluska@guzcar.com.pe',
             'password' => Hash::make('123456789'),
         ]);
 
         User::create([
-            'name' => 'Nataly',
+            'name' => 'Nataly Guzman',
             'email' => 'nataly@guzcar.com.pe',
             'password' => Hash::make('123456789'),
         ]);
 
         User::create([
-            'name' => 'Elard',
+            'name' => 'Elard Guzman',
             'email' => 'elard@guzcar.com.pe',
             'password' => Hash::make('123456789'),
         ]);
@@ -58,20 +58,20 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'name' => 'Yahir',
+            'name' => 'Yahir Alcantara',
             'email' => 'yahir@guzcar.com.pe',
             'password' => Hash::make('123456789'),
         ]);
 
         User::create([
-            'name' => 'Jose',
+            'name' => 'Jose Guevara',
             'email' => 'jose@guzcar.com.pe',
             'password' => Hash::make('123456789'),
         ]);
 
         User::create([
-            'name' => 'Cristofer',
-            'email' => 'cristofer@guzcar.com.pe',
+            'name' => 'Daniel Rojas',
+            'email' => 'daniel@guzcar.com.pe',
             'password' => Hash::make('123456789'),
         ]);
     }

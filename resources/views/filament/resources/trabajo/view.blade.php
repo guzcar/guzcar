@@ -206,9 +206,9 @@
                                 class="w-full h-48 object-cover rounded-lg transition-transform transform hover:scale-105">
                         </a>
                     @elseif ($evidencia->tipo === 'video')
-                        <video controls class="w-full h-48 rounded-lg">
-                            <source src="{{ Storage::url($evidencia->evidencia_url) }}" type="video/mp4">
-                            Tu navegador no soporta videos.
+                        <video controls="controls" preload="auto" class="w-full h-48 rounded-lg" name="media"
+                            src="{{ Storage::url($evidencia->evidencia_url) }}"
+                            type="video/mp4">
                         </video>
                     @endif
                     <div class="pt-4">

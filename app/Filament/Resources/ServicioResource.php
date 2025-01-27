@@ -46,6 +46,7 @@ class ServicioResource extends Resource
                     ->maxLength(255),
                 TextInput::make('costo')
                     ->numeric()
+                    ->required()
                     ->prefix('S/ ')
                     ->maxValue(42949672.95),
             ]);
