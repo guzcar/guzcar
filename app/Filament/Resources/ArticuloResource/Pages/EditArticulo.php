@@ -24,9 +24,13 @@ class EditArticulo extends EditRecord
         $articulo = $this->getRecord();
 
         $subCategoria = $articulo->subCategoria;
+        $ubicacion = $articulo->ubicacion;
 
         $data['sub_categoria_id'] = $articulo->sub_categoria_id;
         $data['categoria_id'] = $subCategoria->categoria_id;
+
+        $data['ubicacion_id'] = $articulo->ubicacion_id;
+        $data['almacen_id'] = $ubicacion->almacen_id;
 
         $this->fillFormWithDataAndCallHooks($articulo, $data);
     }

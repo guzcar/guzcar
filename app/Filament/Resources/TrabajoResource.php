@@ -120,6 +120,7 @@ class TrabajoResource extends Resource
                                                         TextInput::make('nombre')
                                                             ->required()
                                                             ->maxLength(255),
+                                                        PhoneInput::make('telefono')
                                                     ])
                                                     ->createOptionUsing(function (array $data): int {
                                                         return Cliente::create($data)->getKey();
@@ -133,6 +134,7 @@ class TrabajoResource extends Resource
                                                         TextInput::make('nombre')
                                                             ->required()
                                                             ->maxLength(255),
+                                                        PhoneInput::make('telefono')
                                                     ])
                                                     ->getOptionLabelUsing(function ($value): ?string {
                                                         $cliente = Cliente::withTrashed()->find($value);
@@ -362,6 +364,7 @@ class TrabajoResource extends Resource
                                                 TextInput::make('costo')
                                                     ->numeric()
                                                     ->prefix('S/ ')
+                                                    ->required()
                                                     ->maxValue(42949672.95),
                                             ])
                                             ->createOptionUsing(function (array $data): int {

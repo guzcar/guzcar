@@ -15,10 +15,16 @@ class Articulo extends Model
         'descripcion',
         'precio',
         'sub_categoria_id',
+        'ubicacion_id',
     ];
 
     public function subCategoria()
     {
         return $this->belongsTo(SubCategoria::class);
+    }
+
+    public function ubicacion()
+    {
+        return $this->belongsTo(Ubicacion::class);
     }
 }
