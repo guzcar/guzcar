@@ -12,7 +12,7 @@ class EvidenciaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_evidencia') || $user->can('update_trabajo');
+        return $user->can('view_any_evidencia');
     }
 
     /**
@@ -20,7 +20,7 @@ class EvidenciaPolicy
      */
     public function view(User $user, Evidencia $evidencia): bool
     {
-        return $user->can('view_evidencia') || $user->can('update_trabajo');
+        return $user->can('view_evidencia');
     }
 
     /**
@@ -28,7 +28,7 @@ class EvidenciaPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_evidencia') || $user->can('update_trabajo');
+        return $user->can('create_evidencia');
     }
 
     /**
@@ -36,7 +36,7 @@ class EvidenciaPolicy
      */
     public function update(User $user, Evidencia $evidencia): bool
     {
-        return $user->can('update_evidencia') || $user->can('update_trabajo');
+        return $user->can('update_evidencia');
     }
 
     /**
@@ -44,7 +44,7 @@ class EvidenciaPolicy
      */
     public function delete(User $user, Evidencia $evidencia): bool
     {
-        return $user->can('delete_evidencia') || $user->can('update_trabajo');
+        return $user->can('delete_evidencia');
     }
 
     /**
@@ -52,7 +52,7 @@ class EvidenciaPolicy
      */
     public function restore(User $user, Evidencia $evidencia): bool
     {
-        return $user->can('restore_evidencia') || $user->can('update_trabajo');
+        return $user->can('restore_evidencia');
     }
 
     /**
@@ -60,6 +60,6 @@ class EvidenciaPolicy
      */
     public function forceDelete(User $user, Evidencia $evidencia): bool
     {
-        return $user->can('force_delete_evidencia') || $user->can('update_trabajo');
+        return $user->can('force_delete_evidencia');
     }
 }

@@ -22,9 +22,9 @@ class CategoriaResource extends Resource
 {
     protected static ?string $model = Categoria::class;
 
-    protected static ?string $navigationGroup = 'Logística';
+    protected static ?string $navigationGroup = 'Configuración';
 
-    protected static ?int $navigationSort = 0;
+    protected static ?int $navigationSort = 200;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -32,7 +32,7 @@ class CategoriaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Categorías';
 
-    protected static ?string $navigationLabel = 'Categorías';
+    protected static ?string $navigationLabel = 'Categorías de artículos';
 
     public static function form(Form $form): Form
     {

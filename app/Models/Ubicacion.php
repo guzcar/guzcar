@@ -5,15 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SubCategoria extends Model
+class Ubicacion extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre', 'categoria_id'];
+    protected $table = 'ubicaciones';
 
-    public function categoria()
+    protected $fillable = ['nombre', 'almacen_id'];
+
+    public function almacen()
     {
-        return $this->belongsTo(Categoria::class);
+        return $this->belongsTo(Almacen::class);
     }
 
     public function articulos()
