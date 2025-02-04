@@ -15,7 +15,6 @@ class Articulo extends Model
         'descripcion',
         'precio',
         'sub_categoria_id',
-        'ubicacion_id',
     ];
 
     public function subCategoria()
@@ -23,8 +22,8 @@ class Articulo extends Model
         return $this->belongsTo(SubCategoria::class);
     }
 
-    public function ubicacion()
+    public function ubicaciones()
     {
-        return $this->belongsTo(Ubicacion::class);
+        return $this->hasMany(ArticuloUbicacion::class, 'articulo_id');
     }
 }

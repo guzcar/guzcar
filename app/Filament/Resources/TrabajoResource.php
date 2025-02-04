@@ -10,6 +10,8 @@ use App\Models\Cliente;
 use App\Models\Servicio;
 use App\Models\Trabajo;
 use App\Models\User;
+use Carbon\Carbon;
+use DateTime;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -22,8 +24,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\ActionSize;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -216,25 +220,25 @@ class TrabajoResource extends Resource
                                 Select::make('taller_id')
                                     ->relationship('taller', 'nombre')
                                     ->preload()
-                                    ->required()
-                                    ->createOptionForm([
-                                        TextInput::make('nombre')
-                                            ->unique(ignoreRecord: true)
-                                            ->required()
-                                            ->maxLength(255),
-                                        TextInput::make('ubicacion')
-                                            ->required()
-                                            ->maxLength(255),
-                                    ])
-                                    ->editOptionForm([
-                                        TextInput::make('nombre')
-                                            ->unique(ignoreRecord: true)
-                                            ->required()
-                                            ->maxLength(255),
-                                        TextInput::make('ubicacion')
-                                            ->required()
-                                            ->maxLength(255),
-                                    ]),
+                                    ->required(),
+                                // ->createOptionForm([
+                                //     TextInput::make('nombre')
+                                //         ->unique(ignoreRecord: true)
+                                //         ->required()
+                                //         ->maxLength(255),
+                                //     TextInput::make('ubicacion')
+                                //         ->required()
+                                //         ->maxLength(255),
+                                // ])
+                                // ->editOptionForm([
+                                //     TextInput::make('nombre')
+                                //         ->unique(ignoreRecord: true)
+                                //         ->required()
+                                //         ->maxLength(255),
+                                //     TextInput::make('ubicacion')
+                                //         ->required()
+                                //         ->maxLength(255),
+                                // ]),
                                 DatePicker::make('fecha_ingreso')
                                     ->default(now())
                                     ->required(),
@@ -319,7 +323,15 @@ class TrabajoResource extends Resource
                                                     ->required()
                                             )
                                     ])
-                                    ->heading('Mecánicos'),
+                                    ->heading('Mecánicos')
+                                    ->hidden(function () {
+                                        $user = auth()->user();
+                                        return !(
+                                            $user->can('create_user') &&
+                                            $user->can('update_user') &&
+                                            $user->can('delete_user')
+                                        );
+                                    }),
                                 Section::make()
                                     ->schema([
                                         Repeater::make('archivos')
@@ -331,7 +343,8 @@ class TrabajoResource extends Resource
                                                     ->required()
                                             )
                                     ])
-                                    ->heading('Archivos'),
+                                    ->heading('Archivos')
+                                    ->hidden(true),
                             ])
                             ->columnspan(1)
                             ->columns(1),
@@ -419,7 +432,16 @@ class TrabajoResource extends Resource
                                     ->columns(5)
                                     ->hiddenLabel()
                             ])
-                            ->heading('Servicios ejecutados'),
+                            ->heading('Servicios ejecutados')
+                            ->hidden(function () {
+                                $user = auth()->user();
+                                return !(
+                                    $user->can('create_servicio') &&
+                                    $user->can('update_servicio') &&
+                                    $user->can('delete_servicio')
+                                );
+                            })
+                            ->hiddenOn('create'),
                     ])
                     ->columns(2),
             ]);
@@ -444,6 +466,8 @@ class TrabajoResource extends Resource
                 TextColumn::make('vehiculo.modelo')
                     ->placeholder('Sin Modelo')
                     ->label('Modelo')
+                    ->wrap()
+                    ->lineClamp(2)
                     ->sortable()
                     ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -485,7 +509,7 @@ class TrabajoResource extends Resource
                     ->label('Fecha salida')
                     ->state(function ($record) {
                         return $record->fecha_salida
-                            ? $record->fecha_salida
+                            ? Carbon::parse($record->fecha_salida)->format('d/m/Y')
                             : $record->taller->nombre;
                     }),
                 SelectColumn::make('desembolso')
@@ -593,7 +617,8 @@ class TrabajoResource extends Resource
                             ->title('El trabajo ha sido marcado como terminado.')
                             ->success()
                             ->send();
-                    }),
+                    })
+                    ->button(),
                 Action::make('reabrir')
                     ->label('Reabrir')
                     ->color('warning')
@@ -609,12 +634,24 @@ class TrabajoResource extends Resource
                             ->title('El trabajo ha sido reabierto.')
                             ->success()
                             ->send();
-                    }),
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
-                RestoreAction::make(),
-                ForceDeleteAction::make(),
+                    })
+                    ->button(),
+                ActionGroup::make([
+                    Action::make('Descargar')
+                        ->icon('heroicon-s-arrow-down-tray')
+                        ->url(
+                            fn(Trabajo $trabajo): string => route('trabajo.pdf.report', ['trabajo' => $trabajo]),
+                            shouldOpenInNewTab: true
+                        ),
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                    RestoreAction::make(),
+                    ForceDeleteAction::make(),
+                ])
+                    ->color('gray')
+                    ->size(ActionSize::Small)
+                    ->button(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

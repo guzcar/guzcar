@@ -2,38 +2,33 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TrabajoPagoResource\Pages;
-use App\Filament\Resources\TrabajoPagoResource\RelationManagers;
-use App\Models\TrabajoPago;
+use App\Filament\Resources\EvidenciaResource\Pages;
+use App\Filament\Resources\EvidenciaResource\RelationManagers;
+use App\Models\Evidencia;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ColumnGroup;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
-class TrabajoPagoResource extends Resource
+class EvidenciaResource extends Resource
 {
-    protected static ?string $model = TrabajoPago::class;
+    protected static ?string $model = Evidencia::class;
 
     protected static ?string $navigationGroup = 'Histórico';
 
-    protected static ?int $navigationSort = 51;
+    protected static ?int $navigationSort = 55;
 
-    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
-
-    protected static ?string $modelLabel = 'Pago';
-
-    protected static ?string $pluralModelLabel = 'Pagos';
-
-    protected static ?string $navigationLabel = 'Pagos';
+    protected static ?string $navigationIcon = 'heroicon-o-camera';
 
     public static function form(Form $form): Form
     {
@@ -42,18 +37,16 @@ class TrabajoPagoResource extends Resource
                 Forms\Components\TextInput::make('trabajo_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('monto')
-                    ->prefix('S/ ')
+                Forms\Components\TextInput::make('user_id')
                     ->required()
                     ->numeric(),
-                Forms\Components\DatePicker::make('fecha_pago')
+                FileUpload::make('evidencia_url')
+                    ->directory('evidencia')
                     ->required(),
-                Forms\Components\TextInput::make('observacion')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('detalle_id')
-                    ->relationship('detalle', 'id')
+                Forms\Components\TextInput::make('tipo')
                     ->required(),
+                Forms\Components\Textarea::make('observacion')
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -87,28 +80,18 @@ class TrabajoPagoResource extends Resource
                         ->wrap()
                         ->toggleable(isToggledHiddenByDefault: true)
                 ]),
-                ColumnGroup::make('Trabajo', [
-                    TextColumn::make('trabajo.fecha_ingreso')
-                        ->label('Fecha de Ingreso'),
-                    TextColumn::make('trabajo.fecha_salida')
-                        ->label('Fecha de Salida')
-                        ->placeholder('Sin Salida'),
-                ]),
-                ColumnGroup::make('Pago', [
-                    TextColumn::make('monto')
-                        ->prefix('S/ ')
-                        ->sortable(),
-                    TextColumn::make('fecha_pago')
-                        ->date('d/m/Y')
-                        ->sortable(),
+                ColumnGroup::make('Evidencia', [
+                    ImageColumn::make('evidencia_url')
+                        ->label('Archivo')
+                        ->alignCenter()
+                        ->verticallyAlignCenter(),
+                    TextColumn::make('user.name')
+                        ->label('Subido por')
+                        ->searchable(),
                     TextColumn::make('observacion')
+                        ->label('Observación')
                         ->wrap()
-                        ->lineClamp(3)
-                        ->searchable(isIndividual: true),
-                    TextColumn::make('detalle.nombre')
-                        ->numeric()
-                        ->sortable()
-                        ->searchable(isIndividual: true),
+                        ->lineClamp(3),
                 ]),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
@@ -121,18 +104,16 @@ class TrabajoPagoResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('created_at', 'desc')
             ->filters([
-                ValueRangeFilter::make('monto'),
-                DateRangeFilter::make('fecha_pago'),
+                //
             ])
             ->actions([
-                ViewAction::make(),
                 // Tables\Actions\EditAction::make(),
+                ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    ExportBulkAction::make(),
+                    ExportBulkAction::make()
                 ]),
             ]);
     }
@@ -147,10 +128,10 @@ class TrabajoPagoResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTrabajoPagos::route('/'),
-            // 'create' => Pages\CreateTrabajoPago::route('/create'),
-            'view' => Pages\ViewTrabajoPago::route('/{record}'),
-            // 'edit' => Pages\EditTrabajoPago::route('/{record}/edit'),
+            'index' => Pages\ListEvidencias::route('/'),
+            // 'create' => Pages\CreateEvidencia::route('/create'),
+            'view' => Pages\ViewEvidencia::route('/{record}'),
+            // 'edit' => Pages\EditEvidencia::route('/{record}/edit'),
         ];
     }
 }

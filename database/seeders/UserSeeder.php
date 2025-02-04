@@ -16,62 +16,56 @@ class UserSeeder extends Seeder
     {
         User::create([
             'name' => 'Administrador',
-            'email' => 'admin@guzcar.com.pe',
+            'email' => 'admin@guzcar.com',
             'password' => Hash::make('123456789'),
             'is_admin' => true,
         ]);
 
         User::create([
             'name' => 'Miluska Ygnacio',
-            'email' => 'miluska@guzcar.com.pe',
+            'email' => 'miluska@guzcar.com',
             'password' => Hash::make('123456789'),
         ]);
 
         User::create([
             'name' => 'Nataly Guzman',
-            'email' => 'nataly@guzcar.com.pe',
+            'email' => 'nataly@guzcar.com',
             'password' => Hash::make('123456789'),
         ]);
 
         User::create([
             'name' => 'Elard Guzman',
-            'email' => 'elard@guzcar.com.pe',
-            'password' => Hash::make('123456789'),
-        ]);
-
-        User::create([
-            'name' => 'Elias',
-            'email' => 'elias@guzcar.com.pe',
+            'email' => 'elard@guzcar.com',
             'password' => Hash::make('123456789'),
         ]);
 
         User::create([
             'name' => 'Moises',
-            'email' => 'moises@guzcar.com.pe',
+            'email' => 'moises@guzcar.com',
             'password' => Hash::make('123456789'),
         ]);
 
         User::create([
             'name' => 'Jauregui',
-            'email' => 'jauregui@guzcar.com.pe',
+            'email' => 'jauregui@guzcar.com',
             'password' => Hash::make('123456789'),
         ]);
 
         User::create([
             'name' => 'Yahir Alcantara',
-            'email' => 'yahir@guzcar.com.pe',
+            'email' => 'yahir@guzcar.com',
             'password' => Hash::make('123456789'),
         ]);
 
         User::create([
             'name' => 'Jose Guevara',
-            'email' => 'jose@guzcar.com.pe',
+            'email' => 'jose@guzcar.com',
             'password' => Hash::make('123456789'),
         ]);
 
         User::create([
             'name' => 'Daniel Rojas',
-            'email' => 'daniel@guzcar.com.pe',
+            'email' => 'daniel@guzcar.com',
             'password' => Hash::make('123456789'),
         ]);
     }

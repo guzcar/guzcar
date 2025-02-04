@@ -18,7 +18,7 @@
                     <tbody id="tablaVehiculos">
                         @forelse ($trabajos as $trabajo)
                             <tr class="vehiculo">
-                                <td class="px-0">
+                                <td class="px-0" style="max-width: 150px">
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item px-2 py-1" style="background-color: transparent"><b>{{ $trabajo->vehiculo->placa ?? 'N/A' }}</b></li>
                                         <li class="list-group-item px-2 py-1" style="background-color: transparent">{{ $trabajo->vehiculo->marca }}</li>

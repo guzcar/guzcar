@@ -149,7 +149,9 @@ class VehiculoResource extends Resource
                     ->sortable(),
                 TextColumn::make('modelo')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->wrap()
+                    ->lineClamp(2),
                 TextColumn::make('color')
                     ->searchable()
                     ->sortable(),

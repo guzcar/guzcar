@@ -11,6 +11,7 @@ use App\Models\SubCategoria;
 use App\Models\Ubicacion;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -92,29 +93,54 @@ class ArticuloResource extends Resource
                             ->columnSpan(['xl' => 3, 'lg' => 3, 'md' => 1, 'sm' => 1]),
                         Section::make()
                             ->schema([
-                                Select::make('almacen_id')
-                                    ->required()
-                                    ->searchable()
-                                    ->preload()
-                                    ->label('Almacén')
-                                    ->options(Almacen::all()->pluck('nombre', 'id'))
-                                    ->reactive()
-                                    ->afterStateUpdated(fn($state, callable $set) => $set('ubicacion_id', null)),
-                                Select::make('ubicacion_id')
-                                    ->required()
-                                    ->label('Ubicación')
-                                    ->placeholder('')
-                                    ->searchable()
-                                    ->options(function ($get) {
-                                        $almacenId = $get('almacen_id');
-                                        if ($almacenId) {
-                                            return Ubicacion::where('almacen_id', $almacenId)
-                                                ->pluck('nombre', 'id')
-                                                ->toArray();
-                                        }
-                                        return [];
-                                    })
-                                    ->disabled(fn($get) => !$get('almacen_id'))
+                                Repeater::make('ubicaciones')
+                                    ->relationship('ubicaciones')
+                                    // ->defaultItems(0)
+                                    ->schema([
+                                        Select::make('almacen_id')
+                                            ->required()
+                                            ->searchable()
+                                            ->preload()
+                                            ->label('Almacén')
+                                            ->options(Almacen::all()->pluck('nombre', 'id'))
+                                            ->reactive()
+                                            ->afterStateUpdated(fn($state, callable $set) => $set('ubicacion_id', null)),
+                                        Select::make('ubicacion_id')
+                                            ->required()
+                                            ->label('Ubicación')
+                                            ->placeholder('')
+                                            ->searchable()
+                                            ->options(function ($get) {
+                                                $almacenId = $get('almacen_id');
+                                                if ($almacenId) {
+                                                    return Ubicacion::where('almacen_id', $almacenId)
+                                                        ->pluck('nombre', 'id')
+                                                        ->toArray();
+                                                }
+                                                return [];
+                                            })
+                                            ->disabled(fn($get) => !$get('almacen_id')),
+                                    ])
+                                    // ->mutateRelationshipDataBeforeFillUsing(function (array $data): array {
+                                    //     $data['almacen_id'] = '2';
+                                    //     $data['ubicacion_id'] = '5';
+                                    //     // dd($data);
+                                    //     return $data;
+                                    // })
+                                    // ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                                    //     // $data['ubicaciones'] = [
+                                    //     //     [
+                                    //     //         'almacen_id' => 1,
+                                    //     //         'ubicacion_id' => 10,
+                                    //     //     ],
+                                    //     //     [
+                                    //     //         'almacen_id' => 2,
+                                    //     //         'ubicacion_id' => 20,
+                                    //     //     ],
+                                    //     // ];
+                                    //     // dd($data);
+                                    //     return $data;
+                                    // }),
                             ])
                             ->columnSpan(['xl' => 2, 'lg' => 2, 'md' => 1, 'sm' => 1]),
                     ])

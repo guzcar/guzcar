@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proforma {{ $trabajo->vehiculo->placa }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 80px 80px 0px 80px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+
+        header {
+            position: fixed;
+            top: -55px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            text-align: center;
+        }
+
+        .header-logo {
+            position: absolute;
+            width: 60px;
+        }
+
+        .header-title {
+            color: rgb(0, 80, 150);
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .header-date {
+            text-align: right;
+            margin-top: -18px;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .footer-line {
+            border-top: 2px solid rgb(180, 0, 0);
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .footer-text {
+            color: rgb(0, 80, 150);
+        }
+
+        .watermark {
+            position: fixed;
+            width: 450px;
+            top: 45%;
+            left: 42.5%;
+            transform: translate(-50%, -50%);
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .content {
+            text-align: justify;
+            margin-bottom: 50px;
+        }
+
+        .table-container {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-container th,
+        .table-container td {
+            padding: 1px 3px;
+            border: 1px solid #000;
+        }
+
+        .table-container th {
+            background-color: rgb(180, 198, 231);
+        }
+
+        .empty-case {
+            padding: 0.5rem !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <img src="{{ public_path('images/logo-kia.jpg') }}" class="header-logo">
+        <div class="header-title">AUTOMOTORES GUZCAR S.A.C.</div>
+        <p class="header-date">{{ date('d/m/Y') }}</p>
+    </header>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-line"></div>
+        <div class="footer-text">PROLG. LEONCIO PRADO 1575 - PJ. MIRAMAR ALTO</div>
+        <div class="footer-text">ENTEL. 998248543 - CHIMBOTE</div>
+    </footer>
+
+    <!-- MARCA DE AGUA -->
+    <img src="{{ public_path('images/logo-kia.jpg') }}" class="watermark">
+
+    <!-- CONTENIDO -->
+    <div class="content">
+
+        <h3 style="margin-top: 0">PROFORMA</h3>
+
+        <!-- Tabla Principal para alinear Vehículo y Cliente en una línea -->
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <!-- Columna Vehículo -->
+                <td style="width: 50%; vertical-align: top; padding-right: 0.5rem">
+                    <table class="table-container">
+                        <thead>
+                            <tr>
+                                <th colspan="2">VEHÍCULO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="width: 50px">Placa</td>
+                                <td>{{ $vehiculo->placa }}</td>
+                            </tr>
+                            <tr>
+                                <td>Marca</td>
+                                <td>{{ $vehiculo->marca }}</td>
+                            </tr>
+                            <tr>
+                                <td>Modelo</td>
+                                <td>{{ $vehiculo->modelo }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+
+                <!-- Columna Clientes -->
+                <td style="width: 50%; vertical-align: top;">
+                    <table class="table-container">
+                        <thead>
+                            <tr>
+                                <th colspan="3">CLIENTES</th>
+                            </tr>
+                            <tr>
+                                <th style="width: 100px;">RUC / DNI</th>
+                                <th style="width: 120px;">Nombre</th>
+                                <th style="width: 100px;">Contacto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($vehiculo->clientes as $cliente)
+                                <tr>
+                                    <td>{{ $cliente->identificador }}</td>
+                                    <td>{{ $cliente->nombre }}</td>
+                                    <td>{{ $cliente->telefono }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td class="empty-case"></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <h3>SERVICIOS EJECUTADOS</h3>
+
+        <table class="table-container">
+            <thead>
+                <tr>
+                    <th>Servicio</th>
+                    <th style="width: 90px">Costo</th>
+                    <th style="width: 90px">Cantidad</th>
+                    <th style="width: 90px">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($trabajo->servicios as $trabajoServicio)
+                    <tr>
+                        <td>{{ $trabajoServicio->servicio->nombre }}</td>
+                        <td style="text-align: right">S/ {{ $trabajoServicio->precio }}</td>
+                        <td style="text-align: center">{{ $trabajoServicio->cantidad }}</td>
+                        <td style="text-align: right">S/
+                            {{ number_format($trabajoServicio->cantidad * $trabajoServicio->precio, 2) }}
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td class="empty-case"></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                @endforelse
+                <tr>
+                    <td colspan="3" style="border: 0"></td>
+                    <td style="text-align: right"><b>S/ {{ number_format($subtotal_servicios, 2) }}</b></td>
+                </tr>
+            </tbody>
+        </table>
+        <p>Tiempo de ejecución: <strong>{{ $tiempo }}</strong></p>
+    </div>
+
+</body>
+
+</html>

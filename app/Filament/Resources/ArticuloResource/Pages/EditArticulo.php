@@ -22,16 +22,43 @@ class EditArticulo extends EditRecord
         $data = $this->getRecord()->attributesToArray();
 
         $articulo = $this->getRecord();
-
         $subCategoria = $articulo->subCategoria;
-        $ubicacion = $articulo->ubicacion;
+        $articuloUbicaciones = $articulo->ubicaciones()->with('ubicacion.almacen')->get();
 
         $data['sub_categoria_id'] = $articulo->sub_categoria_id;
         $data['categoria_id'] = $subCategoria->categoria_id;
-
-        $data['ubicacion_id'] = $articulo->ubicacion_id;
-        $data['almacen_id'] = $ubicacion->almacen_id;
+        
+        $data['ubicaciones'] = [
+            [
+                'almacen_id' => 1,
+                'ubicacion_id' => 10,
+            ],
+            [
+                'almacen_id' => 2,
+                'ubicacion_id' => 20,
+            ],
+        ];
 
         $this->fillFormWithDataAndCallHooks($articulo, $data);
     }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['ubicaciones'] = [
+            [
+                'almacen_id' => 1,
+                'ubicacion_id' => 10,
+            ],
+            [
+                'almacen_id' => 2,
+                'ubicacion_id' => 20,
+            ],
+        ];
+        return $data;
+    }
+
+    // protected function mutateFormDataBeforeFill(array $data): array
+    // {
+    //     dd($data);
+    // }
 }

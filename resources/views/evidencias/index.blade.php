@@ -9,25 +9,25 @@
     <ul class="list-group mb-3">
     <li class="list-group-item">
         <div class="d-flex">
-            <span class="fw-bold" style="width: 100px;">Marca</span>
+            <span class="fw-bold" style="min-width: 100px;">Marca</span>
             <span>{{ $trabajo->vehiculo->marca }}</span>
         </div>
     </li>
     <li class="list-group-item">
         <div class="d-flex">
-            <span class="fw-bold" style="width: 100px;">Modelo</span>
+            <span class="fw-bold" style="min-width: 100px;">Modelo</span>
             <span>{{ $trabajo->vehiculo->modelo }}</span>
         </div>
     </li>
     <li class="list-group-item">
         <div class="d-flex">
-            <span class="fw-bold" style="width: 100px;">Color</span>
+            <span class="fw-bold" style="min-width: 100px;">Color</span>
             <span>{{ $trabajo->vehiculo->color }}</span>
         </div>
     </li>
     <li class="list-group-item">
         <div class="d-flex">
-            <span class="fw-bold" style="width: 100px;">Tipo</span>
+            <span class="fw-bold" style="min-width: 100px;">Tipo</span>
             <span>{{ $trabajo->vehiculo->tipoVehiculo->nombre }}</span>
         </div>
     </li>
