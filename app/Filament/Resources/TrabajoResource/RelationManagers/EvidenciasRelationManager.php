@@ -29,6 +29,7 @@ class EvidenciasRelationManager extends RelationManager
                 Grid::make()
                     ->schema([
                         FileUpload::make('evidencia_url')
+                            ->label('Evidencia')
                             ->directory('evidencia')
                             ->required()
                             ->columnSpan(1),

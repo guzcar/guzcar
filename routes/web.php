@@ -4,7 +4,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TrabajoController;
+use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
 use App\Http\Controllers\UserController;
+use App\Models\Articulo;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,6 +39,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/trabajos/asignar', [TrabajoController::class, 'asignarTrabajos'])->name('trabajos.asignar');
     Route::post('/trabajos/asignar/{trabajo}', [TrabajoController::class, 'asignar'])->name('trabajos.asignar.post');
     Route::delete('/trabajos/abandonar/{trabajo}', [TrabajoController::class, 'abandonar'])->name('trabajos.abandonar');
+    Route::get('/admin/trabajos/pdf/{trabajo}', [PdfTrabajoController::class, 'report'])->name('trabajo.pdf.report');
 
     // Evidencias
     Route::get('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'index'])->name('evidencias.index');
@@ -49,4 +52,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/edit', [UserController::class, 'update'])->name('user.update');
     Route::post('/profile/add-avatar', [UserController::class,'addAvatar'])->name('user.add-avatar');
     Route::post('/profile/remove-avatar', [UserController::class, 'removeAvatar'])->name('user.remove-avatar');
+});
+
+Route::get('/test',  function () {
+    $a = Articulo::find('2');
+    return $a->ubicaciones;
 });

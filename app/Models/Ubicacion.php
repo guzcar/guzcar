@@ -17,9 +17,4 @@ class Ubicacion extends Model
     {
         return $this->belongsTo(Almacen::class);
     }
-
-    public function articulos()
-    {
-        return $this->hasMany(Articulo::class);
-    }
 }

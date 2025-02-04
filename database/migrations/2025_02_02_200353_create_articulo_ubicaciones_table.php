@@ -10,12 +10,15 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('ubicaciones', function (Blueprint $table) {
+        Schema::create('articulo_ubicaciones', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 50);
-            $table->foreignId('almacen_id')
-                ->constrained('almacenes')
-                ->onDelete('restrict')
+            $table->foreignId('articulo_id')
+                ->constrained('articulos')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->foreignId('ubicacion_id')
+                ->constrained('ubicaciones')
+                ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->timestamps();
         });
@@ -26,6 +29,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('ubicaciones');
+        Schema::dropIfExists('articulo_ubicaciones');
     }
 };

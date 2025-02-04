@@ -33,7 +33,6 @@ class Vehiculo extends Model
 
     public function clientes(): BelongsToMany
     {
-        return $this->belongsToMany(Cliente::class, 'cliente_vehiculos', 'vehiculo_id', 'cliente_id')
-            ->select('clientes.nombre');
+        return $this->belongsToMany(Cliente::class, 'cliente_vehiculos', 'vehiculo_id', 'cliente_id');
     }
 }
