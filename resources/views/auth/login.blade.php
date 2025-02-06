@@ -67,20 +67,6 @@
                     </div>
                 </div>
             </main>
-            {{--
-            <div id="layoutAuthentication_footer">
-                <footer class="py-2 py-sm-4 mt-auto">
-                    <div class="conteiner-fluid px-3 px-sm-4">
-                        <div class="text-white text-end">
-                            <a class="text-white shadow" style="text-decoration: none;" href="{{ route('filament.admin.auth.login') }}">
-                                Ingresar como Administrador
-                                <i class="fa-solid fa-user-shield"></i>
-                            </a>
-                        </div>
-                    </div>
-                </footer>
-            </div>
-            --}}
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>

@@ -106,6 +106,8 @@ class VehiculoResource extends Resource
                                                     ->required()
                                                     ->maxLength(255),
                                                 PhoneInput::make('telefono')
+                                                    ->defaultCountry('PE')
+                                                    ->initialCountry('pe')
                                             ])
                                             ->createOptionUsing(function (array $data): int {
                                                 return Cliente::create($data)->getKey();
@@ -120,6 +122,8 @@ class VehiculoResource extends Resource
                                                     ->required()
                                                     ->maxLength(255),
                                                 PhoneInput::make('telefono')
+                                                    ->defaultCountry('PE')
+                                                    ->initialCountry('pe')
                                             ])
                                             ->getOptionLabelUsing(function ($value): ?string {
                                                 $cliente = Cliente::withTrashed()->find($value);

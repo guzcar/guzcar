@@ -2,7 +2,7 @@
     use Filament\Support\Enums\MaxWidth;
 @endphp
 
-<x-filament-panels::layout.base :livewire="$livewire" style="padding-left: 10px; padding-right: 10px;">
+<x-filament-panels::layout.base :livewire="$livewire" style="background-image: url('{{ asset('images/back-guzcar.jpg') }}'); background-size: cover; background-position: center center; background-repeat: no-repeat; height: 100vh; padding-left: 10px; padding-right: 10px;">
     @props([
         'after' => null,
         'heading' => null,

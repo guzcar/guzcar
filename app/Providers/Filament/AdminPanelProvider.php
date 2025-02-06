@@ -9,6 +9,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -32,6 +33,17 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->passwordReset()
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label('Módulo del Taller')
+                    ->url(fn(): string => route('home'))
+                    ->icon('heroicon-o-truck'),
+                MenuItem::make()
+                    ->label('Manual de usuario')
+                    ->url(fn(): string => asset('docs/manual-admin.pdf'))
+                    ->icon('heroicon-o-lifebuoy')
+                    ->openUrlInNewTab()
+            ])
             ->colors([
                 'primary' => Color::Blue,
             ])
@@ -63,13 +75,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 CustomBreezyCore::make()
-                ->myProfile(
-                    hasAvatars: true,
-                    slug: 'profile'
-                )
-                ->avatarUploadComponent(static fn (FileUpload $fileUpload): FileUpload => $fileUpload->directory('avatar'))
-                ->enableBrowserSessions()
-                ->enableTwoFactorAuthentication(),
+                    ->myProfile(
+                        hasAvatars: true,
+                        slug: 'profile'
+                    )
+                    ->avatarUploadComponent(static fn(FileUpload $fileUpload): FileUpload => $fileUpload->directory('avatar'))
+                    ->enableBrowserSessions()
+                    ->enableTwoFactorAuthentication(),
                 FilamentShieldPlugin::make(),
             ]);
     }
