@@ -98,6 +98,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     public function trabajos(): BelongsToMany
     {
-        return $this->belongsToMany(Trabajo::class, 'trabajo_mecanicos', 'mecanico_id', 'trabajo_id');
+        return $this->belongsToMany(Trabajo::class, 'trabajo_tecnicos', 'tecnico_id', 'trabajo_id');
     }
 }

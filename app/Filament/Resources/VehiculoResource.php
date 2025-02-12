@@ -73,11 +73,13 @@ class VehiculoResource extends Resource
                                     ->required(),
                                 TextInput::make('placa')
                                     ->unique(ignoreRecord: true)
-                                    ->maxLength(7),
+                                    ->maxLength(7)
+                                    ->placeholder('ABC-123'),
                                 TextInput::make('marca')
                                     ->required()
                                     ->maxLength(255),
                                 TextInput::make('modelo')
+                                    ->required()
                                     ->maxLength(255),
                                 TextInput::make('color')
                                     ->required()

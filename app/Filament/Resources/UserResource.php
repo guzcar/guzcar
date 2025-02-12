@@ -111,10 +111,12 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->label('Nombre')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('email')
                     ->label('Correo electrónico')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 ImageColumn::make('avatar_url')
                     ->label('Avatar')
                     ->defaultImageUrl(function ($record) {
@@ -126,12 +128,12 @@ class UserResource extends Resource
                         $initials = rtrim($initials);
                         return 'https://ui-avatars.com/api/?name=' . urlencode($initials) . '&background=09090b&color=ffffff';
                     })
-                    ->circular()
-                    ->alignCenter(),
+                    ->circular(),
                 ToggleColumn::make('is_admin')
                     ->label('Administrativo')
                     ->onIcon('heroicon-s-user')
-                    ->alignCenter(),
+                    ->alignCenter()
+                    ->grow(false),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')

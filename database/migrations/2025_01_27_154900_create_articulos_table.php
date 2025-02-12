@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('articulos', function (Blueprint $table) {
             $table->id();
+            $table->string('especificacion')->nullable();
             $table->string('marca');
             $table->string('tamano_presentacion');
             $table->text('descripcion')->nullable();
@@ -22,6 +23,7 @@ return new class extends Migration
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

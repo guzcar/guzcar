@@ -9,12 +9,14 @@ class TrabajoController extends Controller
 {
     /**
      * Mostrar los trabajos disponibles para asignación.
+     * 
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function asignarTrabajos()
     {
         $trabajos = Trabajo::whereNull('fecha_salida')
-            ->whereDoesntHave('mecanicos', function ($query) {
-                $query->where('mecanico_id', auth()->id());
+            ->whereDoesntHave('tecnicos', function ($query) {
+                $query->where('tecnico_id', auth()->id());
             })
             ->get();
 
@@ -23,6 +25,9 @@ class TrabajoController extends Controller
 
     /**
      * Asignar un trabajo al usuario actual.
+     * 
+     * @param \App\Models\Trabajo $trabajo
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function asignar(Trabajo $trabajo)
     {
@@ -39,12 +44,15 @@ class TrabajoController extends Controller
 
     /**
      * Abandonar un trabajo asignado.
+     * 
+     * @param \App\Models\Trabajo $trabajo
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function abandonar(Trabajo $trabajo)
     {
         $user = auth()->user();
 
-        if (!$trabajo->usuarios()->where('mecanico_id', $user->id)->exists()) {
+        if (!$trabajo->usuarios()->where('tecnico_id', $user->id)->exists()) {
             abort(403, 'Forbidden');
         }
 

@@ -29,7 +29,7 @@ return new class extends Migration {
             ADD COLUMN nombre_completo VARCHAR(255)
             GENERATED ALWAYS AS (
                 CONCAT(
-                    IFNULL(placa, '1'), ' - ',
+                    IFNULL(placa, 'Sin Placa'), ' - ',
                     marca, ' ',
                     modelo
                 )

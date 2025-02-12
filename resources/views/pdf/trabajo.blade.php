@@ -13,7 +13,7 @@
 
         body {
             font-family: Arial, sans-serif;
-            font-size: 11px;
+            font-size: 12px;
             margin: 0;
             padding: 0;
             position: relative;
@@ -35,14 +35,10 @@
 
         .header-title {
             color: rgb(0, 80, 150);
-            font-size: 18px;
+            font-size: 22px;
             font-weight: bold;
             margin-top: 8px;
-        }
-
-        .header-date {
-            text-align: right;
-            margin-top: -18px;
+            padding-right: 30px;
         }
 
         footer {
@@ -52,7 +48,11 @@
             right: 0;
             height: 50px;
             text-align: center;
-            font-size: 10px;
+            font-size: 11px;
+        }
+
+        .header-line {
+            border: 2x solid rgb(180, 0, 0);
         }
 
         .footer-line {
@@ -78,6 +78,19 @@
         .content {
             text-align: justify;
             margin-bottom: 50px;
+        }
+
+        .table-info {
+            margin-left: auto;
+            margin-top: -32px;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .table-info th,
+        .table-info td {
+            padding: 1px 3px;
+            border: 1px solid #000;
         }
 
         .table-container {
@@ -107,7 +120,11 @@
     <header>
         <img src="{{ public_path('images/logo-kia.jpg') }}" class="header-logo">
         <div class="header-title">AUTOMOTORES GUZCAR S.A.C.</div>
-        <p class="header-date">{{ date('d/m/Y') }}</p>
+        <table class="table-info">
+            <tr><th style="width: 100px;">{{ date('d / m / Y') }}</th></tr>
+            <tr><td>{{ $trabajo->codigo }}</td></tr>
+        </table>
+        <hr class="header-line">
     </header>
 
     <!-- FOOTER -->
@@ -123,7 +140,7 @@
     <!-- CONTENIDO -->
     <div class="content">
 
-        <h3 style="margin-top: 0">PROFORMA</h3>
+        <h3>PROFORMA</h3>
 
         <!-- Tabla Principal para alinear Vehículo y Cliente en una línea -->
         <table style="width: 100%; border-collapse: collapse;">
@@ -192,9 +209,9 @@
             <thead>
                 <tr>
                     <th>Servicio</th>
-                    <th style="width: 90px">Costo</th>
-                    <th style="width: 90px">Cantidad</th>
-                    <th style="width: 90px">Subtotal</th>
+                    <th style="width: 95px">Costo</th>
+                    <th style="width: 95px">Cantidad</th>
+                    <th style="width: 100px">Subtotal</th>
                 </tr>
             </thead>
             <tbody>

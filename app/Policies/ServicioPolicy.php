@@ -8,7 +8,7 @@ use App\Models\User;
 class ServicioPolicy
 {
     /**
-     * Determine whether the user can view any workshops.
+     * Determine whether the user can view any service.
      */
     public function viewAny(User $user): bool
     {
@@ -24,7 +24,7 @@ class ServicioPolicy
     }
 
     /**
-     * Determine whether the user can create workshops.
+     * Determine whether the user can create service.
      */
     public function create(User $user): bool
     {

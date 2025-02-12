@@ -65,13 +65,13 @@
 
         <x-filament::card>
             <h2 class="text-xl font-bold text-gray-900 dark:text-white pb-4">
-                Mecánicos Asignados
+                Técnicos Asignados
             </h2>
             <ul class="list-disc list-inside">
                 @forelse($trabajo->usuarios as $usuario)
                     <li class="text-gray-800 dark:text-gray-300">{{ $usuario->name }}</li>
                 @empty
-                    <p class="text-gray-500 dark:text-gray-400">No hay mecánicos asignados.</p>
+                    <p class="text-gray-500 dark:text-gray-400">No hay técnicos asignados.</p>
                 @endforelse
             </ul>
         </x-filament::card>

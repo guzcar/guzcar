@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TrabajoResource\RelationManagers;
 
+use App\Models\Evidencia;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
@@ -35,9 +36,9 @@ class EvidenciasRelationManager extends RelationManager
                             ->columnSpan(1),
                         Grid::make()
                             ->schema([
-                                Select::make('user_id') // Campo mecanico_id
-                                    ->label('Seleccionar Mecánico')
-                                    ->relationship('user', 'name', fn($query) => $query->withTrashed()) // Relación hacia User desde TrabajoMecanico
+                                Select::make('user_id')
+                                    ->label('Seleccionar Técnico')
+                                    ->relationship('user', 'name', fn($query) => $query->withTrashed())
                                     ->distinct()
                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                     ->searchable()
@@ -109,10 +110,16 @@ class EvidenciasRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('observacion')
             ->columns([
                 ImageColumn::make('evidencia_url')
+                    ->size(40)
                     ->label('Evidencia')
+                    ->getStateUsing(function (Evidencia $record): string {
+                        if ($record->tipo === 'imagen') {
+                            return $record->evidencia_url;
+                        }
+                        return asset('images/video.png');
+                    })
                     ->alignCenter()
                     ->verticallyAlignCenter(),
                 TextColumn::make('user.name')

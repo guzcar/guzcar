@@ -6,6 +6,7 @@ use App\Filament\Resources\TrabajoResource\Pages;
 use App\Filament\Resources\TrabajoResource\RelationManagers;
 use App\Filament\Resources\TrabajoResource\RelationManagers\EvidenciasRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\PagosRelationManager;
+use App\Filament\Resources\TrabajoResource\RelationManagers\ServiciosRelationManager;
 use App\Models\Cliente;
 use App\Models\Servicio;
 use App\Models\Trabajo;
@@ -37,7 +38,9 @@ use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\ColumnGroup;
+use Filament\Tables\Columns\Layout\Panel;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -80,32 +83,36 @@ class TrabajoResource extends Resource
                                     ->searchable()
                                     ->required()
                                     ->createOptionForm([
+                                        Select::make('tipo_vehiculo_id')
+                                            ->relationship('tipoVehiculo', 'nombre')
+                                            ->searchable()
+                                            ->preload()
+                                            // ->createOptionForm([
+                                            //     TextInput::make('nombre')
+                                            //         ->unique(ignoreRecord: true)
+                                            //         ->required()
+                                            //         ->maxLength(50),
+                                            // ])
+                                            // ->editOptionForm([
+                                            //     TextInput::make('nombre')
+                                            //         ->unique(ignoreRecord: true)
+                                            //         ->required()
+                                            //         ->maxLength(50),
+                                            // ])
+                                            ->required(),
                                         TextInput::make('placa')
                                             ->unique(ignoreRecord: true)
-                                            ->maxLength(7),
+                                            ->maxLength(7)
+                                            ->placeholder('ABC-123'),
                                         TextInput::make('marca')
                                             ->required()
                                             ->maxLength(255),
                                         TextInput::make('modelo')
+                                            ->required()
                                             ->maxLength(255),
                                         TextInput::make('color')
                                             ->required()
                                             ->maxLength(255),
-                                        Select::make('tipo_vehiculo_id')
-                                            ->relationship('tipoVehiculo', 'nombre')
-                                            ->createOptionForm([
-                                                TextInput::make('nombre')
-                                                    ->unique(ignoreRecord: true)
-                                                    ->required()
-                                                    ->maxLength(50),
-                                            ])
-                                            ->editOptionForm([
-                                                TextInput::make('nombre')
-                                                    ->unique(ignoreRecord: true)
-                                                    ->required()
-                                                    ->maxLength(50),
-                                            ])
-                                            ->required(),
                                         Repeater::make('propietarios')
                                             ->relationship()
                                             ->simple(
@@ -153,6 +160,23 @@ class TrabajoResource extends Resource
                                             ->defaultItems(0)
                                     ])
                                     ->editOptionForm([
+                                        Select::make('tipo_vehiculo_id')
+                                            ->relationship('tipoVehiculo', 'nombre')
+                                            ->searchable()
+                                            ->preload()
+                                            // ->createOptionForm([
+                                            //     TextInput::make('nombre')
+                                            //         ->unique(ignoreRecord: true)
+                                            //         ->required()
+                                            //         ->maxLength(50),
+                                            // ])
+                                            // ->editOptionForm([
+                                            //     TextInput::make('nombre')
+                                            //         ->unique(ignoreRecord: true)
+                                            //         ->required()
+                                            //         ->maxLength(50),
+                                            // ])
+                                            ->required(),
                                         TextInput::make('placa')
                                             ->unique(ignoreRecord: true)
                                             ->maxLength(7),
@@ -164,21 +188,6 @@ class TrabajoResource extends Resource
                                         TextInput::make('color')
                                             ->required()
                                             ->maxLength(255),
-                                        Select::make('tipo_vehiculo_id')
-                                            ->relationship('tipoVehiculo', 'nombre')
-                                            ->createOptionForm([
-                                                TextInput::make('nombre')
-                                                    ->unique(ignoreRecord: true)
-                                                    ->required()
-                                                    ->maxLength(50),
-                                            ])
-                                            ->editOptionForm([
-                                                TextInput::make('nombre')
-                                                    ->unique(ignoreRecord: true)
-                                                    ->required()
-                                                    ->maxLength(50),
-                                            ])
-                                            ->required(),
                                         Repeater::make('propietarios')
                                             ->relationship()
                                             ->simple(
@@ -262,16 +271,18 @@ class TrabajoResource extends Resource
                             ->schema([
                                 Section::make()
                                     ->schema([
-                                        Repeater::make('mecanicos')
-                                            ->relationship('mecanicos') // Relación hacia TrabajoMecanico en el modelo Trabajo
+                                        Repeater::make('tecnicos')
+                                            ->relationship('tecnicos')
                                             ->defaultItems(0)
                                             ->simple(
-                                                Select::make('mecanico_id') // Campo mecanico_id
-                                                    ->label('Seleccionar Mecánico')
-                                                    ->relationship('mecanico', 'name', fn($query) => $query->withTrashed()) // Relación hacia User desde TrabajoMecanico
+                                                Select::make('tecnico_id')
+                                                    ->label('Seleccionar Técnico')
+                                                    ->relationship('tecnico', 'name', fn($query) => $query->withTrashed())
                                                     ->distinct()
                                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                                     ->searchable()
+                                                    ->preload()
+                                                    /*
                                                     ->createOptionForm([
                                                         TextInput::make('name')
                                                             ->label('Nombre')
@@ -328,10 +339,11 @@ class TrabajoResource extends Resource
                                                         $user = User::withTrashed()->find($value);
                                                         return $user ? $user->name : 'Usuario eliminado';
                                                     })
+                                                    */
                                                     ->required()
                                             )
                                     ])
-                                    ->heading('Mecánicos')
+                                    ->heading('Responsables')
                                     ->hidden(function () {
                                         $user = auth()->user();
                                         return !(
@@ -352,10 +364,11 @@ class TrabajoResource extends Resource
                                             )
                                     ])
                                     ->heading('Archivos')
-                                    ->hidden(true),
+                                    ->hiddenOn('create'),
                             ])
                             ->columnspan(1)
                             ->columns(1),
+                        /*
                         Section::make()
                             ->schema([
                                 Repeater::make('servicios')
@@ -450,6 +463,7 @@ class TrabajoResource extends Resource
                                 );
                             })
                             ->hiddenOn('create'),
+                        */
                     ])
                     ->columns(2),
             ]);
@@ -459,6 +473,11 @@ class TrabajoResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('codigo')
+                    ->label('Código')
+                    ->sortable()
+                    ->searchable(isIndividual: true)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('fecha_ingreso')
                     ->date('d/m/Y')
                     ->sortable(),
@@ -501,18 +520,12 @@ class TrabajoResource extends Resource
                     ->lineClamp(2)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('usuarios.name')
-                    ->placeholder('Sin Mecánicos')
-                    ->label('Mecánicos')
+                    ->placeholder('Sin Técnicos')
+                    ->label('Técnicos')
                     ->searchable(isIndividual: true)
                     ->badge()
-                    ->wrap(),
-                // TextColumn::make('taller.nombre')
-                //     ->label('Taller')
-                //     ->searchable()
-                //     ->sortable(),
-                // TextColumn::make('fecha_salida')
-                //     ->date('d/m/Y')
-                //     ->sortable(),
+                    ->wrap()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('fecha_salida')
                     ->label('Fecha salida')
                     ->state(function ($record) {
@@ -526,7 +539,8 @@ class TrabajoResource extends Resource
                         'A CUENTA' => 'A CUENTA',
                         'COBRADO' => 'COBRADO',
                         'POR COBRAR' => 'POR COBRAR',
-                    ]),
+                    ])
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('.getImporte')
                     ->label('Importe Total')
                     ->getStateUsing(function (Trabajo $record): string {
@@ -565,6 +579,8 @@ class TrabajoResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
+            ->recordUrl(null)
+            ->striped()
             ->filters([
                 TernaryFilter::make('estado_trabajo')
                     ->label('Estado del Trabajo')
@@ -626,7 +642,8 @@ class TrabajoResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->button(),
+                    ->button()
+                    ->size(ActionSize::Medium),
                 Action::make('reabrir')
                     ->label('Reabrir')
                     ->color('warning')
@@ -643,7 +660,8 @@ class TrabajoResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->button(),
+                    ->button()
+                    ->size(ActionSize::Medium),
                 ActionGroup::make([
                     Action::make('Descargar')
                         ->icon('heroicon-s-arrow-down-tray')
@@ -658,7 +676,6 @@ class TrabajoResource extends Resource
                     ForceDeleteAction::make(),
                 ])
                     ->color('gray')
-                    ->size(ActionSize::Small)
                     ->button(),
             ])
             ->bulkActions([
@@ -680,6 +697,7 @@ class TrabajoResource extends Resource
     public static function getRelations(): array
     {
         return [
+            ServiciosRelationManager::class,
             EvidenciasRelationManager::class,
             PagosRelationManager::class,
         ];

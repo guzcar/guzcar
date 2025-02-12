@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('trabajos', function (Blueprint $table) {
             $table->id();
+            $table->string('codigo', 14);
             $table->foreignId('vehiculo_id')
                 ->constrained('vehiculos')
                 ->onDelete('restrict')
@@ -27,6 +28,22 @@ return new class extends Migration {
             $table->timestamps();
             $table->softDeletes();
         });
+
+        DB::statement("
+            CREATE TRIGGER generar_codigo_trabajo
+                BEFORE INSERT ON trabajos
+                FOR EACH ROW
+                BEGIN
+                    DECLARE placa_vehiculo VARCHAR(7);
+                    SELECT placa INTO placa_vehiculo
+                    FROM vehiculos
+                    WHERE id = NEW.vehiculo_id;
+                    IF placa_vehiculo IS NULL THEN
+                        SET placa_vehiculo = 'SINPLACA';
+                    END IF;
+                    SET NEW.codigo = CONCAT(DATE_FORMAT(NEW.fecha_ingreso, '%y%m%d'), '-', placa_vehiculo);
+                END;
+        ");
     }
 
     /**

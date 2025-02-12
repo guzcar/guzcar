@@ -4,17 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Ubicacion extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'ubicaciones';
 
-    protected $fillable = ['nombre', 'almacen_id'];
-
-    public function almacen()
-    {
-        return $this->belongsTo(Almacen::class);
-    }
+    protected $fillable = ['estante', 'codigo'];
 }

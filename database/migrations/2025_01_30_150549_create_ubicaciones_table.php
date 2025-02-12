@@ -12,13 +12,19 @@ return new class extends Migration {
     {
         Schema::create('ubicaciones', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 50);
-            $table->foreignId('almacen_id')
-                ->constrained('almacenes')
-                ->onDelete('restrict')
-                ->onUpdate('cascade');
+            $table->string('estante', 5);
+            $table->string('codigo', 5);
             $table->timestamps();
+            $table->softDeletes();
         });
+
+        DB::statement("
+            ALTER TABLE ubicaciones
+            ADD COLUMN nombre_completo VARCHAR(255)
+            GENERATED ALWAYS AS (
+                CONCAT(estante, ' - ', codigo)
+            ) VIRTUAL;
+        ");
     }
 
     /**

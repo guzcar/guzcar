@@ -11,6 +11,9 @@ class EvidenciaController extends Controller
 {
     /**
      * Mostrar todas las evidencias del trabajo actual que pertenecen al usuario.
+     * 
+     * @param \App\Models\Trabajo $trabajo
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function index(Trabajo $trabajo)
     {
@@ -29,12 +32,16 @@ class EvidenciaController extends Controller
 
     /**
      * Subir una nueva evidencia.
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Trabajo $trabajo
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request, Trabajo $trabajo)
     {
         $user = auth()->user();
 
-        if (!$trabajo->usuarios()->where('mecanico_id', $user->id)->exists()) {
+        if (!$trabajo->usuarios()->where('tecnico_id', $user->id)->exists()) {
             abort(403, 'Forbidden');
         }
 
@@ -64,6 +71,11 @@ class EvidenciaController extends Controller
 
     /**
      * Actualizar una evidencia existente.
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Trabajo $trabajo
+     * @param \App\Models\Evidencia $evidencia
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Trabajo $trabajo, Evidencia $evidencia)
     {
@@ -100,6 +112,10 @@ class EvidenciaController extends Controller
 
     /**
      * Eliminar una evidencia.
+     * 
+     * @param \App\Models\Trabajo $trabajo
+     * @param \App\Models\Evidencia $evidencia
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Trabajo $trabajo, Evidencia $evidencia)
     {
@@ -117,6 +133,10 @@ class EvidenciaController extends Controller
 
     /**
      * Optimizar imagen utilizando GD.
+     * 
+     * @param mixed $path
+     * @param mixed $mimeType
+     * @return void
      */
     private function optimizeImage($path, $mimeType)
     {
