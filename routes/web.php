@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TrabajoController;
 use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
 use App\Http\Controllers\UserController;
-use App\Models\Articulo;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,6 +28,13 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('/login', 'showLoginForm')->middleware('guest')->name('login');
     Route::post('/login', 'login')->middleware('guest')->name('login.process');
     Route::post('/logout', 'logout')->name('logout');
+});
+
+Route::controller(ForgotPasswordController::class)->group(function () {
+    Route::get('password/reset', 'showLinkRequestForm')->name('password.request');
+    Route::post('password/email', 'sendResetLinkEmail')->name('password.email');
+    Route::get('password/reset/{token}', 'showResetForm')->name('password.reset');
+    Route::post('password/reset', 'reset')->name('password.update');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -52,9 +59,4 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/edit', [UserController::class, 'update'])->name('user.update');
     Route::post('/profile/add-avatar', [UserController::class,'addAvatar'])->name('user.add-avatar');
     Route::post('/profile/remove-avatar', [UserController::class, 'removeAvatar'])->name('user.remove-avatar');
-});
-
-Route::get('/test',  function () {
-    $a = Articulo::find('2');
-    return $a->ubicaciones;
 });

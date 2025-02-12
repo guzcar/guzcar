@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\App;
 
 class TrabajoController extends Controller
 {
+    /**
+     * Genera el PDF de la proforma.
+     * 
+     * @param mixed $id
+     */
     public function report($id)
     {
         $trabajo = Trabajo::find($id);
@@ -42,10 +47,3 @@ class TrabajoController extends Controller
         return $pdf->stream($fileName);
     }
 }
-
-// return $trabajo->servicios;
-// return view('pdf.trabajo', compact(
-//     'trabajo',
-//     'vehiculo',
-//     'tiempo',
-// ));

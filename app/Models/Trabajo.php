@@ -23,12 +23,12 @@ class Trabajo extends Model
 
     public function taller()
     {
-        return $this->belongsTo(Taller::class);
+        return $this->belongsTo(Taller::class)->withTrashed();
     }
 
     public function vehiculo()
     {
-        return $this->belongsTo(Vehiculo::class);
+        return $this->belongsTo(Vehiculo::class)->withTrashed();
     }
 
     public function evidencias(): HasMany
@@ -36,14 +36,14 @@ class Trabajo extends Model
         return $this->hasMany(Evidencia::class);
     }
 
-    public function mecanicos(): HasMany
+    public function tecnicos()
     {
-        return $this->hasMany(TrabajoMecanico::class, 'trabajo_id');
+        return $this->hasMany(TrabajoTecnico::class, 'trabajo_id');
     }
 
-    public function usuarios(): BelongsToMany
+    public function usuarios()
     {
-        return $this->belongsToMany(User::class, 'trabajo_mecanicos', 'trabajo_id', 'mecanico_id');
+        return $this->belongsToMany(User::class, 'trabajo_tecnicos', 'trabajo_id', 'tecnico_id')->withTrashed();
     }
 
     public function servicios(): HasMany

@@ -18,13 +18,13 @@ class TrabajoServicio extends Model
         'cantidad',
     ];
 
-    public function servicio(): BelongsTo
+    public function servicio()
     {
-        return $this->belongsTo(Servicio::class, 'servicio_id');
+        return $this->belongsTo(Servicio::class, 'servicio_id')->withTrashed();
     }
 
-    public function trabajo(): BelongsTo
+    public function trabajo()
     {
-        return $this->belongsTo(Trabajo::class, 'trabajo_id');
+        return $this->belongsTo(Trabajo::class, 'trabajo_id')->withTrashed();
     }
 }

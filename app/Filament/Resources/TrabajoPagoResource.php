@@ -33,7 +33,7 @@ class TrabajoPagoResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Pagos';
 
-    protected static ?string $navigationLabel = 'Pagos';
+    protected static ?string $navigationLabel = 'Pagos recibidos';
 
     public static function form(Form $form): Form
     {
@@ -61,6 +61,18 @@ class TrabajoPagoResource extends Resource
     {
         return $table
             ->columns([
+                ColumnGroup::make('Trabajo', [
+                    TextColumn::make('trabajo.codigo')
+                        ->label('Código')
+                        ->searchable(isIndividual: true),
+                    TextColumn::make('trabajo.fecha_ingreso')
+                        ->label('Fecha de Ingreso')
+                        ->toggleable(isToggledHiddenByDefault: true),
+                    TextColumn::make('trabajo.fecha_salida')
+                        ->label('Fecha de Salida')
+                        ->placeholder('Sin Salida')
+                        ->toggleable(isToggledHiddenByDefault: true),
+                ]),
                 ColumnGroup::make('Vehiculo', [
                     TextColumn::make('trabajo.vehiculo.placa')
                         ->label('Placa')
@@ -87,13 +99,6 @@ class TrabajoPagoResource extends Resource
                         ->wrap()
                         ->toggleable(isToggledHiddenByDefault: true)
                 ]),
-                ColumnGroup::make('Trabajo', [
-                    TextColumn::make('trabajo.fecha_ingreso')
-                        ->label('Fecha de Ingreso'),
-                    TextColumn::make('trabajo.fecha_salida')
-                        ->label('Fecha de Salida')
-                        ->placeholder('Sin Salida'),
-                ]),
                 ColumnGroup::make('Pago', [
                     TextColumn::make('monto')
                         ->prefix('S/ ')
@@ -101,14 +106,15 @@ class TrabajoPagoResource extends Resource
                     TextColumn::make('fecha_pago')
                         ->date('d/m/Y')
                         ->sortable(),
-                    TextColumn::make('observacion')
-                        ->wrap()
-                        ->lineClamp(3)
-                        ->searchable(isIndividual: true),
                     TextColumn::make('detalle.nombre')
                         ->numeric()
                         ->sortable()
                         ->searchable(isIndividual: true),
+                    TextColumn::make('observacion')
+                        ->wrap()
+                        ->lineClamp(3)
+                        ->searchable(isIndividual: true)
+                        ->toggleable(isToggledHiddenByDefault: true),
                 ]),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
@@ -127,13 +133,10 @@ class TrabajoPagoResource extends Resource
                 DateRangeFilter::make('fecha_pago'),
             ])
             ->actions([
-                ViewAction::make(),
-                // Tables\Actions\EditAction::make(),
+
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    ExportBulkAction::make(),
-                ]),
+                ExportBulkAction::make(),
             ]);
     }
 
@@ -149,7 +152,6 @@ class TrabajoPagoResource extends Resource
         return [
             'index' => Pages\ListTrabajoPagos::route('/'),
             // 'create' => Pages\CreateTrabajoPago::route('/create'),
-            'view' => Pages\ViewTrabajoPago::route('/{record}'),
             // 'edit' => Pages\EditTrabajoPago::route('/{record}/edit'),
         ];
     }

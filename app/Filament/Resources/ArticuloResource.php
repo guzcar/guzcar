@@ -23,7 +23,12 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreAction;
+use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -77,6 +82,8 @@ class ArticuloResource extends Resource
                                         return [];
                                     })
                                     ->disabled(fn($get) => !$get('categoria_id')),
+                                TextInput::make('especificacion')
+                                    ->label('Especificación'),
                                 TextInput::make('marca')
                                     ->required(),
                                 TextInput::make('tamano_presentacion')
@@ -90,58 +97,41 @@ class ArticuloResource extends Resource
                                 Textarea::make('descripcion')
                                     ->label('Descripción'),
                             ])
+                            ->heading('Artículo')
                             ->columnSpan(['xl' => 3, 'lg' => 3, 'md' => 1, 'sm' => 1]),
                         Section::make()
                             ->schema([
-                                Repeater::make('ubicaciones')
-                                    ->relationship('ubicaciones')
-                                    // ->defaultItems(0)
-                                    ->schema([
-                                        Select::make('almacen_id')
-                                            ->required()
+                                Repeater::make('articuloUbicaciones')
+                                    ->relationship('articuloUbicaciones')
+                                    ->defaultItems(0)
+                                    ->simple(
+                                        Select::make('ubicacion_id')
+                                            ->label('Seleccionar Ubicación')
+                                            ->relationship('ubicacion', 'nombre_completo', fn($query) => $query->withTrashed())
+                                            ->distinct()
+                                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                             ->searchable()
                                             ->preload()
-                                            ->label('Almacén')
-                                            ->options(Almacen::all()->pluck('nombre', 'id'))
-                                            ->reactive()
-                                            ->afterStateUpdated(fn($state, callable $set) => $set('ubicacion_id', null)),
-                                        Select::make('ubicacion_id')
-                                            ->required()
-                                            ->label('Ubicación')
-                                            ->placeholder('')
-                                            ->searchable()
-                                            ->options(function ($get) {
-                                                $almacenId = $get('almacen_id');
-                                                if ($almacenId) {
-                                                    return Ubicacion::where('almacen_id', $almacenId)
-                                                        ->pluck('nombre', 'id')
-                                                        ->toArray();
-                                                }
-                                                return [];
-                                            })
-                                            ->disabled(fn($get) => !$get('almacen_id')),
-                                    ])
-                                    // ->mutateRelationshipDataBeforeFillUsing(function (array $data): array {
-                                    //     $data['almacen_id'] = '2';
-                                    //     $data['ubicacion_id'] = '5';
-                                    //     // dd($data);
-                                    //     return $data;
-                                    // })
-                                    // ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
-                                    //     // $data['ubicaciones'] = [
-                                    //     //     [
-                                    //     //         'almacen_id' => 1,
-                                    //     //         'ubicacion_id' => 10,
-                                    //     //     ],
-                                    //     //     [
-                                    //     //         'almacen_id' => 2,
-                                    //     //         'ubicacion_id' => 20,
-                                    //     //     ],
-                                    //     // ];
-                                    //     // dd($data);
-                                    //     return $data;
-                                    // }),
+                                            ->createOptionForm([
+                                                TextInput::make('estante')
+                                                    ->required()
+                                                    ->maxLength(5),
+                                                TextInput::make('codigo')
+                                                    ->label('Código')
+                                                    ->required()
+                                                    ->maxLength(5),
+                                            ])
+                                        // ->editOptionForm([
+                                        //     TextInput::make('estante')
+                                        //         ->required()
+                                        //         ->maxLength(5),
+                                        //     TextInput::make('codigo')
+                                        //         ->required()
+                                        //         ->maxLength(5),
+                                        // ])
+                                    )
                             ])
+                            ->heading('Ubicación en Almacen')
                             ->columnSpan(['xl' => 2, 'lg' => 2, 'md' => 1, 'sm' => 1]),
                     ])
                     ->columns(['xl' => 5, 'lg' => 5, 'md' => 1, 'sm' => 1]),
@@ -153,9 +143,16 @@ class ArticuloResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('subCategoria.categoria.nombre')
+                    ->label('Categoría')
                     ->sortable()
                     ->searchable(isIndividual: true),
                 TextColumn::make('subCategoria.nombre')
+                    ->label('Sub-Categoría')
+                    ->sortable()
+                    ->searchable(isIndividual: true),
+                TextColumn::make('especificacion')
+                    ->label('Especificación')
+                    ->placeholder('Sin especificación')
                     ->sortable()
                     ->searchable(isIndividual: true),
                 TextColumn::make('marca')
@@ -165,15 +162,14 @@ class ArticuloResource extends Resource
                     ->label('Tamaño')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('precio')
-                    ->prefix('S/ '),
-                TextColumn::make('ubicacion.almacen.nombre')
-                    ->sortable()
+                TextColumn::make('ubicaciones.nombre_completo')
+                    ->label('Ubicación')
                     ->searchable()
+                    ->badge()
+                    ->wrap()
                     ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('ubicacion.nombre')
-                    ->sortable()
-                    ->searchable()
+                TextColumn::make('precio')
+                    ->prefix('S/ ')
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
@@ -186,17 +182,23 @@ class ArticuloResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
-                ValueRangeFilter::make('precio')
+                ValueRangeFilter::make('precio'),
+                TrashedFilter::make(),
             ])
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
+                RestoreAction::make(),
+                ForceDeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     ExportBulkAction::make(),
                     DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -215,5 +217,13 @@ class ArticuloResource extends Resource
             'create' => Pages\CreateArticulo::route('/create'),
             'edit' => Pages\EditArticulo::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 }

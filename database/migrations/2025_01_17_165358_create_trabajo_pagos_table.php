@@ -18,11 +18,11 @@ return new class extends Migration {
                 ->onUpdate('cascade');
             $table->decimal('monto');
             $table->date('fecha_pago');
-            $table->string('observacion');
             $table->foreignId('detalle_id')
                 ->constrained('trabajo_pago_detalles')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
+            $table->string('observacion')->nullable();
             $table->timestamps();
         });
 

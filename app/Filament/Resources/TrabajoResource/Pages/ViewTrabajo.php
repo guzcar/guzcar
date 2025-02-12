@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TrabajoResource\Pages;
 
 use App\Filament\Resources\TrabajoResource;
+use App\Models\Trabajo;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
@@ -15,9 +16,11 @@ class ViewTrabajo extends ViewRecord
     {
         $trabajo = $this->record;
 
-        $trabajo->load(['servicios' => function ($query) {
-            $query->orderBy('sort');
-        }]);
+        $trabajo->load([
+            'servicios' => function ($query) {
+                $query->orderBy('sort');
+            }
+        ]);
 
         return [
             'trabajo' => $trabajo,
@@ -33,10 +36,17 @@ class ViewTrabajo extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('back')
-                ->label('Regresar')
-                ->url(TrabajoResource::getUrl())
-                ->icon('heroicon-o-arrow-left')
+            // Action::make('back')
+            //     ->label('Regresar')
+            //     ->url(TrabajoResource::getUrl())
+            //     ->icon('heroicon-o-arrow-left')
+            //     ->color('gray'),
+            Action::make('Descargar')
+                ->icon('heroicon-s-arrow-down-tray')
+                ->url(
+                    fn(Trabajo $trabajo): string => route('trabajo.pdf.report', ['trabajo' => $trabajo]),
+                    shouldOpenInNewTab: true
+                )
                 ->color('gray'),
             EditAction::make()
                 ->icon('heroicon-o-pencil-square'),

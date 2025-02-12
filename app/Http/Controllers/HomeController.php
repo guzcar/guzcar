@@ -9,6 +9,8 @@ class HomeController extends Controller
 {
     /**
      * Mostrar la tabla de trabajos asignados al usuario actual.
+     * 
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function index()
     {

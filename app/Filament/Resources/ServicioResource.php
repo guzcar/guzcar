@@ -30,9 +30,9 @@ class ServicioResource extends Resource
 {
     protected static ?string $model = Servicio::class;
 
-    protected static ?string $navigationGroup = 'Histórico';
+    protected static ?string $navigationGroup = 'Core';
 
-    protected static ?int $navigationSort = 0;
+    protected static ?int $navigationSort = 30;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard';
 
@@ -43,7 +43,8 @@ class ServicioResource extends Resource
                 TextInput::make('nombre')
                     ->unique(ignoreRecord: true)
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpanFull(),
                 TextInput::make('costo')
                     ->numeric()
                     ->required()
@@ -58,7 +59,9 @@ class ServicioResource extends Resource
             ->columns([
                 TextColumn::make('nombre')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->wrap()
+                    ->lineClamp(2),
                 TextColumn::make('costo')
                     ->prefix('S/ '),
                 TextColumn::make('created_at')

@@ -30,6 +30,8 @@ class EvidenciaResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-camera';
 
+    protected static ?string $navigationLabel = 'Evidencias subidas';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -54,6 +56,18 @@ class EvidenciaResource extends Resource
     {
         return $table
             ->columns([
+                ColumnGroup::make('Trabajo', [
+                    TextColumn::make('trabajo.codigo')
+                        ->label('Código')
+                        ->searchable(isIndividual: true),
+                    TextColumn::make('trabajo.fecha_ingreso')
+                        ->label('Fecha de Ingreso')
+                        ->toggleable(isToggledHiddenByDefault: true),
+                    TextColumn::make('trabajo.fecha_salida')
+                        ->label('Fecha de Salida')
+                        ->placeholder('Sin Salida')
+                        ->toggleable(isToggledHiddenByDefault: true),
+                ]),
                 ColumnGroup::make('Vehiculo', [
                     TextColumn::make('trabajo.vehiculo.placa')
                         ->label('Placa')
@@ -82,7 +96,14 @@ class EvidenciaResource extends Resource
                 ]),
                 ColumnGroup::make('Evidencia', [
                     ImageColumn::make('evidencia_url')
+                        ->size(40)
                         ->label('Archivo')
+                        ->getStateUsing(function (Evidencia $record): string {
+                            if ($record->tipo === 'imagen') {
+                                return $record->evidencia_url;
+                            }
+                            return asset('images/video.png');
+                        })
                         ->alignCenter()
                         ->verticallyAlignCenter(),
                     TextColumn::make('user.name')
@@ -91,7 +112,8 @@ class EvidenciaResource extends Resource
                     TextColumn::make('observacion')
                         ->label('Observación')
                         ->wrap()
-                        ->lineClamp(3),
+                        ->lineClamp(3)
+                        ->toggleable(isToggledHiddenByDefault: true),
                 ]),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
@@ -112,9 +134,7 @@ class EvidenciaResource extends Resource
                 ViewAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    ExportBulkAction::make()
-                ]),
+                ExportBulkAction::make()
             ]);
     }
 

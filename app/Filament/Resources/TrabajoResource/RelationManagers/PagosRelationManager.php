@@ -30,8 +30,6 @@ class PagosRelationManager extends RelationManager
                 DatePicker::make('fecha_pago')
                     ->default(today())
                     ->required(),
-                TextInput::make('observacion')
-                    ->required(),
                 Select::make('detalle_id')
                     ->relationship('detalle', 'nombre')
                     ->searchable()
@@ -46,14 +44,14 @@ class PagosRelationManager extends RelationManager
                         TextInput::make('nombre')
                             ->unique(ignoreRecord: true)
                             ->required()
-                    ])
+                    ]),
+                TextInput::make('observacion'),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('monto')
             ->columns([
                 TextColumn::make('monto')
                     ->prefix('S/ '),

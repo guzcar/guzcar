@@ -20,35 +20,58 @@
                             <img id="profile-preview" src="{{ auth()->user()->getFilamentAvatarUrl() }}" alt="Perfil"
                                 class="rounded-circle" width="120" height="120" style="object-fit: cover;">
                         @else
-                            @php
-                                $nameParts = explode(' ', auth()->user()->name);
-                                $initials = '';
-                                foreach ($nameParts as $part) {
-                                    $initials .= strtoupper(substr($part, 0, 1)) . ' ';
-                                }
-                                $initials = rtrim($initials);
-                            @endphp
-                            <img id="profile-preview"
-                                src="https://ui-avatars.com/api/?name={{ urlencode($initials) }}&background=09090b&color=ffffff"
-                                alt="Perfil" class="rounded-circle" width="120" height="120" style="object-fit: cover;">
+                                                @php
+                                                    $nameParts = explode(' ', auth()->user()->name);
+                                                    $initials = '';
+                                                    foreach ($nameParts as $part) {
+                                                        $initials .= strtoupper(substr($part, 0, 1)) . ' ';
+                                                    }
+                                                    $initials = rtrim($initials);
+                                                @endphp
+                                                <img id="profile-preview"
+                                                    src="https://ui-avatars.com/api/?name={{ urlencode($initials) }}&background=09090b&color=ffffff"
+                                                    alt="Perfil" class="rounded-circle" width="120" height="120" style="object-fit: cover;">
                         @endif
                     </div>
                     <form action="{{ route('user.add-avatar') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3 text-center">
                             <input type="file" id="avatar_url" name="avatar_url"
-                                class="form-control @error('avatar_url') is-invalid @enderror" accept="image/*"
-                                onchange="previewImage(event)">
+                                class="form-control @error('avatar_url') is-invalid @enderror" capture="environment"
+                                onchange="previewImage(event)" required>
                             @error('avatar_url')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         <button type="submit" class="btn btn-primary w-100 mb-3">Guardar Imagen</button>
                     </form>
-                    <form action="{{ route('user.remove-avatar') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-light border w-100">Eliminar Imagen</button>
-                    </form>
+                    <button type="button" class="btn btn-light border w-100" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal">
+                        Eliminar Imagen
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmar Eliminación</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Estás seguro de que deseas eliminar tu foto de perfil permanentemente?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <form action="{{ route('user.remove-avatar') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-danger">
+                                Eliminar Imagen
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -65,7 +88,7 @@
                         <div class="mb-3">
                             <label for="name" class="form-label">Nombre</label>
                             <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
-                                name="name" value="{{ old('name', $user->name) }}" required>
+                                name="name" value="{{ old('name', $user->name) }}" required readonly>
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
