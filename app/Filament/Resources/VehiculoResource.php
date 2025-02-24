@@ -150,6 +150,11 @@ class VehiculoResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->placeholder('Sin Placa'),
+                TextColumn::make('tipoVehiculo.nombre')
+                    ->label('Tipo')
+                    ->numeric()
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('marca')
                     ->searchable()
                     ->sortable(),
@@ -159,11 +164,6 @@ class VehiculoResource extends Resource
                     ->wrap()
                     ->lineClamp(2),
                 TextColumn::make('color')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('tipoVehiculo.nombre')
-                    ->label('Tipo')
-                    ->numeric()
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('clientes.nombre')
@@ -193,12 +193,12 @@ class VehiculoResource extends Resource
                 ForceDeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    ExportBulkAction::make(),
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                ]),
+                ExportBulkAction::make(),
+                // BulkActionGroup::make([
+                //     DeleteBulkAction::make(),
+                //     ForceDeleteBulkAction::make(),
+                //     RestoreBulkAction::make(),
+                // ]),
             ]);
     }
 

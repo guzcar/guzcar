@@ -20,7 +20,7 @@ class TallerSeeder extends Seeder
 
         Taller::create([
             'nombre' => 'Taller 2',
-            'ubicacion' => 'Chimbote, ...',
+            'ubicacion' => '1550 Pje. 2 de Mayo Chimbote, Áncash',
         ]);
     }
 }

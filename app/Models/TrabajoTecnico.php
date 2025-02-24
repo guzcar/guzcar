@@ -13,6 +13,7 @@ class TrabajoTecnico extends Model
     protected $fillable = [
         'trabajo_id',
         'tecnico_id',
+        'finalizado',
     ];
 
     public function trabajo(): BelongsTo

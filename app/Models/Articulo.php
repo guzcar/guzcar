@@ -14,9 +14,15 @@ class Articulo extends Model
         'especificacion',
         'marca',
         'tamano_presentacion',
+        'color',
         'descripcion',
+        'costo',
         'precio',
         'sub_categoria_id',
+        'stock',
+        'abiertos',
+        'mermas',
+        'fraccionable',
     ];
 
     public function subCategoria()

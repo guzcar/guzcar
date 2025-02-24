@@ -45,6 +45,10 @@
             </h2>
             <div class="space-y-4">
                 <p class="text-gray-800 dark:text-gray-300">
+                    <span class="font-medium text-gray-900 dark:text-gray-300">Código:</span>
+                    {{ $trabajo->codigo }}
+                </p>
+                <p class="text-gray-800 dark:text-gray-300">
                     <span class="font-medium text-gray-900 dark:text-gray-300">Taller:</span>
                     {{ $trabajo->taller->nombre ?? 'N/A' }}
                 </p>
@@ -99,6 +103,7 @@
         </x-filament::card>
     </div>
 
+    {{--
     <h2 class="text-xl font-bold">Servicios ejecutados</h2>
 
     <section
@@ -142,7 +147,7 @@
                                         class="group flex w-full items-center gap-x-1 whitespace-nowrap justify-start">
                                         <span
                                             class="fi-ta-header-cell-label text-sm font-semibold text-gray-950 dark:text-white">
-                                            Total
+                                            Sub-Total
                                         </span>
                                     </span>
                                 </th>
@@ -161,7 +166,7 @@
                                         {{ $trabajoServicio->cantidad }}
                                     </td>
                                     <td class="fi-ta-cell px-6 py-4 text-gray-700 dark:text-gray-300 truncate max-w-xs">
-                                        S/ {{ number_format($trabajoServicio->cantidad * $trabajoServicio->precio, 2) }}
+                                        S/ {{ number_format($trabajoServicio->cantidad * $trabajoServicio->precio, 2, '.', '') }}
                                     </td>
                                 </tr>
                             @empty
@@ -193,8 +198,10 @@
             </div>
         </div>
     </section>
+    --}}
 
     <h2 class="text-xl font-bold">Evidencias Asociadas</h2>
+
     @if ($evidencias->isNotEmpty())
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             @foreach ($evidencias as $evidencia)

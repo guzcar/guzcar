@@ -6,6 +6,7 @@ use App\Filament\Resources\ServicioResource\Pages;
 use App\Filament\Resources\ServicioResource\RelationManagers;
 use App\Models\Servicio;
 use Filament\Forms;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -40,7 +41,7 @@ class ServicioResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('nombre')
+                Textarea::make('nombre')
                     ->unique(ignoreRecord: true)
                     ->required()
                     ->maxLength(255)
@@ -58,6 +59,8 @@ class ServicioResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('nombre')
+                    ->lineClamp(3)
+                    ->wrap()
                     ->sortable()
                     ->searchable()
                     ->wrap()
@@ -92,12 +95,12 @@ class ServicioResource extends Resource
                 ForceDeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    ExportBulkAction::make(),
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                ]),
+                ExportBulkAction::make(),
+                // BulkActionGroup::make([
+                //     DeleteBulkAction::make(),
+                //     ForceDeleteBulkAction::make(),
+                //     RestoreBulkAction::make(),
+                // ]),
             ]);
     }
 

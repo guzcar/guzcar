@@ -67,6 +67,7 @@ class UserResource extends Resource
                                 TextInput::make('password')
                                     ->label('Contraseña')
                                     ->password()
+                                    ->revealable()
                                     ->confirmed()
                                     ->dehydrated(fn($state) => filled($state))
                                     ->required(fn(string $context): bool => $context === 'create')
@@ -74,6 +75,7 @@ class UserResource extends Resource
                                 TextInput::make('password_confirmation')
                                     ->label('Confirmar contraseña')
                                     ->password()
+                                    ->revealable()
                                     ->dehydrated(fn($state) => filled($state))
                                     ->required(fn(string $context): bool => $context === 'create')
                                     ->minLength(8),

@@ -24,17 +24,17 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
-        DB::statement("
-            ALTER TABLE vehiculos
-            ADD COLUMN nombre_completo VARCHAR(255)
-            GENERATED ALWAYS AS (
-                CONCAT(
-                    IFNULL(placa, 'Sin Placa'), ' - ',
-                    marca, ' ',
-                    modelo
-                )
-            ) VIRTUAL;
-        ");
+        // DB::statement("
+        //     ALTER TABLE vehiculos
+        //     ADD COLUMN nombre_completo VARCHAR(255)
+        //     GENERATED ALWAYS AS (
+        //         CONCAT(
+        //             IFNULL(placa, 'Sin Placa'), ' - ',
+        //             marca, ' ',
+        //             modelo
+        //         )
+        //     ) VIRTUAL;
+        // ");
     }
 
     /**

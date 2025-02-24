@@ -2,6 +2,13 @@
     <h1 class="mb-3">Vehículos Asignados</h1>
     <a class="btn btn-primary mb-3" href="{{ route('trabajos.asignar') }}">Asignarme vehículos</a>
 
+    @if (session('success'))
+        <div class="alert alert-light alert-dismissible border shadow-sm fade show">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     {{-- Input para el buscador --}}
     <input type="text" id="buscador" class="form-control mb-3" placeholder="Buscar">
 
@@ -29,15 +36,75 @@
                                 </td>
                                 <td style="max-width: 100px;">
                                     <div class="d-grid gap-2">
-                                        <a class="btn btn-primary" href="{{ route('evidencias.index', $trabajo) }}">Evidencias</a>
-                                        <form action="{{ route('trabajos.abandonar', $trabajo) }}" method="POST" style="display: inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-danger w-100" type="submit">Abandonar</button>
-                                        </form>
+                                        <div class="dropdown">
+                                            <button class="btn btn-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Gestionar
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('evidencias.index', $trabajo) }}">
+                                                        <i class="text-secondary me-2 fa-solid fa-image"></i>
+                                                        Evidencias
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('trabajos.articulos', $trabajo) }}">
+                                                        <i class="text-secondary me-2 fa-solid fa-box-archive"></i>
+                                                        Artículos
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#finalizarModal{{ $trabajo->id }}">Finalizar</button>
+                                        <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#abandonarModal{{ $trabajo->id }}">Abandonar</button>
                                     </div>
                                 </td>
                             </tr>
+
+                            <!-- Modal para Finalizar -->
+                            <div class="modal fade" id="finalizarModal{{ $trabajo->id }}" tabindex="-1" aria-labelledby="finalizarModalLabel{{ $trabajo->id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="finalizarModalLabel{{ $trabajo->id }}">Confirmar Finalización</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ¿Estás seguro de que deseas finalizar este trabajo? Una vez finalizado ya no podrás tener acceso, solo un administrador del sistema puede revertir esta acción.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <form action="{{ route('trabajos.finalizar', $trabajo) }}" method="POST" style="display: inline;">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success">Finalizar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal para Abandonar -->
+                            <div class="modal fade" id="abandonarModal{{ $trabajo->id }}" tabindex="-1" aria-labelledby="abandonarModalLabel{{ $trabajo->id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="abandonarModalLabel{{ $trabajo->id }}">Confirmar Abandono</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ¿Estás seguro de que deseas abandonar este trabajo?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <form action="{{ route('trabajos.abandonar', $trabajo) }}" method="POST" style="display: inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger">Abandonar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         @empty
                             <tr id="sinVehiculos">
                                 <td class="text-center text-secondary py-5" colspan="2">

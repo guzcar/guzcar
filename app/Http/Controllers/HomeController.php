@@ -16,8 +16,11 @@ class HomeController extends Controller
     {
         $user = auth()->user();
 
-        // Obtener trabajos asignados al usuario con fecha_salida == null
-        $trabajos = $user->trabajos()->whereNull('fecha_salida')->get();
+        // Obtener trabajos asignados al usuario con fecha_salida == null y finalizado == false
+        $trabajos = $user->trabajos()
+            ->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
+            ->wherePivot('finalizado', false) // Filtra por finalizado == false en la tabla intermedia
+            ->get();
 
         return view('home', compact('trabajos'));
     }

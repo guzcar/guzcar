@@ -43,6 +43,25 @@ class TrabajoController extends Controller
     }
 
     /**
+     * Finalizar un trabajo asignado.
+     * 
+     * @param \App\Models\Trabajo $trabajo
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function finalizar(Trabajo $trabajo)
+    {
+        $user = auth()->user();
+    
+        if (!$trabajo->usuarios()->where('tecnico_id', $user->id)->exists()) {
+            abort(403, 'Forbidden');
+        }
+
+        $trabajo->usuarios()->updateExistingPivot($user->id, ['finalizado' => true]);
+    
+        return redirect()->route('home')->with('success', 'Trabajo finalizado correctamente.');
+    }
+
+    /**
      * Abandonar un trabajo asignado.
      * 
      * @param \App\Models\Trabajo $trabajo

@@ -36,18 +36,18 @@ class ViewTrabajo extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            // Action::make('back')
-            //     ->label('Regresar')
-            //     ->url(TrabajoResource::getUrl())
-            //     ->icon('heroicon-o-arrow-left')
-            //     ->color('gray'),
-            Action::make('Descargar')
-                ->icon('heroicon-s-arrow-down-tray')
-                ->url(
-                    fn(Trabajo $trabajo): string => route('trabajo.pdf.report', ['trabajo' => $trabajo]),
-                    shouldOpenInNewTab: true
-                )
+            Action::make('back')
+                ->label('Regresar')
+                ->url(TrabajoResource::getUrl())
+                ->icon('heroicon-o-arrow-left')
                 ->color('gray'),
+            // Action::make('Descargar')
+            //     ->icon('heroicon-s-arrow-down-tray')
+            //     ->url(
+            //         fn(Trabajo $trabajo): string => route('trabajo.pdf.report', ['trabajo' => $trabajo]),
+            //         shouldOpenInNewTab: true
+            //     )
+            //     ->color('gray'),
             EditAction::make()
                 ->icon('heroicon-o-pencil-square'),
         ];

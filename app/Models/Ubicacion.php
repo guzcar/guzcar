@@ -12,5 +12,5 @@ class Ubicacion extends Model
 
     protected $table = 'ubicaciones';
 
-    protected $fillable = ['estante', 'codigo'];
+    protected $fillable = ['codigo'];
 }

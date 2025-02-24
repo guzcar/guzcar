@@ -9,6 +9,7 @@ use App\Models\Articulo;
 use App\Models\Categoria;
 use App\Models\SubCategoria;
 use App\Models\Ubicacion;
+use App\Services\FractionService;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
@@ -16,6 +17,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -66,11 +68,22 @@ class ArticuloResource extends Resource
                                     ->label('Categoría')
                                     ->options(Categoria::all()->pluck('nombre', 'id'))
                                     ->reactive()
+                                    ->createOptionForm([
+                                        TextInput::make('nombre')
+                                            ->label('Nombre de la categoría')
+                                            ->required(),
+                                    ])
+                                    ->createOptionUsing(function ($data) {
+                                        $categoria = Categoria::create([
+                                            'nombre' => $data['nombre'],
+                                        ]);
+                                        return $categoria->id;
+                                    })
                                     ->afterStateUpdated(fn($state, callable $set) => $set('sub_categoria_id', null)),
                                 Select::make('sub_categoria_id')
                                     ->required()
                                     ->label('Subcategoría')
-                                    ->placeholder('')
+                                    ->placeholder('Seleccione una subcategoría')
                                     ->searchable()
                                     ->options(function ($get) {
                                         $categoriaId = $get('categoria_id');
@@ -81,57 +94,111 @@ class ArticuloResource extends Resource
                                         }
                                         return [];
                                     })
+                                    ->createOptionForm([
+                                        TextInput::make('nombre')
+                                            ->label('Nombre de la subcategoría')
+                                            ->required(),
+                                    ])
+                                    ->createOptionUsing(function ($data, $get) {
+                                        $categoriaId = $get('categoria_id');
+                                        if (!$categoriaId) {
+                                            throw new \Exception('Primero seleccione una categoría.');
+                                        }
+
+                                        $subCategoria = SubCategoria::create([
+                                            'nombre' => $data['nombre'],
+                                            'categoria_id' => $categoriaId,
+                                        ]);
+                                        return $subCategoria->id;
+                                    })
                                     ->disabled(fn($get) => !$get('categoria_id')),
-                                TextInput::make('especificacion')
-                                    ->label('Especificación'),
-                                TextInput::make('marca')
-                                    ->required(),
-                                TextInput::make('tamano_presentacion')
-                                    ->label('Tamaño / Presentación')
-                                    ->required(),
-                                TextInput::make('precio')
-                                    ->required()
-                                    ->numeric()
-                                    ->prefix('S/ ')
-                                    ->maxValue(42949672.95),
+                                Grid::make()
+                                    ->schema([
+                                        TextInput::make('especificacion')
+                                            ->label('Especificación'),
+                                        TextInput::make('marca')
+                                            ->required(),
+                                        TextInput::make('tamano_presentacion')
+                                            ->label('Tamaño / Presentación')
+                                            ->required(),
+                                        TextInput::make('color'),
+                                    ])->columns(2),
+                                Grid::make()
+                                    ->schema([
+                                        TextInput::make('costo')
+                                            ->label('Costo de compra')
+                                            ->required()
+                                            ->numeric()
+                                            ->prefix('S/ ')
+                                            ->maxValue(42949672.95),
+                                        TextInput::make('precio')
+                                            ->label('Precio de venta')
+                                            ->numeric()
+                                            ->prefix('S/ ')
+                                            ->maxValue(42949672.95),
+                                    ])
+                                    ->columns(['xl' => 2, 'lg' => 2, 'md' => 2, 'sm' => 2]),
                                 Textarea::make('descripcion')
                                     ->label('Descripción'),
                             ])
                             ->heading('Artículo')
                             ->columnSpan(['xl' => 3, 'lg' => 3, 'md' => 1, 'sm' => 1]),
-                        Section::make()
+                        Grid::make()
                             ->schema([
-                                Repeater::make('articuloUbicaciones')
-                                    ->relationship('articuloUbicaciones')
-                                    ->defaultItems(0)
-                                    ->simple(
-                                        Select::make('ubicacion_id')
-                                            ->label('Seleccionar Ubicación')
-                                            ->relationship('ubicacion', 'nombre_completo', fn($query) => $query->withTrashed())
-                                            ->distinct()
-                                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
-                                            ->searchable()
-                                            ->preload()
-                                            ->createOptionForm([
-                                                TextInput::make('estante')
+                                Section::make()
+                                    ->schema([
+                                        Repeater::make('articuloUbicaciones')
+                                            ->label('Ubicaciones')
+                                            ->relationship('articuloUbicaciones')
+                                            ->defaultItems(0)
+                                            ->addActionLabel('Añadir ubicación')
+                                            ->simple(
+                                                Select::make('ubicacion_id')
+                                                    ->relationship('ubicacion', 'codigo', fn($query) => $query->withTrashed())
+                                                    ->distinct()
+                                                    ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->createOptionForm([
+                                                        TextInput::make('codigo')
+                                                            ->label('Código')
+                                                            ->required()
+                                                            ->unique(ignoreRecord: true)
+                                                            ->maxLength(10),
+                                                    ])
+                                                    ->editOptionForm([
+                                                        TextInput::make('codigo')
+                                                            ->label('Código')
+                                                            ->required()
+                                                            ->unique(ignoreRecord: true)
+                                                            ->maxLength(10),
+                                                    ])
+                                            )
+                                    ])
+                                    ->heading('Ubicación en Almacen'),
+                                Section::make()
+                                    ->schema([
+                                        Grid::make()
+                                            ->schema([
+                                                Toggle::make('fraccionable')
+                                                    ->inline(false),
+                                                TextInput::make('stock')
                                                     ->required()
-                                                    ->maxLength(5),
-                                                TextInput::make('codigo')
-                                                    ->label('Código')
+                                                    ->numeric()
+                                                    ->default(0),
+                                                TextInput::make('abiertos')
                                                     ->required()
-                                                    ->maxLength(5),
+                                                    ->numeric()
+                                                    ->default(0),
+                                                TextInput::make('mermas')
+                                                    ->required()
+                                                    ->numeric()
+                                                    ->default(0),
                                             ])
-                                        // ->editOptionForm([
-                                        //     TextInput::make('estante')
-                                        //         ->required()
-                                        //         ->maxLength(5),
-                                        //     TextInput::make('codigo')
-                                        //         ->required()
-                                        //         ->maxLength(5),
-                                        // ])
-                                    )
+                                            ->columns(['xl' => 2, 'lg' => 2, 'md' => 2, 'sm' => 2])
+                                    ])
+                                    ->heading('Inventario'),
                             ])
-                            ->heading('Ubicación en Almacen')
                             ->columnSpan(['xl' => 2, 'lg' => 2, 'md' => 1, 'sm' => 1]),
                     ])
                     ->columns(['xl' => 5, 'lg' => 5, 'md' => 1, 'sm' => 1]),
@@ -154,22 +221,55 @@ class ArticuloResource extends Resource
                     ->label('Especificación')
                     ->placeholder('Sin especificación')
                     ->sortable()
-                    ->searchable(isIndividual: true),
+                    ->searchable(isIndividual: true)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('marca')
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('tamano_presentacion')
-                    ->label('Tamaño')
+                    ->label('Presentación')
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('ubicaciones.nombre_completo')
+                TextColumn::make('color')
+                    ->placeholder('Sin color')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('ubicaciones.codigo')
                     ->label('Ubicación')
+                    ->placeholder('Sin ubicación')
                     ->searchable()
                     ->badge()
                     ->wrap()
                     ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('precio')
+                TextColumn::make('costo')
+                    ->label('Costo de compra')
                     ->prefix('S/ ')
+                    ->alignRight()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('precio')
+                    ->label('Precio de venta')
+                    ->prefix('S/ ')
+                    ->placeholder('S/ 0.00')
+                    ->alignRight()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('stock')
+                    ->alignCenter(),
+                TextColumn::make('abiertos')
+                    ->alignCenter()
+                    ->formatStateUsing(function ($state, FractionService $fractionService) {
+                        return $fractionService->decimalToFraction((float) $state);
+                    }),
+                TextColumn::make('mermas')
+                    ->alignCenter(),
+                TextColumn::make('descripcion')
+                    ->placeholder('Sin descripción')
+                    ->extraAttributes(['style' => 'width: 15rem'])
+                    ->lineClamp(2)
+                    ->wrap()
+                    ->searchable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
@@ -184,7 +284,10 @@ class ArticuloResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
-                ValueRangeFilter::make('precio'),
+                ValueRangeFilter::make('costo')
+                    ->label('Costo de compra'),
+                ValueRangeFilter::make('precio')
+                    ->label('Precio de venta'),
                 TrashedFilter::make(),
             ])
             ->actions([
@@ -194,12 +297,12 @@ class ArticuloResource extends Resource
                 ForceDeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    ExportBulkAction::make(),
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                ]),
+                ExportBulkAction::make(),
+                // BulkActionGroup::make([
+                //     DeleteBulkAction::make(),
+                //     ForceDeleteBulkAction::make(),
+                //     RestoreBulkAction::make(),
+                // ]),
             ]);
     }
 

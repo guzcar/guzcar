@@ -102,12 +102,12 @@ class ClienteResource extends Resource
                 ForceDeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    ExportBulkAction::make(),
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                ]),
+                ExportBulkAction::make(),
+                // BulkActionGroup::make([
+                //     DeleteBulkAction::make(),
+                //     ForceDeleteBulkAction::make(),
+                //     RestoreBulkAction::make(),
+                // ]),
             ]);
     }
 

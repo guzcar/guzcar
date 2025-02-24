@@ -13,6 +13,8 @@ class Trabajo extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'control',
+        'codigo',
         'vehiculo_id',
         'taller_id',
         'fecha_ingreso',
@@ -43,7 +45,8 @@ class Trabajo extends Model
 
     public function usuarios()
     {
-        return $this->belongsToMany(User::class, 'trabajo_tecnicos', 'trabajo_id', 'tecnico_id')->withTrashed();
+        return $this->belongsToMany(User::class, 'trabajo_tecnicos', 'trabajo_id', 'tecnico_id')
+            ->withTrashed();
     }
 
     public function servicios(): HasMany
@@ -61,24 +64,16 @@ class Trabajo extends Model
         return $this->hasMany(TrabajoPago::class, 'trabajo_id', 'id');
     }
 
-    /**
-     * Obtiene el importe total sumando precios y cantidades de los servicios.
-     *
-     * @return float
-     */
-    public function getImporte(): float
+    public function trabajoArticulos()
     {
-        return round($this->servicios->sum(fn($servicio) => $servicio->precio * $servicio->cantidad), 2);
+        return $this->hasMany(TrabajoArticulo::class, 'trabajo_id');
     }
 
-    /**
-     * Obtiene el monto total de los pagos realizados.
-     *
-     * @return float
-     */
-    public function getACuenta(): float
+    public function articulos()
     {
-        return round($this->pagos->sum('monto'), 2);
+        return $this->belongsToMany(Articulo::class, 'trabajo_articulos', 'trabajo_id', 'articulo_id')
+            ->withPivot(['fecha', 'hora', 'precio', 'cantidad', 'tecnico_id', 'responsable_id', 'movimiento', 'observacion'])
+            ->withTimestamps();
     }
 
     /**
@@ -88,6 +83,14 @@ class Trabajo extends Model
      */
     public function getPorCobrar(): float
     {
-        return round($this->getImporte() - $this->getACuenta(), 2);
+        // Obtener los valores de importe y a_cuenta (y convertirlos a float)
+        $importe = (float)$this->importe;
+        $aCuenta = (float)$this->a_cuenta;
+
+        // Calcular la diferencia
+        $porCobrar = $importe - $aCuenta;
+
+        // Devolver 0 si el resultado es negativo
+        return max($porCobrar, 0);
     }
 }

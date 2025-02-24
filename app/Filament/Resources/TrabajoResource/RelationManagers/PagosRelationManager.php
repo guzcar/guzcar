@@ -39,12 +39,12 @@ class PagosRelationManager extends RelationManager
                         TextInput::make('nombre')
                             ->unique(ignoreRecord: true)
                             ->required()
-                    ])
-                    ->editOptionForm([
-                        TextInput::make('nombre')
-                            ->unique(ignoreRecord: true)
-                            ->required()
                     ]),
+                    // ->editOptionForm([
+                    //     TextInput::make('nombre')
+                    //         ->unique(ignoreRecord: true)
+                    //         ->required()
+                    // ]),
                 TextInput::make('observacion'),
             ]);
     }

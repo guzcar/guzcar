@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proforma {{ $trabajo->vehiculo->placa }}</title>
+    <title>Proforma {{ $trabajo->codigo }}</title>
     <style>
         @page {
             size: A4;
@@ -38,7 +38,7 @@
             font-size: 22px;
             font-weight: bold;
             margin-top: 8px;
-            padding-right: 30px;
+            padding-right: 70px;
         }
 
         footer {
@@ -121,8 +121,12 @@
         <img src="{{ public_path('images/logo-kia.jpg') }}" class="header-logo">
         <div class="header-title">AUTOMOTORES GUZCAR S.A.C.</div>
         <table class="table-info">
-            <tr><th style="width: 100px;">{{ date('d / m / Y') }}</th></tr>
-            <tr><td>{{ $trabajo->codigo }}</td></tr>
+            <tr>
+                <th style="width: 130px;">{{ date('d / m / Y') }}</th>
+            </tr>
+            <tr>
+                <td>{{ $trabajo->codigo }}</td>
+            </tr>
         </table>
         <hr class="header-line">
     </header>
@@ -211,7 +215,7 @@
                     <th>Servicio</th>
                     <th style="width: 95px">Costo</th>
                     <th style="width: 95px">Cantidad</th>
-                    <th style="width: 100px">Subtotal</th>
+                    <th style="width: 100px">Sub-Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -221,7 +225,7 @@
                         <td style="text-align: right">S/ {{ $trabajoServicio->precio }}</td>
                         <td style="text-align: center">{{ $trabajoServicio->cantidad }}</td>
                         <td style="text-align: right">S/
-                            {{ number_format($trabajoServicio->cantidad * $trabajoServicio->precio, 2) }}
+                            {{ number_format($trabajoServicio->cantidad * $trabajoServicio->precio, 2, '.', '') }}
                         </td>
                     </tr>
                 @empty
@@ -234,11 +238,86 @@
                 @endforelse
                 <tr>
                     <td colspan="3" style="border: 0"></td>
-                    <td style="text-align: right"><b>S/ {{ number_format($subtotal_servicios, 2) }}</b></td>
+                    <td style="text-align: right"><b>S/ {{ number_format($subtotal_servicios, 2, '.', '') }}</b></td>
                 </tr>
             </tbody>
         </table>
-        <p>Tiempo de ejecución: <strong>{{ $tiempo }}</strong></p>
+
+        <h3>ARTÍCULOS UTILIZADOS</h3>
+
+        <table class="table-container">
+            <thead>
+                <tr>
+                    <th>Artículo</th>
+                    <th style="width: 95px">Costo</th>
+                    <th style="width: 95px">Cantidad</th>
+                    <th style="width: 100px">Sub-Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($articulosAgrupados as $articulo)
+                    <tr>
+                        <td>
+                            {{ $articulo['articulo']->subCategoria->categoria->nombre }}
+                            {{ $articulo['articulo']->subCategoria->nombre }}
+                            {{ $articulo['articulo']->especificacion }}
+                            {{ $articulo['articulo']->marca }}
+                            {{ $articulo['articulo']->color }} - {{ $articulo['articulo']->tamano_presentacion }}
+                        </td>
+                        <td style="text-align: right">S/ {{ $articulo['precio'] }}</td>
+                        <td style="text-align: center">{{ $articulo['cantidad'] }}</td>
+                        <td style="text-align: right">S/
+                            {{ number_format($articulo['cantidad'] * $articulo['precio'], 2, '.', '') }}
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td class="empty-case"></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                @endforelse
+                <tr>
+                    <td colspan="3" style="border: 0"></td>
+                    <td style="text-align: right"><b>S/ {{ number_format($subtotal_articulos, 2, '.', '') }}</b></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3></h3>
+
+        @if (request('igv'))
+            <table class="table-container">
+                <tr>
+                    <td style="border: 0"></td>
+                    <td style="border: 0; width: 95px;">Sub-Total:</td>
+                    <td style="text-align: right;">S/ {{ number_format($total, 2, '.', '') }}</td>
+                </tr>
+                <tr>
+                    <td style="border: 0"></td>
+                    <td style="border: 0;">IGV:</td>
+                    <td style="text-align: right;">S/ {{ number_format($total * request('igv_porcentaje') / 100, 2, '.', '') }}</td>
+                </tr>
+                <tr>
+                    <td style="border: 0"></td>
+                    <td style="border: 0;">Total:</td>
+                    <th style="width: 100px; text-align: right;">S/ {{ number_format($total * (1 + request('igv_porcentaje') / 100), 2, '.', '') }}</th>
+                </tr>
+            </table>
+        @else
+            <table class="table-container">
+                <tr>
+                    <td style="border: 0"></td>
+                    <td style="border: 0; width: 95px;">Total:</td>
+                    <th style="width: 100px; text-align: right;">S/ {{ number_format($total, 2, '.', '') }}</th>
+                </tr>
+            </table>
+        @endif
+
+        {{-- Fin de la parte que quiero mejorar --}}
+
+        <p>Tiempo de ejecución: <b>{{ $tiempo }}</b></p>
     </div>
 
 </body>

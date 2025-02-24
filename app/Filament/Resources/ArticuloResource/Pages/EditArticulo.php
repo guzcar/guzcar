@@ -29,4 +29,9 @@ class EditArticulo extends EditRecord
 
         $this->fillFormWithDataAndCallHooks($articulo, $data);
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->previousUrl ?? $this->getResource()::getUrl('index');
+    }
 }
