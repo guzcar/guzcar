@@ -33,7 +33,8 @@ class EvidenciasRelationManager extends RelationManager
                             ->label('Evidencia')
                             ->directory('evidencia')
                             ->required()
-                            ->columnSpan(1),
+                            ->columnSpan(1)
+                            ->maxSize(500 * 1024),
                         Grid::make()
                             ->schema([
                                 Select::make('user_id')
@@ -97,8 +98,8 @@ class EvidenciasRelationManager extends RelationManager
                                     ->getOptionLabelUsing(function ($value): ?string {
                                         $user = User::withTrashed()->find($value);
                                         return $user ? $user->name : 'Usuario eliminado';
-                                    })
-                                    ->required(),
+                                    }),
+                                // ->required(),
                                 Textarea::make('observacion'),
                             ])
                             ->columns(1)

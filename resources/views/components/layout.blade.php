@@ -12,6 +12,17 @@
                 background: transparent;
                 color: inherit;
             }
+            .dropdown-menu .dropdown-item:focus,
+            .dropdown-menu .dropdown-item:active {
+                color: inherit !important;
+                background-color: transparent !important;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+            .dropdown-menu .dropdown-item::selection {
+                background: transparent;
+                color: inherit;
+            }
         </style>
     @endpush
 

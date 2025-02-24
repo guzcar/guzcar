@@ -73,6 +73,7 @@ class ServiciosRelationManager extends RelationManager
                     ->required()
                     ->dehydrated(),
                 TextInput::make('cantidad')
+                    ->default(1)
                     ->required()
                     ->numeric()
             ]);

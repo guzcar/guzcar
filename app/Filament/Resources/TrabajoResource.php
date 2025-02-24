@@ -11,9 +11,11 @@ use App\Models\Cliente;
 use App\Models\Servicio;
 use App\Models\Trabajo;
 use App\Models\User;
+use App\Services\TrabajoService;
 use Carbon\Carbon;
 use DateTime;
 use Filament\Forms;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -22,6 +24,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -43,12 +46,14 @@ use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\Layout\Panel;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\DB;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
@@ -78,9 +83,30 @@ class TrabajoResource extends Resource
                     ->schema([
                         Section::make()
                             ->schema([
+                                TextInput::make('codigo')
+                                    ->required()
+                                    ->label('Código')
+                                    ->placeholder('Ingrese una clave única de trabajo')
+                                    ->unique(ignoreRecord: true)
+                                    ->hiddenOn('create')
+                                    ->prefixIcon('heroicon-s-key')
+                                    ->minLength(16)
+                                    ->maxLength(16),
                                 Select::make('vehiculo_id')
-                                    ->relationship('vehiculo', 'nombre_completo')
+                                    ->relationship('vehiculo')
+                                    ->getOptionLabelFromRecordUsing(function ($record) {
+                                        $placa = $record->placa ?? '';
+                                        $tipoVehiculo = $record->tipoVehiculo->nombre;
+                                        $marca = $record->marca;
+                                        $modelo = $record->modelo;
+                                        if (!empty($placa)) {
+                                            return "{$placa} - {$tipoVehiculo} - {$marca} {$modelo}";
+                                        } else {
+                                            return "{$tipoVehiculo} - {$marca} {$modelo}";
+                                        }
+                                    })
                                     ->searchable()
+                                    ->preload()
                                     ->required()
                                     ->createOptionForm([
                                         Select::make('tipo_vehiculo_id')
@@ -125,7 +151,7 @@ class TrabajoResource extends Resource
                                                     ->createOptionForm([
                                                         TextInput::make('identificador')
                                                             ->label('RUC / DNI')
-                                                            ->required()
+                                                            // ->required()
                                                             ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                             ->maxLength(12),
                                                         TextInput::make('nombre')
@@ -141,7 +167,7 @@ class TrabajoResource extends Resource
                                                     ->editOptionForm([
                                                         TextInput::make('identificador')
                                                             ->label('RUC / DNI')
-                                                            ->required()
+                                                            // ->required()
                                                             ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                             ->maxLength(12),
                                                         TextInput::make('nombre')
@@ -236,7 +262,7 @@ class TrabajoResource extends Resource
                                     ]),
                                 Select::make('taller_id')
                                     ->relationship('taller', 'nombre')
-                                    ->preload()
+                                    ->default(1)
                                     ->required(),
                                 // ->createOptionForm([
                                 //     TextInput::make('nombre')
@@ -272,6 +298,8 @@ class TrabajoResource extends Resource
                                 Section::make()
                                     ->schema([
                                         Repeater::make('tecnicos')
+                                            ->label('')
+                                            ->createItemButtonLabel('Añadir técnico')
                                             ->relationship('tecnicos')
                                             ->defaultItems(0)
                                             ->simple(
@@ -282,79 +310,50 @@ class TrabajoResource extends Resource
                                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                                     ->searchable()
                                                     ->preload()
-                                                    /*
-                                                    ->createOptionForm([
-                                                        TextInput::make('name')
-                                                            ->label('Nombre')
-                                                            ->required()
-                                                            ->maxLength(255),
-                                                        TextInput::make('email')
-                                                            ->label('Correo electrónico')
-                                                            ->unique(ignoreRecord: true)
-                                                            ->email()
-                                                            ->required()
-                                                            ->maxLength(255),
-                                                        TextInput::make('password')
-                                                            ->label('Contraseña')
-                                                            ->password()
-                                                            ->confirmed()
-                                                            ->dehydrated(fn($state) => filled($state))
-                                                            ->required()
-                                                            ->minLength(8),
-                                                        TextInput::make('password_confirmation')
-                                                            ->label('Confirmar contraseña')
-                                                            ->password()
-                                                            ->dehydrated(fn($state) => filled($state))
-                                                            ->required()
-                                                            ->minLength(8),
-                                                    ])
-                                                    ->createOptionUsing(function (array $data): int {
-                                                        $data['password'] = bcrypt($data['password']);
-                                                        return User::create($data)->getKey();
-                                                    })
-                                                    ->editOptionForm([
-                                                        TextInput::make('name')
-                                                            ->label('Nombre')
-                                                            ->required()
-                                                            ->maxLength(255),
-                                                        TextInput::make('email')
-                                                            ->label('Correo electrónico')
-                                                            ->unique(ignoreRecord: true)
-                                                            ->email()
-                                                            ->required()
-                                                            ->maxLength(255),
-                                                        TextInput::make('password')
-                                                            ->label('Contraseña')
-                                                            ->password()
-                                                            ->confirmed()
-                                                            ->dehydrated(fn($state) => filled($state))
-                                                            ->minLength(8),
-                                                        TextInput::make('password_confirmation')
-                                                            ->label('Confirmar contraseña')
-                                                            ->password()
-                                                            ->dehydrated(fn($state) => filled($state))
-                                                            ->minLength(8),
-                                                    ])
-                                                    ->getOptionLabelUsing(function ($value): ?string {
-                                                        $user = User::withTrashed()->find($value);
-                                                        return $user ? $user->name : 'Usuario eliminado';
-                                                    })
-                                                    */
                                                     ->required()
                                             )
                                     ])
-                                    ->heading('Responsables')
-                                    ->hidden(function () {
-                                        $user = auth()->user();
-                                        return !(
-                                            $user->can('create_user') &&
-                                            $user->can('update_user') &&
-                                            $user->can('delete_user')
-                                        );
-                                    }),
+                                    ->heading('Técnicos')
+                                    ->hiddenOn('edit'),
+                                Section::make()
+                                    ->schema([
+                                        Repeater::make('tecnicos')
+                                            ->label('')
+                                            ->createItemButtonLabel('Añadir técnico')
+                                            ->relationship('tecnicos')
+                                            ->defaultItems(0)
+                                            ->schema([
+                                                Grid::make()
+                                                    ->schema([
+                                                        Select::make('tecnico_id')
+                                                            ->label('Seleccionar Técnico')
+                                                            ->relationship('tecnico', 'name', fn($query) => $query->withTrashed())
+                                                            ->distinct()
+                                                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                                            ->searchable()
+                                                            ->preload()
+                                                            ->required()
+                                                            ->columnSpan(2),
+                                                        Toggle::make('finalizado')
+                                                            ->inline(false)
+                                                            ->onIcon('heroicon-m-check')
+                                                            ->offIcon('heroicon-m-x-mark')
+                                                            ->onColor('success')
+                                                            ->offColor('danger')
+                                                            ->columnSpan(1)
+                                                    ])
+                                                    ->columns(3),
+                                            ])
+                                            ->collapsed()
+                                            ->itemLabel(fn(array $state): ?string => $state['tecnico_id'] ? User::find($state['tecnico_id'])->name : null)
+                                    ])
+                                    ->heading('Técnicos')
+                                    ->hiddenOn('create'),
                                 Section::make()
                                     ->schema([
                                         Repeater::make('archivos')
+                                            ->label('')
+                                            ->createItemButtonLabel('Añadir archivo')
                                             ->defaultItems(0)
                                             ->relationship()
                                             ->simple(
@@ -368,102 +367,6 @@ class TrabajoResource extends Resource
                             ])
                             ->columnspan(1)
                             ->columns(1),
-                        /*
-                        Section::make()
-                            ->schema([
-                                Repeater::make('servicios')
-                                    ->relationship()
-                                    ->defaultItems(0)
-                                    ->schema([
-                                        Select::make('servicio_id')
-                                            ->label('Servicio')
-                                            ->options(Servicio::query()->withTrashed()->pluck('nombre', 'id'))
-                                            ->searchable()
-                                            ->preload()
-                                            ->required()
-                                            ->reactive()
-                                            ->distinct()
-                                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
-                                            ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                                $servicio = Servicio::find($state);
-                                                if ($servicio) {
-                                                    $set('precio', $servicio->costo);
-                                                }
-                                            })
-                                            ->createOptionForm([
-                                                TextInput::make('nombre')
-                                                    ->unique(table: 'servicios', column: 'nombre', ignoreRecord: true)
-                                                    ->required()
-                                                    ->maxLength(255),
-                                                TextInput::make('costo')
-                                                    ->numeric()
-                                                    ->prefix('S/ ')
-                                                    ->required()
-                                                    ->maxValue(42949672.95),
-                                            ])
-                                            ->createOptionUsing(function (array $data): int {
-                                                return Servicio::create($data)->getKey();
-                                            })
-                                            // ->editOptionForm([
-                                            //     TextInput::make('nombre')
-                                            //         ->unique(table: 'servicios', column: 'nombre', ignoreRecord: true)
-                                            //         ->required()
-                                            //         ->maxLength(255),
-                                            //     TextInput::make('costo')
-                                            //         ->numeric()
-                                            //         ->prefix('S/ ')
-                                            //         ->maxValue(42949672.95),
-                                            // ])
-                                            // ->getOptionLabelUsing(function ($value): ?string {
-                                            //     $servicio = Servicio::withTrashed()->find($value);
-                                            //     return $servicio ? $servicio->nombre : 'Servicio eliminado';
-                                            // })
-                                            ->columnSpan(['xl' => 3, 'lg' => 3, 'md' => 2, 'sm' => 1]),
-                                        TextInput::make('precio')
-                                            // ->reactive()
-                                            ->numeric()
-                                            ->prefix('S/ ')
-                                            ->maxValue(42949672.95)
-                                            ->required()
-                                            ->dehydrated()
-                                            // ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
-                                            //     $cantidad = $get('cantidad') ?? 0;
-                                            //     $set('total', $state * $cantidad);
-                                            // })
-                                            ->columnSpan(1),
-                                        TextInput::make('cantidad')
-                                            // ->reactive()
-                                            ->numeric()
-                                            ->default('1')
-                                            ->required()
-                                            ->dehydrated()
-                                            // ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
-                                            //     $precio = $get('precio') ?? 0;
-                                            //     $set('total', $precio * $state);
-                                            // })
-                                            ->columnSpan(1),
-                                        // TextInput::make('total')
-                                        //     ->numeric()
-                                        //     ->prefix('S/ ')
-                                        //     ->disabled()
-                                        //     ->columnSpan(1)
-                                    ])
-                                    ->orderColumn('sort')
-                                    ->reorderableWithButtons()
-                                    ->columns(5)
-                                    ->hiddenLabel()
-                            ])
-                            ->heading('Servicios ejecutados')
-                            ->hidden(function () {
-                                $user = auth()->user();
-                                return !(
-                                    $user->can('create_servicio') &&
-                                    $user->can('update_servicio') &&
-                                    $user->can('delete_servicio')
-                                );
-                            })
-                            ->hiddenOn('create'),
-                        */
                     ])
                     ->columns(2),
             ]);
@@ -481,10 +384,22 @@ class TrabajoResource extends Resource
                 TextColumn::make('fecha_ingreso')
                     ->date('d/m/Y')
                     ->sortable(),
+                CheckboxColumn::make('control')
+                    ->alignCenter(),
                 TextColumn::make('vehiculo.placa')
                     ->label('Placa')
+                    ->placeholder('SIN PLACA')
                     ->sortable()
-                    ->searchable(isIndividual: true),
+                    ->searchable(isIndividual: true)
+                    ->badge()
+                    ->color(function ($record) { // Accede al registro completo
+                        return $record->control ? 'success' : 'gray'; // Color dinámico basado en "control"
+                    }),
+                TextColumn::make('vehiculo.tipoVehiculo.nombre')
+                    ->label('Tipo')
+                    ->sortable()
+                    ->searchable(isIndividual: true)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('vehiculo.marca')
                     ->label('Marca')
                     ->sortable()
@@ -500,11 +415,6 @@ class TrabajoResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('vehiculo.color')
                     ->label('Color')
-                    ->sortable()
-                    ->searchable(isIndividual: true)
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('vehiculo.tipoVehiculo.nombre')
-                    ->label('Tipo')
                     ->sortable()
                     ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -541,21 +451,17 @@ class TrabajoResource extends Resource
                         'POR COBRAR' => 'POR COBRAR',
                     ])
                     ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('.getImporte')
-                    ->label('Importe Total')
-                    ->getStateUsing(function (Trabajo $record): string {
-                        return number_format($record->getImporte(), 2, '.', '');
-                    })
+                TextColumn::make('importe')
+                    ->alignRight()
+                    ->label('Importe total')
                     ->prefix('S/ ')
                     ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('.getACuenta')
-                    ->label('A Cuenta')
-                    ->getStateUsing(function (Trabajo $record): string {
-                        return number_format($record->getACuenta(), 2, '.', '');
-                    })
+                TextColumn::make('a_cuenta')
+                    ->alignRight()
                     ->prefix('S/ ')
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('.getPorCobrar')
+                    ->alignRight()
                     ->label('Por cobrar')
                     ->getStateUsing(function (Trabajo $record): string {
                         return number_format($record->getPorCobrar(), 2, '.', '');
@@ -579,9 +485,15 @@ class TrabajoResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
-            ->recordUrl(null)
+            ->recordUrl(function (Trabajo $record): string {
+                // Genera la URL para la vista de edición
+                return static::getUrl('edit', ['record' => $record]);
+            })
             ->striped()
             ->filters([
+                Filter::make('control_o_fecha_salida_null')
+                    ->label('Control vehicular')
+                    ->query(fn($query) => $query->where('control', true)->orWhereNull('fecha_salida')),
                 TernaryFilter::make('estado_trabajo')
                     ->label('Estado del Trabajo')
                     ->placeholder('Todos')
@@ -593,7 +505,9 @@ class TrabajoResource extends Resource
                         false: fn($query) => $query->whereNotNull('fecha_salida'),
                         blank: fn($query) => $query, // Mostrar todos sin filtrar
                     ),
-
+                SelectFilter::make('taller_id')
+                    ->label('Taller')
+                    ->relationship('taller', 'nombre'),
                 SelectFilter::make('desembolso')
                     ->label('Estado del Desembolso')
                     ->options([
@@ -604,38 +518,22 @@ class TrabajoResource extends Resource
                     ->placeholder('Todos'),
                 DateRangeFilter::make('fecha_ingreso'),
                 DateRangeFilter::make('fecha_salida'),
-                SelectFilter::make('taller_id')
-                    ->label('Taller')
-                    ->relationship('taller', 'nombre')
-                    ->preload(),
                 TrashedFilter::make(),
             ])
             ->actions([
+
                 Action::make('terminar')
                     ->label('Terminar')
                     ->color('success')
                     ->icon('heroicon-s-check')
                     ->visible(fn(Trabajo $record) => is_null($record->fecha_salida)) // Visible solo si fecha_salida es null
                     ->action(function (Trabajo $record) {
-                        $total = $record->getImporte();
-                        $cuenta = $record->getACuenta();
 
-                        if ($total == 0 || $cuenta == 0) {
-                            $record->update([
-                                'fecha_salida' => now(),
-                                'desembolso' => 'POR COBRAR'
-                            ]);
-                        } elseif ($cuenta < $total) {
-                            $record->update([
-                                'fecha_salida' => now(),
-                                'desembolso' => 'A CUENTA'
-                            ]);
-                        } elseif ($cuenta >= $total) {
-                            $record->update([
-                                'fecha_salida' => now(),
-                                'desembolso' => 'COBRADO'
-                            ]);
-                        }
+                        $record->update([
+                            'fecha_salida' => now(),
+                        ]);
+
+                        TrabajoService::actualizarTrabajoPorId($record);
 
                         Notification::make()
                             ->title('El trabajo ha sido marcado como terminado.')
@@ -644,7 +542,10 @@ class TrabajoResource extends Resource
                     })
                     ->button()
                     ->size(ActionSize::Medium),
-                Action::make('reabrir')
+
+                Action::make('reabrir')->requiresConfirmation()
+                    ->modalHeading('Reabrir Trabajo')
+                    ->modalDescription('¿Estás segura/o de que deseas reabrir el trabajo? Esto eliminará la fecha de salida actual, pero podrás asignar una nueva más tarde.')
                     ->label('Reabrir')
                     ->color('warning')
                     ->icon('heroicon-s-arrow-path')
@@ -662,13 +563,76 @@ class TrabajoResource extends Resource
                     })
                     ->button()
                     ->size(ActionSize::Medium),
+
                 ActionGroup::make([
-                    Action::make('Descargar')
-                        ->icon('heroicon-s-arrow-down-tray')
+
+                    Action::make('Descargar proforma')
+                        ->icon('heroicon-s-document-text')
+                        ->form([
+                            // Grid::make()
+                            //     ->schema([
+                            //         Section::make()
+                            //             ->schema([
+                            Checkbox::make('igv')
+                                ->label('Incluir IGV')
+                                ->reactive(),
+                            TextInput::make('igv_porcentaje')
+                                ->label('Porcentaje')
+                                ->suffix('%')
+                                ->default('18')
+                                ->numeric()
+                                ->integer()
+                                ->minValue(0)
+                                ->disabled(function (callable $get) {
+                                    return !$get('igv');
+                                }),
+                            // ])
+                            // ->heading('Configuración de IGV')
+                            // ->columnSpan(['xl' => 1, 'lg' => 1, 'md' => 1, 'sm' => 1]),
+
+                            // Section::make()
+                            //     ->schema([
+                            //         Checkbox::make('servicios')
+                            //             ->label('Incluir servicios')
+                            //             ->default(true),
+                            //         Checkbox::make('articulos')
+                            //             ->label('Incluir artículos')
+                            //             ->default(true),
+                            //     ])
+                            //     ->heading('Opciones de Descarga')
+                            //     ->columnSpan(['xl' => 1, 'lg' => 1, 'md' => 1, 'sm' => 1]),
+                            // ])
+                            // ->columns(['xl' => 2, 'lg' => 2, 'md' => 2, 'sm' => 2]),
+                        ])
+                        ->action(function (Trabajo $trabajo, array $data, $livewire) {
+
+                            $params = [
+                                'igv' => $data['igv'] ?? false,
+                                'igv_porcentaje' => $data['igv_porcentaje'] ?? 18,
+                                // 'servicios' => $data['servicios'] ?? true,
+                                // 'articulos' => $data['articulos'] ?? true,
+                            ];
+
+                            $url = route('trabajo.pdf.report', ['trabajo' => $trabajo] + $params);
+                            $livewire->js("window.open('{$url}', '_blank');");
+                        })
+                        ->modalHeading('Configuración de Descarga')
+                        ->modalButton('Descargar')
+                        ->modalWidth('md'),
+
+                    Action::make('Descargar evidencias')
+                        ->icon('heroicon-s-photo')
                         ->url(
-                            fn(Trabajo $trabajo): string => route('trabajo.pdf.report', ['trabajo' => $trabajo]),
+                            fn(Trabajo $trabajo): string => route('trabajo.pdf.evidencia', ['trabajo' => $trabajo]),
                             shouldOpenInNewTab: true
                         ),
+                ])
+                    ->button()
+                    ->label('Descargar')
+                    ->icon('heroicon-s-arrow-down-tray'),
+
+                ActionGroup::make([
+
                     ViewAction::make(),
                     EditAction::make(),
                     DeleteAction::make(),
@@ -679,12 +643,28 @@ class TrabajoResource extends Resource
                     ->button(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    ExportBulkAction::make(),
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                ]),
+                ExportBulkAction::make(),
+                // BulkActionGroup::make([
+                //     DeleteBulkAction::make(),
+                //     ForceDeleteBulkAction::make(),
+                //     RestoreBulkAction::make(),
+                // ]),
+            ])
+            ->headerActions([
+                Action::make('reiniciarControl')
+                    ->label('Reiniciar Control')
+                    ->requiresConfirmation()
+                    ->modalHeading('Reiniciar Control')
+                    ->modalDescription('¿Estás segura/o de que deseas reiniciar el control de todos los registros? Esta acción no se puede deshacer.')
+                    ->action(function () {
+                        DB::table('trabajos')->update(['control' => false]);
+                        Notification::make()
+                            ->title('Control reiniciado')
+                            ->body('Todos los registros han sido actualizados correctamente.')
+                            ->success()
+                            ->send();
+                    })
+                    ->color('danger'),
             ])
             ->recordClasses(fn(Trabajo $record) => match ($record->desembolso) {
                 'A CUENTA' => 'desembolso-a-cuenta',

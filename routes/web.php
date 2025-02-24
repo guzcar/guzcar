@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArticuloController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\EvidenciaController;
@@ -45,8 +46,15 @@ Route::middleware(['auth'])->group(function () {
     // Trabajos
     Route::get('/trabajos/asignar', [TrabajoController::class, 'asignarTrabajos'])->name('trabajos.asignar');
     Route::post('/trabajos/asignar/{trabajo}', [TrabajoController::class, 'asignar'])->name('trabajos.asignar.post');
+    Route::post('/trabajos/finalizar/{trabajo}', [TrabajoController::class, 'finalizar'])->name('trabajos.finalizar');
     Route::delete('/trabajos/abandonar/{trabajo}', [TrabajoController::class, 'abandonar'])->name('trabajos.abandonar');
+
+    // Articulos
+    Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'index'])->name('trabajos.articulos');
+
+    // PDF
     Route::get('/admin/trabajos/pdf/{trabajo}', [PdfTrabajoController::class, 'report'])->name('trabajo.pdf.report');
+    Route::get('/admin/evidencias/pdf/{trabajo}', [PdfTrabajoController::class, 'evidencia'])->name('trabajo.pdf.evidencia');
 
     // Evidencias
     Route::get('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'index'])->name('evidencias.index');

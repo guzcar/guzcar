@@ -47,13 +47,11 @@ class UbicacionResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('estante')
-                    ->required()
-                    ->maxLength(5),
                 TextInput::make('codigo')
                     ->label('Código')
                     ->required()
-                    ->maxLength(5),
+                    ->unique(ignoreRecord: true)
+                    ->maxLength(10),
             ]);
     }
 
@@ -61,8 +59,6 @@ class UbicacionResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('estante')
-                    ->searchable(),
                 TextColumn::make('codigo')
                     ->searchable(),
                 TextColumn::make('created_at')
@@ -84,12 +80,12 @@ class UbicacionResource extends Resource
                 ForceDeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    ExportBulkAction::make(),
-                    DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                ]),
+                ExportBulkAction::make(),
+                // BulkActionGroup::make([
+                //     DeleteBulkAction::make(),
+                //     ForceDeleteBulkAction::make(),
+                //     RestoreBulkAction::make(),
+                // ]),
             ]);
     }
 
