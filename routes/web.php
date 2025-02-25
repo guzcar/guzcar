@@ -50,7 +50,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/trabajos/abandonar/{trabajo}', [TrabajoController::class, 'abandonar'])->name('trabajos.abandonar');
 
     // Articulos
-    Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'index'])->name('trabajos.articulos');
+    Route::get('/articulos', [ArticuloController::class, 'index'])->name('articulos');
+    Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'trabajo'])->name('trabajos.articulos');
 
     // PDF
     Route::get('/admin/trabajos/pdf/{trabajo}', [PdfTrabajoController::class, 'report'])->name('trabajo.pdf.report');

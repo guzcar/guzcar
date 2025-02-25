@@ -4,16 +4,17 @@ namespace App\Services;
 
 use App\Models\Trabajo;
 
-class TrabajoService {
+class TrabajoService
+{
 
-    public static function actualizarTrabajoPorId(Trabajo $record) {
-        
+    public static function actualizarTrabajoPorId(?Trabajo $record)
+    {
+
         if ($record) {
-            if($record->fecha_salida)
-            {
+            if ($record->fecha_salida) {
                 $importe = $record->importe;
                 $aCuenta = $record->a_cuenta;
-    
+
                 if ($aCuenta == 0) {
                     $desembolso = 'POR COBRAR';
                 } elseif ($aCuenta >= $importe) {

@@ -55,8 +55,8 @@ return new class extends Migration {
                     SET placa_vehiculo = codigo_aleatorio;
                 END IF;
 
-                -- Obtener la fecha base (AAMMDD)
-                SET fecha_base = DATE_FORMAT(NOW(), '%y%m%d'); -- Formato: Año (2 dígitos), Mes, Día
+                -- Obtener la fecha base (AAMMDD) desde la fecha de ingreso
+                SET fecha_base = DATE_FORMAT(NEW.fecha_ingreso, '%y%m%d'); -- Formato: Año (2 dígitos), Mes, Día
 
                 -- Obtener la hora actual (HH)
                 SET hora_base = DATE_FORMAT(NOW(), '%H'); -- Hora actual (0-23)

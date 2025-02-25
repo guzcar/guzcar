@@ -12,7 +12,6 @@ class TrabajoServicio extends Model
     use HasFactory;
 
     protected $fillable = [
-        'sort',
         'trabajo_id',
         'servicio_id',
         'precio',

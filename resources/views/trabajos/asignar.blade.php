@@ -1,6 +1,6 @@
 <x-layout>
     <h1 class="mb-3">Vehículos Disponibles</h1>
-    <a class="btn btn-light border mb-3" href="{{ route('home') }}">Volver</a>
+    <a class="btn btn-light border mb-3" href="{{ route('home') }}">Volver al Inicio</a>
 
     {{-- Input para el buscador --}}
     <input type="text" id="buscador" class="form-control mb-3" placeholder="Buscar">

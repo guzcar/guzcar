@@ -23,6 +23,11 @@ class TrabajoArticulo extends Model
         'observacion',
     ];
 
+    protected $casts = [
+        'fecha' => 'date',
+        'hora' => 'datetime',
+    ];
+
     public function articulo()
     {
         return $this->belongsTo(Articulo::class, 'articulo_id')->withTrashed();
