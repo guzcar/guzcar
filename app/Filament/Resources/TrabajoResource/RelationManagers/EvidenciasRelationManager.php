@@ -43,63 +43,64 @@ class EvidenciasRelationManager extends RelationManager
                                     ->distinct()
                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                     ->searchable()
-                                    ->createOptionForm([
-                                        TextInput::make('name')
-                                            ->label('Nombre')
-                                            ->required()
-                                            ->maxLength(255),
-                                        TextInput::make('email')
-                                            ->label('Correo electrónico')
-                                            ->unique(ignoreRecord: true)
-                                            ->email()
-                                            ->required()
-                                            ->maxLength(255),
-                                        TextInput::make('password')
-                                            ->label('Contraseña')
-                                            ->password()
-                                            ->confirmed()
-                                            ->dehydrated(fn($state) => filled($state))
-                                            ->required()
-                                            ->minLength(8),
-                                        TextInput::make('password_confirmation')
-                                            ->label('Confirmar contraseña')
-                                            ->password()
-                                            ->dehydrated(fn($state) => filled($state))
-                                            ->required()
-                                            ->minLength(8),
-                                    ])
-                                    ->createOptionUsing(function (array $data): int {
-                                        $data['password'] = bcrypt($data['password']);
-                                        return User::create($data)->getKey();
-                                    })
-                                    ->editOptionForm([
-                                        TextInput::make('name')
-                                            ->label('Nombre')
-                                            ->required()
-                                            ->maxLength(255),
-                                        TextInput::make('email')
-                                            ->label('Correo electrónico')
-                                            ->unique(ignoreRecord: true)
-                                            ->email()
-                                            ->required()
-                                            ->maxLength(255),
-                                        TextInput::make('password')
-                                            ->label('Contraseña')
-                                            ->password()
-                                            ->confirmed()
-                                            ->dehydrated(fn($state) => filled($state))
-                                            ->minLength(8),
-                                        TextInput::make('password_confirmation')
-                                            ->label('Confirmar contraseña')
-                                            ->password()
-                                            ->dehydrated(fn($state) => filled($state))
-                                            ->minLength(8),
-                                    ])
-                                    ->getOptionLabelUsing(function ($value): ?string {
-                                        $user = User::withTrashed()->find($value);
-                                        return $user ? $user->name : 'Usuario eliminado';
-                                    }),
-                                // ->required(),
+                                    ->preload()
+                                    // ->createOptionForm([
+                                    //     TextInput::make('name')
+                                    //         ->label('Nombre')
+                                    //         ->required()
+                                    //         ->maxLength(255),
+                                    //     TextInput::make('email')
+                                    //         ->label('Correo electrónico')
+                                    //         ->unique(ignoreRecord: true)
+                                    //         ->email()
+                                    //         ->required()
+                                    //         ->maxLength(255),
+                                    //     TextInput::make('password')
+                                    //         ->label('Contraseña')
+                                    //         ->password()
+                                    //         ->confirmed()
+                                    //         ->dehydrated(fn($state) => filled($state))
+                                    //         ->required()
+                                    //         ->minLength(8),
+                                    //     TextInput::make('password_confirmation')
+                                    //         ->label('Confirmar contraseña')
+                                    //         ->password()
+                                    //         ->dehydrated(fn($state) => filled($state))
+                                    //         ->required()
+                                    //         ->minLength(8),
+                                    // ])
+                                    // ->createOptionUsing(function (array $data): int {
+                                    //     $data['password'] = bcrypt($data['password']);
+                                    //     return User::create($data)->getKey();
+                                    // })
+                                    // ->editOptionForm([
+                                    //     TextInput::make('name')
+                                    //         ->label('Nombre')
+                                    //         ->required()
+                                    //         ->maxLength(255),
+                                    //     TextInput::make('email')
+                                    //         ->label('Correo electrónico')
+                                    //         ->unique(ignoreRecord: true)
+                                    //         ->email()
+                                    //         ->required()
+                                    //         ->maxLength(255),
+                                    //     TextInput::make('password')
+                                    //         ->label('Contraseña')
+                                    //         ->password()
+                                    //         ->confirmed()
+                                    //         ->dehydrated(fn($state) => filled($state))
+                                    //         ->minLength(8),
+                                    //     TextInput::make('password_confirmation')
+                                    //         ->label('Confirmar contraseña')
+                                    //         ->password()
+                                    //         ->dehydrated(fn($state) => filled($state))
+                                    //         ->minLength(8),
+                                    // ])
+                                    // ->getOptionLabelUsing(function ($value): ?string {
+                                    //     $user = User::withTrashed()->find($value);
+                                    //     return $user ? $user->name : 'Usuario eliminado';
+                                    // }),
+                                    ->required(),
                                 Textarea::make('observacion'),
                             ])
                             ->columns(1)

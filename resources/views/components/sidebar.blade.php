@@ -10,6 +10,10 @@
                 <div class="sb-nav-link-icon"><i class="fa-solid fa-car-side"></i></div>
                 Vehículos
             </a>
+            <a class="nav-link {{ request()->routeIs('articulos') ? 'active' : '' }}" href="{{ route('articulos') }}">
+                <div class="sb-nav-link-icon"><i class="fa-solid fa-box-archive"></i></div>
+                Artículos
+            </a>
         </div>
     </div>
     <div class="sb-sidenav-footer">

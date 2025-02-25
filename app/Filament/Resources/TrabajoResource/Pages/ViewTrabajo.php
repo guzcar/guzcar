@@ -17,9 +17,7 @@ class ViewTrabajo extends ViewRecord
         $trabajo = $this->record;
 
         $trabajo->load([
-            'servicios' => function ($query) {
-                $query->orderBy('sort');
-            }
+            'servicios'
         ]);
 
         return [
