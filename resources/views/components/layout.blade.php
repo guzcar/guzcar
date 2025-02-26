@@ -8,10 +8,12 @@
                 outline: none !important;
                 box-shadow: none !important;
             }
+
             .sb-topnav .dropdown-item::selection {
                 background: transparent;
                 color: inherit;
             }
+
             .dropdown-menu .dropdown-item:focus,
             .dropdown-menu .dropdown-item:active {
                 color: inherit !important;
@@ -19,6 +21,7 @@
                 outline: none !important;
                 box-shadow: none !important;
             }
+
             .dropdown-menu .dropdown-item::selection {
                 background: transparent;
                 color: inherit;
@@ -39,4 +42,8 @@
             </main>
         </div>
     </div>
+
+    @push('scripts')
+        <script src="{{ asset('js/scripts.js') }}"></script>
+    @endpush
 </x-base>

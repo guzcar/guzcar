@@ -345,7 +345,7 @@ class TrabajoResource extends Resource
                                                     ->columns(3),
                                             ])
                                             ->collapsed()
-                                            ->itemLabel(fn(array $state): ?string => $state['tecnico_id'] ? User::find($state['tecnico_id'])->name : null)
+                                            ->itemLabel(fn(array $state): ?string => $state['tecnico_id'] ? User::withTrashed()->find($state['tecnico_id'])->name : null)
                                     ])
                                     ->heading('Técnicos')
                                     ->hiddenOn('create'),

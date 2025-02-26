@@ -39,15 +39,20 @@
                             @endif
                             <form action="{{ route('login.process') }}" method="POST">
                                 @csrf
-                                <div class="form-floating mb-3">
-                                    <input class="form-control" type="email" id="inputEmail" name="email"
-                                        value="{{ old('email') }}" placeholder="name@example.com" required autofocus>
-                                    <label for="inputEmail">Correo electrónico</label>
+                                <label for="inputEmail" class="mb-2">Correo electrónico</label>
+                                <div class="mb-3">
+                                    <input class="form-control" style="height: 3.5rem;" type="email" id="inputEmail"
+                                        placeholder="ejemplo@guzcar.com" name="email" value="{{ old('email') }}"
+                                        required autofocus>
                                 </div>
-                                <div class="form-floating mb-3">
-                                    <input class="form-control" type="password" id="inputPassword" name="password"
-                                        placeholder="Password" minlength="8" required>
-                                    <label for="inputPassword">Contraseña</label>
+                                <label for="inputEmail" class="mb-2">Contraseña</label>
+                                <div class="input-group mb-3">
+                                    <input class="form-control" style="height: 3.5rem;" id="inputPassword"
+                                        type="password" name="password" placeholder="Contraseña" minlength="8" required>
+                                    <span class="input-group-text" id="togglePassword"
+                                        style="width:3.5rem; cursor: pointer">
+                                        <i class="fa fa-eye-slash mx-auto fs-5"></i>
+                                    </span>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-4">
@@ -81,4 +86,26 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const togglePassword = document.getElementById('togglePassword');
+                const passwordInput = document.getElementById('inputPassword');
+                const eyeIcon = togglePassword.querySelector('i');
+
+                togglePassword.addEventListener('click', function () {
+                    if (passwordInput.type === "password") {
+                        passwordInput.type = "text";
+                        eyeIcon.classList.remove("fa-eye-slash");
+                        eyeIcon.classList.add("fa-eye");
+                    } else {
+                        passwordInput.type = "password";
+                        eyeIcon.classList.remove("fa-eye");
+                        eyeIcon.classList.add("fa-eye-slash");
+                    }
+                });
+            });
+        </script>
+    @endpush
 </x-base>
