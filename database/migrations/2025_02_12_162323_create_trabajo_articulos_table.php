@@ -33,7 +33,6 @@ return new class extends Migration {
                 ->constrained('users')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
-            // $table->enum('movimiento', ['gasto_completo', 'abrir_sin_terminar', 'gastar_abierto', 'gastar_abierto_sin_terminar']);
             $table->enum('movimiento', ['cerrado', 'abierto'])->default('cerrado');
             $table->text('observacion')->nullable();
             $table->timestamps();

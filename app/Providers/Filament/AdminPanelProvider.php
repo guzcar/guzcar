@@ -41,7 +41,7 @@ class AdminPanelProvider extends PanelProvider
                 MenuItem::make()
                     ->label('Manual de usuario')
                     ->url(fn(): string => asset('docs/manual-admin.pdf'))
-                    ->icon('heroicon-o-lifebuoy')
+                    ->icon('heroicon-o-document')
                     ->openUrlInNewTab()
             ])
             ->colors([

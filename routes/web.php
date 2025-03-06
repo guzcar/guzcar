@@ -5,8 +5,10 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\TrabajoController;
+use App\Http\Controllers\Pdf\DespachoController as PdfDespachoController;
 use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
+use App\Http\Controllers\Pdf\VentaController as PdfVentaController;
+use App\Http\Controllers\TrabajoController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -56,6 +58,8 @@ Route::middleware(['auth'])->group(function () {
     // PDF
     Route::get('/admin/trabajos/pdf/{trabajo}', [PdfTrabajoController::class, 'report'])->name('trabajo.pdf.report');
     Route::get('/admin/evidencias/pdf/{trabajo}', [PdfTrabajoController::class, 'evidencia'])->name('trabajo.pdf.evidencia');
+    Route::get('/admin/despachos/pdf/{despacho}', [PdfDespachoController::class, 'downloadPdf'])->name('despachos.pdf');
+    Route::get('/admin/ventas/pdf/{venta}', [PdfVentaController::class, 'downloadPdf'])->name('ventas.pdf');
 
     // Evidencias
     Route::get('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'index'])->name('evidencias.index');

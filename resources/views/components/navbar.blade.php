@@ -25,21 +25,21 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                 <li>
                     <a class="dropdown-item" href="{{ route('user.edit') }}">
-                        <i class="fa-solid fa-circle-user me-2 text-muted"></i>
+                        <i class="fa-solid fa-circle-user fa-fw me-2 text-muted"></i>
                         {{ auth()->user()->name }}
                     </a>
                 </li>
                 @if ( auth()->user()->is_admin )
                     <li>
                         <a class="dropdown-item" href="{{ route('filament.admin.pages.dashboard') }}">
-                            <i class="fa-solid fa-shield-halved me-2 text-muted"></i>
+                            <i class="fa-solid fa-lock fa-fw me-2 text-muted"></i>
                             Módulo Administrativo
                         </a>
                     </li>
                 @endif
                 <li>
                     <a class="dropdown-item" href="{{ asset('docs/manual-taller.pdf') }}" target="_blank">
-                        <i class="fa-solid fa-life-ring me-2 text-muted"></i>
+                        <i class="fa-solid fa-file fa-fw me-2 text-muted"></i>
                         Manual de Usuario
                     </a>
                 </li>
@@ -48,7 +48,7 @@
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button class="dropdown-item" type="submit">
-                            <i class="fa-solid fa-right-from-bracket me-2 text-muted"></i>
+                            <i class="fa-solid fa-right-from-bracket fa-fw me-2 text-muted"></i>
                             Cerrar Sesión
                         </button>
                     </form>

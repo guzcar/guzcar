@@ -33,6 +33,7 @@
                     {{ $entrada->guia }}
                 </x-slot>
                 <p><b>Fecha: </b>{{ \Carbon\Carbon::parse($entrada->fecha)->format('d/m/Y') }}</p>
+                <p><b>Hora: </b>{{ $entrada->hora }}</p>
                 <p><b>Responsable:</b> {{ $entrada->responsable->name }}</p>
                 @if ($entrada->observacion)
                     <p><b>Observación:</b></p>

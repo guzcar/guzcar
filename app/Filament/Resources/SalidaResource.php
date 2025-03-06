@@ -45,7 +45,7 @@ class SalidaResource extends Resource
 
     protected static ?string $navigationGroup = 'Logística';
 
-    protected static ?int $navigationSort = 51;
+    protected static ?int $navigationSort = 60;
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
 
@@ -63,25 +63,33 @@ class SalidaResource extends Resource
                     ->schema([
                         Section::make()
                             ->schema([
-                                Grid::make()
-                                    ->schema([
-                                        DatePicker::make('fecha')
-                                            ->required()
-                                            ->default(now()),
-                                        TimePicker::make('hora')
-                                            ->required()
-                                            ->default(now()),
-                                        Select::make('movimiento')
-                                            ->label('Movimiento')
-                                            ->options([
-                                                'cerrado' => 'Abrir y gastar',
-                                                'abierto' => 'Gastar abierto',
-                                            ])
-                                            ->default('cerrado')
-                                            ->required()
-                                            ->placeholder('')
-                                            ->hidden(fn($get) => !$get('articulo_id') || !Articulo::find($get('articulo_id'))?->fraccionable),
-                                    ])->columns(3),
+                                TextInput::make('responsable')
+                                    ->label('Responsable de entrega')
+                                    ->required()
+                                    ->readOnly()
+                                    ->prefixIcon('heroicon-s-user-circle')
+                                    ->afterStateHydrated(function (TextInput $component, $context) {
+                                        if ($context === 'create') {
+                                            $userName = Auth::user()->name;
+                                            $component->state($userName);
+                                        }
+                                    }),
+                                DatePicker::make('fecha')
+                                    ->required()
+                                    ->default(now()),
+                                TimePicker::make('hora')
+                                    ->required()
+                                    ->default(now()),
+                                Select::make('movimiento')
+                                    ->label('Movimiento')
+                                    ->options([
+                                        'cerrado' => 'Abrir y gastar',
+                                        'abierto' => 'Gastar abierto',
+                                    ])
+                                    ->default('cerrado')
+                                    ->required()
+                                    ->placeholder('')
+                                    ->hidden(fn($get) => !$get('articulo_id') || !Articulo::find($get('articulo_id'))?->fraccionable),
                                 Select::make('articulo_id')
                                     ->label('Artículo')
                                     ->columnSpanFull()
@@ -140,6 +148,7 @@ class SalidaResource extends Resource
                                                         '1' => '1',
                                                         'custom' => 'Ingresar valor exacto',
                                                     ])
+                                                    ->required()
                                                     ->reactive()
                                                     ->afterStateUpdated(function ($state, Forms\Set $set) {
                                                         if ($state !== 'custom') {
@@ -152,6 +161,7 @@ class SalidaResource extends Resource
                                                     ->numeric()
                                                     ->hidden(fn($get) => $get('cantidad_fraccion') !== 'custom')
                                                     ->reactive()
+                                                    ->required()
                                                     ->afterStateUpdated(function ($state, Forms\Set $set) {
                                                         if ($state !== null) {
                                                             $set('cantidad', $state);
@@ -199,17 +209,6 @@ class SalidaResource extends Resource
                                             ->searchable()
                                             ->preload()
                                             ->required(),
-                                        TextInput::make('responsable')
-                                            ->label('Responsable de entrega')
-                                            ->required()
-                                            ->readOnly()
-                                            ->prefixIcon('heroicon-s-user-circle')
-                                            ->afterStateHydrated(function (TextInput $component, $context) {
-                                                if ($context === 'create') {
-                                                    $userName = Auth::user()->name;
-                                                    $component->state($userName);
-                                                }
-                                            }),
                                         Select::make('trabajo_id')
                                             ->label('Trabajo en vehículo')
                                             ->prefixIcon('heroicon-s-truck')
@@ -219,9 +218,12 @@ class SalidaResource extends Resource
                                                     ->get()
                                                     ->mapWithKeys(function ($trabajo) {
                                                         $codigo = $trabajo->codigo;
+                                                        $placa = $trabajo->vehiculo->placa;
                                                         $tipo = $trabajo->vehiculo->tipoVehiculo->nombre;
                                                         $marca = $trabajo->vehiculo->marca;
-                                                        $label = "{$codigo} {$tipo} {$marca}";
+                                                        $modelo = $trabajo->vehiculo->modelo;
+                                                        $color = $trabajo->vehiculo->color;
+                                                        $label = "{$placa} {$tipo} {$marca} {$modelo} {$color} ({$codigo})";
                                                         return [$trabajo->id => $label];
                                                     });
                                             })
@@ -236,9 +238,9 @@ class SalidaResource extends Resource
                                                     ->content(fn($get) => $get('stock'))
                                                     ->columnSpan(['xl' => 1, 'lg' => 2, 'md' => 2, 'sm' => 2]),
                                                 Placeholder::make('abiertos')
-                                                    ->content(function ($get, FractionService $fractionService) {
+                                                    ->content(function ($get) {
                                                         $value = $get('abiertos');
-                                                        return $fractionService->decimalToFraction((float) $value);
+                                                        return FractionService::decimalToFraction((float) $value);
                                                     })
                                                     ->columnSpan(['xl' => 1, 'lg' => 2, 'md' => 2, 'sm' => 2])
                                                     ->hidden(fn($get) => !$get('fraccionable')),
@@ -289,7 +291,7 @@ class SalidaResource extends Resource
                         ->date('d/m/Y')
                         ->sortable(),
                     TextColumn::make('hora')
-                        ->time('H:i:s')
+                        ->time('H:i A')
                         ->sortable(),
                     TextColumn::make('responsable.name')
                         ->label('Entrega')
@@ -317,10 +319,11 @@ class SalidaResource extends Resource
                     TextColumn::make('articulo.marca')
                         ->label('Marca')
                         ->sortable()
-                        ->searchable(),
+                        ->searchable(isIndividual: true),
                     TextColumn::make('articulo.tamano_presentacion')
                         ->label('Presentación')
                         ->searchable(isIndividual: true)
+                        ->alignCenter()
                         ->sortable()
                         ->toggleable(isToggledHiddenByDefault: false),
                     TextColumn::make('articulo.color')
@@ -338,8 +341,8 @@ class SalidaResource extends Resource
                         ->sortable(),
                     TextColumn::make('cantidad')
                         ->sortable()
-                        ->formatStateUsing(function ($state, FractionService $fractionService) {
-                            return $fractionService->decimalToFraction((float) $state);
+                        ->formatStateUsing(function ($state) {
+                            return FractionService::decimalToFraction((float) $state);
                         })
                         ->alignCenter(),
                 ]),

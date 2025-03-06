@@ -7,7 +7,7 @@ class FractionService
     private const TOLERANCE = 1.e-6;
     private const MAX_DENOMINATOR = 1000;
 
-    public function decimalToFraction(float $decimal): string
+    public static function decimalToFraction(float $decimal): string
     {
         // Extraer la parte entera
         $integerPart = (int) $decimal;

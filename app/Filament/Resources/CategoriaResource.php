@@ -32,7 +32,7 @@ class CategoriaResource extends Resource
 
     protected static ?string $navigationGroup = 'Configuración';
 
-    protected static ?int $navigationSort = 200;
+    protected static ?int $navigationSort = 160;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

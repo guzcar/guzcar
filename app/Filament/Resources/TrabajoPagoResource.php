@@ -25,7 +25,7 @@ class TrabajoPagoResource extends Resource
 
     protected static ?string $navigationGroup = 'Histórico';
 
-    protected static ?int $navigationSort = 51;
+    protected static ?int $navigationSort = 100;
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 

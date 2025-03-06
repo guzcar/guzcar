@@ -14,9 +14,15 @@ class Entrada extends Model
     protected $fillable = [
         'guia',
         'fecha',
+        'hora',
         'observacion',
         'responsable_id',
         'evidencia_url',
+    ];
+
+    protected $casts = [
+        'fecha' => 'date',
+        'hora' => 'datetime',
     ];
 
     public function articulos()
