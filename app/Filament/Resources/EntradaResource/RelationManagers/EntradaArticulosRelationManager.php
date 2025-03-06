@@ -162,24 +162,18 @@ class EntradaArticulosRelationManager extends RelationManager
                         $subCategoria = $articulo->subCategoria->nombre;
                         $especificacion = $articulo->especificacion ? " - {$articulo->especificacion}" : '';
                         $marca = $articulo->marca;
+                        $color = $articulo->color ? " {$articulo->color}" : '';
+                        $tamano_presentacion = $articulo->tamano_presentacion;
 
-                        $label = "{$categoria} {$subCategoria}{$especificacion} - {$marca}";
+                        $label = "{$categoria} {$subCategoria}{$especificacion} - {$marca}{$color} - {$tamano_presentacion}";
 
                         return $label;
                     }),
-                // TextColumn::make('articulo.subcategoria.categoria.nombre'),
-                // TextColumn::make('articulo.subcategoria.nombre'),
-                // TextColumn::make('articulo.especificacion')
-                //     ->label('Especificación')
-                //     ->placeholder('Sin especificacion'),
-                // TextColumn::make('articulo.marca')
-                //     ->label('Marca'),
                 TextColumn::make('articulo.ubicaciones.codigo')
                     ->label('Ubicación')
+                    ->placeholder('Sin ubicación')
                     ->wrap()
                     ->badge(),
-                TextColumn::make('articulo.tamano_presentacion')
-                    ->label('Presentación'),
                 TextColumn::make('cantidad')
                     ->alignCenter(),
                 TextColumn::make('costo')

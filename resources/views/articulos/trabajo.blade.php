@@ -33,7 +33,7 @@
         </li>
     </ul>
 
-    <hr>
+    <p>Esta es la lista de todos los artículos que solicitaste para este vehícuo.</p>
 
     <div class="accordion" id="articulosAcordion">
         @forelse ($trabajo->trabajoArticulos as $index => $trabajoArticulo)
@@ -52,10 +52,10 @@
                 <div id="collapse-{{ $index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ $index }}"
                     data-bs-parent="#articulosAcordion">
                     <div class="accordion-body">
-                        <p><i class="fas text-secondary me-2 fa-box"></i> Cantidad: {{ $trabajoArticulo->cantidad }}</p>
-                        <p><i class="fas text-secondary me-2 fa-calendar-alt"></i> Día:
+                        <p><i class="fas text-secondary fa-fw me-2 fa-box"></i> Cantidad: {{ \App\Services\FractionService::decimalToFraction($trabajoArticulo->cantidad) }}</p>
+                        <p><i class="fas text-secondary fa-fw me-2 fa-calendar-alt"></i> Día:
                             {{ $trabajoArticulo->fecha->isoFormat('dddd, D [de] MMMM') }}</p>
-                        <p class="mb-0"><i class="fas text-secondary me-2 fa-clock"></i> Hora:
+                        <p class="mb-0"><i class="fas text-secondary fa-fw me-2 fa-clock"></i> Hora:
                             {{ $trabajoArticulo->hora->format('h:i A') }}</p>
                     </div>
                 </div>

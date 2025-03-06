@@ -18,6 +18,7 @@ class HomeController extends Controller
 
         // Obtener trabajos asignados al usuario con fecha_salida == null y finalizado == false
         $trabajos = $user->trabajos()
+            ->orderBy('created_at', 'desc')
             ->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
             ->wherePivot('finalizado', false) // Filtra por finalizado == false en la tabla intermedia
             ->get();

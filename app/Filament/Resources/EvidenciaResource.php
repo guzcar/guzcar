@@ -26,7 +26,7 @@ class EvidenciaResource extends Resource
 
     protected static ?string $navigationGroup = 'Histórico';
 
-    protected static ?int $navigationSort = 55;
+    protected static ?int $navigationSort = 90;
 
     protected static ?string $navigationIcon = 'heroicon-o-camera';
 
@@ -71,6 +71,7 @@ class EvidenciaResource extends Resource
                 ColumnGroup::make('Vehiculo', [
                     TextColumn::make('trabajo.vehiculo.placa')
                         ->label('Placa')
+                        ->placeholder('Sin Placa')
                         ->sortable()
                         ->searchable(isIndividual: true),
                     TextColumn::make('trabajo.vehiculo.marca')
@@ -126,6 +127,7 @@ class EvidenciaResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])

@@ -32,7 +32,9 @@ class TrabajoController extends Controller
             $fecha_ingreso = new DateTime($fecha_ingreso);
             $fecha_salida = new DateTime($fecha_salida);
             $diferencia = $fecha_ingreso->diff($fecha_salida);
-            $tiempo = "{$diferencia->days} DÍAS";
+            $dias = $diferencia->days ?: 1;
+
+            $tiempo = $dias == 1 ? "{$dias} DÍA" : "{$dias} DÍAS";
         }
 
         // Subtotal de servicios
@@ -69,7 +71,10 @@ class TrabajoController extends Controller
             'total', // Pasamos los artículos agrupados a la vista
         ))->setPaper('A4', 'portrait');
 
-        $fileName = 'Proforma ' . $trabajo->codigo . ' - ' . now()->format('ymdhis') . '.pdf';
+        $codenow = now()->format('ymdhis');
+
+        $fileName = "Proforma {$trabajo->codigo} - {$codenow}.pdf";
+
         return $pdf->stream($fileName);
     }
 

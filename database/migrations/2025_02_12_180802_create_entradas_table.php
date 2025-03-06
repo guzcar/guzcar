@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('guia', 20)->unique();
             $table->date('fecha');
+            $table->time('hora');
             $table->text('observacion')->nullable();
             $table->foreignId('responsable_id')
                 ->constrained('users')

@@ -27,7 +27,7 @@
                             <tr class="vehiculo">
                                 <td class="px-0" style="max-width: 150px">
                                     <ul class="list-group list-group-flush">
-                                        <li class="list-group-item px-2 py-1" style="background-color: transparent"><b>{{ $trabajo->vehiculo->placa ?? 'N/A' }}</b></li>
+                                        <li class="list-group-item px-2 py-1" style="background-color: transparent"><b>{{ $trabajo->vehiculo->placa ?? 'SIN PLACA' }}</b></li>
                                         <li class="list-group-item px-2 py-1" style="background-color: transparent">{{ $trabajo->vehiculo->marca }}</li>
                                         <li class="list-group-item px-2 py-1" style="background-color: transparent">{{ $trabajo->vehiculo->modelo }}</li>
                                         <li class="list-group-item px-2 py-1" style="background-color: transparent">{{ $trabajo->vehiculo->color }}</li>
@@ -43,13 +43,13 @@
                                             <ul class="dropdown-menu">
                                                 <li>
                                                     <a class="dropdown-item" href="{{ route('evidencias.index', $trabajo) }}">
-                                                        <i class="text-secondary me-2 fa-solid fa-image"></i>
+                                                        <i class="text-secondary fa-fw me-2 fa-solid fa-image"></i>
                                                         Evidencias
                                                     </a>
                                                 </li>
                                                 <li>
                                                     <a class="dropdown-item" href="{{ route('trabajos.articulos', $trabajo) }}">
-                                                        <i class="text-secondary me-2 fa-solid fa-box-archive"></i>
+                                                        <i class="text-secondary fa-fw me-2 fa-solid fa-box-archive"></i>
                                                         Artículos
                                                     </a>
                                                 </li>

@@ -11,6 +11,7 @@ class TrabajoArticulo extends Model
     use HasFactory;
 
     protected $fillable = [
+        'despacho_id',
         'fecha',
         'hora',
         'trabajo_id',
@@ -46,6 +47,11 @@ class TrabajoArticulo extends Model
     public function responsable()
     {
         return $this->belongsTo(User::class, 'responsable_id')->withTrashed();
+    }
+
+    public function despacho()
+    {
+        return $this->belongsTo(Despacho::class);
     }
 
     protected static function booted()

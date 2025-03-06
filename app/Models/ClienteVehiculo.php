@@ -15,13 +15,13 @@ class ClienteVehiculo extends Model
         'cliente_id',
     ];
 
-    public function vehiculo(): BelongsTo
+    public function vehiculo()
     {
-        return $this->belongsTo(Vehiculo::class, 'vehiculo_id');
+        return $this->belongsTo(Vehiculo::class, 'vehiculo_id')->withTrashed();
     }
 
-    public function cliente(): BelongsTo
+    public function cliente()
     {
-        return $this->belongsTo(Cliente::class, 'cliente_id');
+        return $this->belongsTo(Cliente::class, 'cliente_id')->withTrashed();
     }
 }

@@ -22,12 +22,12 @@
                 <div id="collapse-{{ $index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ $index }}"
                     data-bs-parent="#articulosAcordion">
                     <div class="accordion-body">
-                        <p><i class="fas text-secondary me-2 fa-box"></i> Cantidad: {{ $articulo->cantidad }}</p>
-                        <p><i class="fas text-secondary me-2 fa-calendar-alt"></i> Día:
+                        <p><i class="fas text-secondary fa-fw me-2 fa-box"></i> Cantidad: {{ \App\Services\FractionService::decimalToFraction($articulo->cantidad) }}</p>
+                        <p><i class="fas text-secondary fa-fw me-2 fa-calendar-alt"></i> Día:
                             {{ $articulo->fecha->isoFormat('dddd, D [de] MMMM') }}
                         </p>
-                        <p><i class="fas text-secondary me-2 fa-clock"></i> Hora: {{ $articulo->hora->format('h:i A') }}</p>
-                        <p class="mb-0"><i class="fas text-secondary me-2 fa-car"></i> Vehículo:
+                        <p><i class="fas text-secondary fa-fw me-2 fa-clock"></i> Hora: {{ $articulo->hora->format('h:i A') }}</p>
+                        <p class="mb-0"><i class="fas text-secondary fa-fw me-2 fa-car"></i> Vehículo:
                             @if($articulo->trabajo)
                                 {{ $articulo->trabajo->vehiculo->placa }} -
                                 {{ $articulo->trabajo->vehiculo->marca }}

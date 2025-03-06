@@ -32,7 +32,7 @@ class TallerResource extends Resource
 
     protected static ?string $navigationGroup = 'Configuración';
 
-    protected static ?int $navigationSort = 201;
+    protected static ?int $navigationSort = 130;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -84,6 +84,7 @@ class TallerResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 TrashedFilter::make(),
             ])

@@ -43,7 +43,7 @@ class ArticuloResource extends Resource
 
     protected static ?string $navigationGroup = 'Logística';
 
-    protected static ?int $navigationSort = 50;
+    protected static ?int $navigationSort = 40;
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
@@ -259,8 +259,8 @@ class ArticuloResource extends Resource
                     ->alignCenter(),
                 TextColumn::make('abiertos')
                     ->alignCenter()
-                    ->formatStateUsing(function ($state, FractionService $fractionService) {
-                        return $fractionService->decimalToFraction((float) $state);
+                    ->formatStateUsing(function ($state) {
+                        return FractionService::decimalToFraction((float) $state);
                     }),
                 TextColumn::make('mermas')
                     ->alignCenter(),

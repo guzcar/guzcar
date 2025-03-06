@@ -37,7 +37,6 @@ class ViewTrabajo extends ViewRecord
             Action::make('back')
                 ->label('Regresar')
                 ->url(TrabajoResource::getUrl())
-                ->icon('heroicon-o-arrow-left')
                 ->color('gray'),
             // Action::make('Descargar')
             //     ->icon('heroicon-s-arrow-down-tray')
@@ -46,8 +45,7 @@ class ViewTrabajo extends ViewRecord
             //         shouldOpenInNewTab: true
             //     )
             //     ->color('gray'),
-            EditAction::make()
-                ->icon('heroicon-o-pencil-square'),
+            EditAction::make(),
         ];
     }
 }

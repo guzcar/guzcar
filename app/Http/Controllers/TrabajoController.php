@@ -18,6 +18,7 @@ class TrabajoController extends Controller
             ->whereDoesntHave('tecnicos', function ($query) {
                 $query->where('tecnico_id', auth()->id());
             })
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return view('trabajos.asignar', compact('trabajos'));

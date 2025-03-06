@@ -66,7 +66,7 @@
                 <div class="space-y-0">
                     <p class="text-gray-800 dark:text-gray-300">
                         <span class="font-medium text-gray-900 dark:text-gray-300">Placa:</span>
-                        {{ $evidencia->trabajo->vehiculo->placa ?? 'N/A' }}
+                        {{ $evidencia->trabajo->vehiculo->placa ?? 'SIN PLACA' }}
                     </p>
                     <p class="text-gray-800 dark:text-gray-300">
                         <span class="font-medium text-gray-900 dark:text-gray-300">Marca:</span>

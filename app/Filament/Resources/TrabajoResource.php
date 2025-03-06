@@ -7,6 +7,7 @@ use App\Filament\Resources\TrabajoResource\RelationManagers;
 use App\Filament\Resources\TrabajoResource\RelationManagers\EvidenciasRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\PagosRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\ServiciosRelationManager;
+use App\Filament\Resources\TrabajoResource\RelationManagers\TrabajoArticulosRelationManager;
 use App\Models\Cliente;
 use App\Models\Servicio;
 use App\Models\Trabajo;
@@ -65,7 +66,7 @@ class TrabajoResource extends Resource
 
     protected static ?string $navigationGroup = 'Core';
 
-    protected static ?int $navigationSort = -1;
+    protected static ?int $navigationSort = 0;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
@@ -678,6 +679,7 @@ class TrabajoResource extends Resource
     {
         return [
             ServiciosRelationManager::class,
+            TrabajoArticulosRelationManager::class,
             EvidenciasRelationManager::class,
             PagosRelationManager::class,
         ];

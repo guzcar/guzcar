@@ -37,7 +37,7 @@ class VehiculoResource extends Resource
 
     protected static ?string $navigationGroup = 'Core';
 
-    protected static ?int $navigationSort = 20;
+    protected static ?int $navigationSort = 10;
 
     protected static ?string $navigationIcon = 'heroicon-o-truck';
 
