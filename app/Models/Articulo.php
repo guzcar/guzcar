@@ -39,4 +39,11 @@ class Articulo extends Model
     {
         return $this->belongsToMany(Ubicacion::class, 'articulo_ubicaciones', 'articulo_id', 'ubicacion_id');
     }
+
+    public function trabajos()
+    {
+        return $this->belongsToMany(Trabajo::class, 'trabajo_articulos', 'articulo_id', 'trabajo_id')
+            ->withPivot(['fecha', 'hora', 'precio', 'cantidad', 'tecnico_id', 'responsable_id', 'movimiento', 'observacion'])
+            ->withTimestamps();
+    }
 }

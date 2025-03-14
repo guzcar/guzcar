@@ -14,9 +14,16 @@ class TrabajoController extends Controller
      */
     public function asignarTrabajos()
     {
-        $trabajos = Trabajo::whereNull('fecha_salida')
+        // Obtener la fecha actual
+        $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
+
+        // Obtener trabajos que no tengan fecha_salida o cuya fecha_salida sea igual a la fecha actual
+        $trabajos = Trabajo::where(function ($query) use ($fechaActual) {
+            $query->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
+                ->orWhereDate('fecha_salida', '>=', $fechaActual); // Filtra por fecha_salida igual a la fecha actual
+        })
             ->whereDoesntHave('tecnicos', function ($query) {
-                $query->where('tecnico_id', auth()->id());
+                $query->where('tecnico_id', auth()->id()); // Filtra por trabajos no asignados al técnico actual
             })
             ->orderBy('created_at', 'desc')
             ->get();
@@ -32,9 +39,12 @@ class TrabajoController extends Controller
      */
     public function asignar(Trabajo $trabajo)
     {
+        // Obtener la fecha actual
+        $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
+
         $user = auth()->user();
 
-        if ($trabajo->fecha_salida !== null) {
+        if ($trabajo->fecha_salida !== null && $trabajo->fecha_salida < $fechaActual) {
             abort(403, 'Forbidden');
         }
 
@@ -52,13 +62,13 @@ class TrabajoController extends Controller
     public function finalizar(Trabajo $trabajo)
     {
         $user = auth()->user();
-    
+
         if (!$trabajo->usuarios()->where('tecnico_id', $user->id)->exists()) {
             abort(403, 'Forbidden');
         }
 
         $trabajo->usuarios()->updateExistingPivot($user->id, ['finalizado' => true]);
-    
+
         return redirect()->route('home')->with('success', 'Trabajo finalizado correctamente.');
     }
 

@@ -3,7 +3,7 @@
     <a class="btn btn-primary mb-3" href="{{ route('trabajos.asignar') }}">Asignarme vehículos</a>
 
     @if (session('success'))
-        <div class="alert alert-light alert-dismissible border shadow-sm fade show">
+        <div class="alert alert-primary alert-dismissible shadow-sm fade show">
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -42,13 +42,13 @@
                                             </button>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <a class="dropdown-item" href="{{ route('evidencias.index', $trabajo) }}">
+                                                    <a class="dropdown-item" href="{{ route('gestion.evidencias.index', $trabajo) }}">
                                                         <i class="text-secondary fa-fw me-2 fa-solid fa-image"></i>
                                                         Evidencias
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item" href="{{ route('trabajos.articulos', $trabajo) }}">
+                                                    <a class="dropdown-item" href="{{ route('gestion.trabajos.articulos', $trabajo) }}">
                                                         <i class="text-secondary fa-fw me-2 fa-solid fa-box-archive"></i>
                                                         Artículos
                                                     </a>
@@ -73,7 +73,7 @@
                                             ¿Estás seguro de que deseas finalizar este trabajo? Una vez finalizado ya no podrás tener acceso, solo un administrador del sistema puede revertir esta acción.
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
                                             <form action="{{ route('trabajos.finalizar', $trabajo) }}" method="POST" style="display: inline;">
                                                 @csrf
                                                 <button type="submit" class="btn btn-success">Finalizar</button>
@@ -95,7 +95,7 @@
                                             ¿Estás seguro de que deseas abandonar este trabajo?
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
                                             <form action="{{ route('trabajos.abandonar', $trabajo) }}" method="POST" style="display: inline;">
                                                 @csrf
                                                 @method('DELETE')

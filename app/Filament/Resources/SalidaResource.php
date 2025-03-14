@@ -30,6 +30,8 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -213,8 +215,14 @@ class SalidaResource extends Resource
                                             ->label('Trabajo en vehículo')
                                             ->prefixIcon('heroicon-s-truck')
                                             ->options(function () {
+                                                // Obtener la fecha actual
+                                                $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
+                                    
                                                 return Trabajo::with(['vehiculo'])
-                                                    ->whereNull('fecha_salida')
+                                                    ->where(function ($query) use ($fechaActual) {
+                                                        $query->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
+                                                            ->orWhereDate('fecha_salida', '>=', $fechaActual); // Filtra por fecha_salida igual a la fecha actual
+                                                    })
                                                     ->get()
                                                     ->mapWithKeys(function ($trabajo) {
                                                         $codigo = $trabajo->codigo;
@@ -301,6 +309,13 @@ class SalidaResource extends Resource
                         ->label('Recibe')
                         ->searchable(isIndividual: true)
                         ->sortable(),
+                    ToggleColumn::make('confirmado')
+                        ->alignCenter()
+                        ->label('Confirmado')
+                        ->onColor('success')
+                        ->offColor('gray')
+                        ->onIcon('heroicon-c-check')
+                        ->offIcon('heroicon-c-x-mark'),
                 ]),
                 ColumnGroup::make('Artículo', [
                     TextColumn::make('articulo.subcategoria.categoria.nombre')
@@ -350,6 +365,14 @@ class SalidaResource extends Resource
                     TextColumn::make('trabajo.codigo')
                         ->label('Código')
                         ->searchable(isIndividual: true)
+                        ->url(function ($record) {
+                            if ($record->trabajo) {
+                                $url = TrabajoResource::getUrl('edit', ['record' => $record->trabajo->id]);
+                                return "{$url}?activeRelationManager=2";
+                            }
+                            return null;
+                        })
+                        ->color('primary')
                         ->sortable()
                         ->placeholder('Sin trabajo'),
                     TextColumn::make('trabajo.fecha_ingreso')
@@ -399,6 +422,9 @@ class SalidaResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                Filter::make('sin_confirmar')
+                    ->label('Sin confirmar')
+                    ->query(fn(Builder $query) => $query->where('confirmado', false)),
                 DateRangeFilter::make('fecha'),
                 ValueRangeFilter::make('precio'),
             ])

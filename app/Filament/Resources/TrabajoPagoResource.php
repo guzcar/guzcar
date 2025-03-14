@@ -64,7 +64,11 @@ class TrabajoPagoResource extends Resource
                 ColumnGroup::make('Trabajo', [
                     TextColumn::make('trabajo.codigo')
                         ->label('Código')
-                        ->searchable(isIndividual: true),
+                        ->searchable(isIndividual: true)->url(function ($record) {
+                            $url = TrabajoResource::getUrl('edit', ['record' => $record->trabajo_id]);
+                            return "{$url}?activeRelationManager=3";
+                        })
+                        ->color('primary'),
                     TextColumn::make('trabajo.fecha_ingreso')
                         ->label('Fecha de Ingreso')
                         ->toggleable(isToggledHiddenByDefault: true),

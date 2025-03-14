@@ -60,7 +60,9 @@ class ServicioEjecutadoResource extends Resource
                 ColumnGroup::make('Trabajo', [
                     TextColumn::make('trabajo.codigo')
                         ->label('Código')
-                        ->searchable(isIndividual: true),
+                        ->searchable(isIndividual: true)
+                        ->url(fn($record) => TrabajoResource::getUrl('edit', ['record' => $record->trabajo_id]))
+                        ->color('primary'),
                     TextColumn::make('trabajo.fecha_ingreso')
                         ->label('Fecha de Ingreso')
                         ->toggleable(isToggledHiddenByDefault: true),

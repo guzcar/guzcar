@@ -99,7 +99,7 @@
         </tbody>
     </table>
 
-    <h3>ARTÍCULOS UTILIZADOS</h3>
+    <h3>REPUESTOS MATERIALES Y OTROS</h3>
 
     <table class="table-container">
         <thead>
@@ -145,8 +145,8 @@
 
     <h3></h3>
 
-    @if (request('igv'))
-        <table class="table-container">
+    <table class="table-container">
+        @if (request('igv'))
             <tr>
                 <td style="border: 0"></td>
                 <td style="border: 0; width: 95px;">Sub-Total:</td>
@@ -154,7 +154,7 @@
             </tr>
             <tr>
                 <td style="border: 0"></td>
-                <td style="border: 0;">IGV:</td>
+                <td style="border: 0;">IGV ({{ request('igv_porcentaje')}}%):</td>
                 <td style="text-align: right;">S/ {{ number_format($total * request('igv_porcentaje') / 100, 2, '.', '') }}
                 </td>
             </tr>
@@ -164,16 +164,14 @@
                 <th style="width: 100px; text-align: right;">
                     S/ {{ number_format($total * (1 + request('igv_porcentaje') / 100), 2, '.', '') }}</th>
             </tr>
-        </table>
-    @else
-        <table class="table-container">
+        @else
             <tr>
                 <td style="border: 0"></td>
                 <td style="border: 0; width: 95px;">Total:</td>
                 <th style="width: 100px; text-align: right;">S/ {{ number_format($total, 2, '.', '') }}</th>
             </tr>
-        </table>
-    @endif
+        @endif
+    </table>
 
     {{-- Fin de la parte que quiero mejorar --}}
 

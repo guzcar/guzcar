@@ -19,15 +19,18 @@ class CreateVenta extends CreateRecord
         $vehiculoId = $data['vehiculo_id'];
         $data['responsable_id'] = auth()->user()->id;
 
-        $relacionExistente = ClienteVehiculo::where('cliente_id', $clienteId)
-            ->where('vehiculo_id', $vehiculoId)
-            ->exists();
+        if ($vehiculoId) {
 
-        if (!$relacionExistente) {
-            ClienteVehiculo::create([
-                'cliente_id' => $clienteId,
-                'vehiculo_id' => $vehiculoId,
-            ]);
+            $relacionExistente = ClienteVehiculo::where('cliente_id', $clienteId)
+                ->where('vehiculo_id', $vehiculoId)
+                ->exists();
+
+            if (!$relacionExistente) {
+                ClienteVehiculo::create([
+                    'cliente_id' => $clienteId,
+                    'vehiculo_id' => $vehiculoId,
+                ]);
+            }
         }
 
         return $data;

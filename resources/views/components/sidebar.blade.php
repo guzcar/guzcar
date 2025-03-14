@@ -1,16 +1,25 @@
-<nav class="sb-sidenav accordion sb-sidenav-light shadow-sm" id="sidenavAccordion">
+<nav class="sb-sidenav accordion sb-sidenav-light shadow-sm bg-white" id="sidenavAccordion">
     <div class="sb-sidenav-menu">
         <div class="nav">
-            <div class="sb-sidenav-menu-heading py-2"></div>
-            <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
+
+            <div class="sb-sidenav-menu-heading">INICIO</div>
+
+            <a class="nav-link {{ request()->routeIs('home') || request()->routeIs('gestion.*') ? 'active bg-light' : '' }}" href="{{ route('home') }}">
                 <div class="sb-nav-link-icon"><i class="fa-solid fa-house fa-fw me-2"></i></div>
-                Inicio
-            </a>
-            <a class="nav-link {{ request()->routeIs('trabajos.asignar') ? 'active' : '' }}" href="{{ route('trabajos.asignar') }}">
-                <div class="sb-nav-link-icon"><i class="fa-solid fa-car-side fa-fw me-2"></i></div>
                 Vehículos
             </a>
-            <a class="nav-link {{ request()->routeIs('articulos') ? 'active' : '' }}" href="{{ route('articulos') }}">
+            <a class="nav-link {{ request()->routeIs('trabajos.asignar') ? 'active bg-light' : '' }}" href="{{ route('trabajos.asignar') }}">
+                <div class="sb-nav-link-icon"><i class="fa-solid fa-car-side fa-fw me-2"></i></div>
+                Asignar vehículo
+            </a>
+
+            <div class="sb-sidenav-menu-heading">HISTORIAL</div>
+
+            <a class="nav-link {{ request()->routeIs('consulta.*') ? 'active bg-light' : '' }}" href="{{ route('consulta.vehicular') }}">
+                <div class="sb-nav-link-icon"><i class="fa-solid fa-magnifying-glass fa-fw me-2"></i></div>
+                Consulta vehicular
+            </a>
+            <a class="nav-link {{ request()->routeIs('articulos') ? 'active bg-light' : '' }}" href="{{ route('articulos') }}">
                 <div class="sb-nav-link-icon"><i class="fa-solid fa-box-archive fa-fw me-2"></i></div>
                 Artículos
             </a>

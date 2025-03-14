@@ -128,6 +128,7 @@ class EvidenciasRelationManager extends RelationManager
                     ->label('Subido por'),
                 TextColumn::make('observacion')
                     ->label('Observación')
+                    ->placeholder('Sin obserbación')
                     ->wrap()
                     ->lineClamp(3),
                 TextColumn::make('created_at')

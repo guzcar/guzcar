@@ -15,7 +15,9 @@ class ArticuloController extends Controller
         $trabajo->load([
             'trabajoArticulos' => function ($query) {
                 $query->where('tecnico_id', Auth::id())
-                    ->with(['articulo.subCategoria.categoria']);
+                    ->with(['articulo.subCategoria.categoria'])
+                    ->orderBy('fecha', 'desc')
+                    ->orderBy('hora', 'desc');
             },
             'vehiculo.tipoVehiculo'
         ]);
@@ -39,5 +41,12 @@ class ArticuloController extends Controller
             ->get();
 
         return view('articulos.index', compact('articulos'));
+    }
+
+    public function confirmar(TrabajoArticulo $trabajoArticulo)
+    {
+        $trabajoArticulo->confirmado = true; 
+        $trabajoArticulo->save();
+        return back()->with('success', 'El artículo ha sido confirmado');
     }
 }

@@ -91,8 +91,14 @@ class DespachoResource extends Resource
                                     ->label('Trabajo en vehículo')
                                     ->prefixIcon('heroicon-s-truck')
                                     ->options(function () {
+                                        // Obtener la fecha actual
+                                        $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
+                            
                                         return Trabajo::with(['vehiculo'])
-                                            ->whereNull('fecha_salida')
+                                            ->where(function ($query) use ($fechaActual) {
+                                                $query->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
+                                                    ->orWhereDate('fecha_salida', '>=', $fechaActual); // Filtra por fecha_salida igual a la fecha actual
+                                            })
                                             ->get()
                                             ->mapWithKeys(function ($trabajo) {
                                                 $codigo = $trabajo->codigo;
@@ -119,11 +125,19 @@ class DespachoResource extends Resource
             ->columns([
                 TextColumn::make('codigo')
                     ->label('Código')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 TextColumn::make('trabajo.codigo')
                     ->placeholder('Sin trabajo')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(isIndividual: true)
+                    ->url(function ($record) {
+                        if ($record->trabajo) {
+                            $url = TrabajoResource::getUrl('edit', ['record' => $record->trabajo->id]);
+                            return "{$url}?activeRelationManager=2";
+                        }
+                        return null;
+                    })
+                    ->color('primary'),
                 TextColumn::make('responsable.name')
                     ->sortable()
                     ->searchable(),

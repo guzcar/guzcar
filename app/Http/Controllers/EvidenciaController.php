@@ -19,7 +19,7 @@ class EvidenciaController extends Controller
     {
         $user = auth()->user();
 
-        if (!$trabajo->usuarios->contains($user) || $trabajo->fecha_salida !== null) {
+        if (!$trabajo->usuarios->contains($user) /*|| $trabajo->fecha_salida !== null*/) {
             abort(403, 'Forbidden');
         }
 
@@ -46,27 +46,32 @@ class EvidenciaController extends Controller
         }
 
         $request->validate([
-            'evidencia' => 'required|file|mimes:jpg,jpeg,png,mp4,mov',
+            'evidencias' => 'required|array|max:5',
+            'evidencias.*' => 'file|mimes:jpg,jpeg,png,mp4,mov',
             'observacion' => 'nullable|string',
         ]);
 
-        $file = $request->file('evidencia');
-        $path = $file->store('evidencia', 'public');
+        $files = $request->file('evidencias');
+        $observacion = $request->observacion;
 
-        // Optimizar imágenes con GD
-        if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
-            $this->optimizeImage(Storage::disk('public')->path($path), $file->getMimeType());
+        foreach ($files as $index => $file) {
+            $path = $file->store('evidencia', 'public');
+
+            // Optimizar imágenes con GD
+            if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
+                $this->optimizeImage(Storage::disk('public')->path($path), $file->getMimeType());
+            }
+
+            Evidencia::create([
+                'trabajo_id' => $trabajo->id,
+                'user_id' => $user->id,
+                'evidencia_url' => $path,
+                'tipo' => $file->getMimeType() === 'video/mp4' ? 'video' : 'imagen',
+                'observacion' => $index === 0 ? $observacion : null, // Solo la primera evidencia tiene descripción
+            ]);
         }
 
-        Evidencia::create([
-            'trabajo_id' => $trabajo->id,
-            'user_id' => $user->id,
-            'evidencia_url' => $path,
-            'tipo' => $file->getMimeType() === 'video/mp4' ? 'video' : 'imagen',
-            'observacion' => $request->observacion,
-        ]);
-
-        return redirect()->route('evidencias.index', $trabajo)->with('success', 'Evidencia subida correctamente.');
+        return redirect()->route('gestion.evidencias.index', $trabajo)->with('success', 'Evidencias subidas correctamente.');
     }
 
     /**
@@ -87,27 +92,12 @@ class EvidenciaController extends Controller
 
         $request->validate([
             'observacion' => 'nullable|string',
-            'evidencia' => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov|max:10240',
         ]);
-
-        if ($request->hasFile('evidencia')) {
-            Storage::disk('public')->delete($evidencia->evidencia_url);
-            $file = $request->file('evidencia');
-            $path = $file->store('evidencia', 'public');
-
-            // Optimizar imágenes con GD
-            if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
-                $this->optimizeImage(Storage::disk('public')->path($path), $file->getMimeType());
-            }
-
-            $evidencia->evidencia_url = $path;
-            $evidencia->tipo = $file->getMimeType() === 'video/mp4' ? 'video' : 'imagen';
-        }
 
         $evidencia->observacion = $request->observacion;
         $evidencia->save();
 
-        return redirect()->route('evidencias.index', $trabajo)->with('success', 'Evidencia actualizada correctamente.');
+        return redirect()->route('gestion.evidencias.index', $trabajo)->with('success', 'Evidencia actualizada correctamente.');
     }
 
     /**
@@ -128,7 +118,7 @@ class EvidenciaController extends Controller
         Storage::disk('public')->delete($evidencia->evidencia_url);
         $evidencia->delete();
 
-        return redirect()->route('evidencias.index', $trabajo)->with('success', 'Evidencia eliminada correctamente.');
+        return redirect()->route('gestion.evidencias.index', $trabajo)->with('success', 'Evidencia eliminada correctamente.');
     }
 
     /**

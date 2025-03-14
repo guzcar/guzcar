@@ -32,11 +32,6 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::table('trabajo_articulos', function (Blueprint $table) {
-            $table->unsignedBigInteger('despacho_id')->nullable()->after('id');
-            $table->foreign('despacho_id')->references('id')->on('despachos')->onDelete('restrict');
-        });
-
         DB::unprepared("
             CREATE TRIGGER before_insert_trabajo_articulo
             BEFORE INSERT ON trabajo_articulos
@@ -103,11 +98,6 @@ return new class extends Migration {
     {
         DB::unprepared('DROP TRIGGER IF EXISTS before_insert_trabajo_articulo;');
         DB::unprepared('DROP TRIGGER IF EXISTS after_update_despacho;');
-
-        Schema::table('trabajo_articulos', function (Blueprint $table) {
-            $table->dropForeign(['despacho_id']);
-            $table->dropColumn('despacho_id');
-        });
 
         Schema::dropIfExists('despachos');
     }
