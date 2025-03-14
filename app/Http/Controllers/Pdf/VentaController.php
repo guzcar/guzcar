@@ -13,7 +13,11 @@ class VentaController extends Controller
     {
         $venta->load('ventaArticulos.articulo');
 
-        $pdf = Pdf::loadView('pdf.venta', compact('venta'));
+        $subtotal = $venta->ventaArticulos->sum(function ($ventaArticulo) {
+            return $ventaArticulo->cantidad * $ventaArticulo->precio;
+        });
+
+        $pdf = Pdf::loadView('pdf.venta', compact('venta', 'subtotal'));
 
         $codenow = now()->format('ymdhis');
 

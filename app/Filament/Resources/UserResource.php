@@ -10,6 +10,7 @@ use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -95,9 +96,11 @@ class UserResource extends Resource
                                     ->heading('Avatar'),
                                 Section::make()
                                     ->schema([
-                                        CheckboxList::make('roles')
+                                        Select::make('roles')
                                             ->relationship('roles', 'name')
-                                            ->searchable(),
+                                            ->multiple()
+                                            ->searchable()
+                                            ->preload(),
                                     ])
                                     ->heading('Roles'),
                             ])

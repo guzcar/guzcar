@@ -12,6 +12,11 @@ return new class extends Migration {
     {
         Schema::create('trabajo_articulos', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('despacho_id')
+                ->nullable()
+                ->constrained('despachos')
+                ->onDelete('restrict')
+                ->onUpdate('cascade');
             $table->date('fecha');
             $table->time('hora');
             $table->foreignId('trabajo_id')
@@ -35,6 +40,7 @@ return new class extends Migration {
                 ->onUpdate('cascade');
             $table->enum('movimiento', ['cerrado', 'abierto'])->default('cerrado');
             $table->text('observacion')->nullable();
+            $table->boolean('confirmado')->default(false);
             $table->timestamps();
         });
 

@@ -48,12 +48,14 @@ class VentaArticuloRelationManager extends RelationManager
                     ->afterStateUpdated(function ($state, Forms\Set $set) {
                         if ($articulo = Articulo::find($state)) {
                             $set('precio', $articulo->precio ?? $articulo->costo);
+                            $set('min_precio', $articulo->costo);
                         }
                     }),
                 TextInput::make('precio')
                     ->label('Precio de venta')
                     ->required()
                     ->numeric()
+                    ->minValue(fn (Forms\Get $get) => $get('min_precio') ?? 0)
                     ->prefix('S/ ')
                     ->maxValue(42949672.95)
                     ->dehydrated(),

@@ -22,6 +22,7 @@ class TrabajoArticulo extends Model
         'responsable_id',
         'movimiento',
         'observacion',
+        'confirmado',
     ];
 
     protected $casts = [

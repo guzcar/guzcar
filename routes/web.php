@@ -10,6 +10,7 @@ use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
 use App\Http\Controllers\Pdf\VentaController as PdfVentaController;
 use App\Http\Controllers\TrabajoController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VehiculoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,7 +41,7 @@ Route::controller(ForgotPasswordController::class)->group(function () {
     Route::post('password/reset', 'reset')->name('password.update');
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', '2fa.verified'])->group(function () {
 
     // Home principal
     Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -53,7 +54,14 @@ Route::middleware(['auth'])->group(function () {
 
     // Articulos
     Route::get('/articulos', [ArticuloController::class, 'index'])->name('articulos');
-    Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'trabajo'])->name('trabajos.articulos');
+    Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'trabajo'])->name('gestion.trabajos.articulos');
+    Route::post('/trabajos/{trabajoArticulo}/articulos', [ArticuloController::class, 'confirmar'])->name('gestion.trabajos.articulos.confirmar');
+
+    // Consulta Vehicular
+    Route::get('/consulta-vehicular', [VehiculoController::class, 'consultaVehicular'])->name('consulta.vehicular');
+    Route::get('/consulta-vehicular/buscar', [VehiculoController::class, 'buscarVehiculo'])->name('consulta.buscar.vehiculo');
+    Route::get('/vehiculo/{id}/articulos', [VehiculoController::class, 'articulosUtilizados'])->name('consulta.vehiculo.articulos');
+    Route::get('/vehiculo/{id}/servicios', [VehiculoController::class, 'serviciosEjecutados'])->name('consulta.vehiculo.servicios');
 
     // PDF
     Route::get('/admin/trabajos/pdf/{trabajo}', [PdfTrabajoController::class, 'report'])->name('trabajo.pdf.report');
@@ -62,10 +70,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/ventas/pdf/{venta}', [PdfVentaController::class, 'downloadPdf'])->name('ventas.pdf');
 
     // Evidencias
-    Route::get('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'index'])->name('evidencias.index');
-    Route::post('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'store'])->name('evidencias.store');
-    Route::put('/trabajos/{trabajo}/evidencias/{evidencia}', [EvidenciaController::class, 'update'])->name('evidencias.update');
-    Route::delete('/trabajos/{trabajo}/evidencias/{evidencia}', [EvidenciaController::class, 'destroy'])->name('evidencias.destroy');
+    Route::get('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'index'])->name('gestion.evidencias.index');
+    Route::post('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'store'])->name('gestion.evidencias.store');
+    Route::put('/trabajos/{trabajo}/evidencias/{evidencia}', [EvidenciaController::class, 'update'])->name('gestion.evidencias.update');
+    Route::delete('/trabajos/{trabajo}/evidencias/{evidencia}', [EvidenciaController::class, 'destroy'])->name('gestion.evidencias.destroy');
 
     // Editar perfil
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('user.edit');

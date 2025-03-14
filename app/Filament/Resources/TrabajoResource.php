@@ -386,7 +386,8 @@ class TrabajoResource extends Resource
                     ->date('d/m/Y')
                     ->sortable(),
                 CheckboxColumn::make('control')
-                    ->alignCenter(),
+                    ->alignCenter()
+                    ->hidden(fn() => !auth()->user()->can('update_trabajo')),
                 TextColumn::make('vehiculo.placa')
                     ->label('Placa')
                     ->placeholder('SIN PLACA')
@@ -451,15 +452,18 @@ class TrabajoResource extends Resource
                         'COBRADO' => 'COBRADO',
                         'POR COBRAR' => 'POR COBRAR',
                     ])
+                    ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('importe')
                     ->alignRight()
                     ->label('Importe total')
                     ->prefix('S/ ')
+                    ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('a_cuenta')
                     ->alignRight()
                     ->prefix('S/ ')
+                    ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('.getPorCobrar')
                     ->alignRight()
@@ -468,6 +472,7 @@ class TrabajoResource extends Resource
                         return number_format($record->getPorCobrar(), 2, '.', '');
                     })
                     ->prefix('S/ ')
+                    ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
@@ -486,15 +491,18 @@ class TrabajoResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
-            ->recordUrl(function (Trabajo $record): string {
-                // Genera la URL para la vista de edición
-                return static::getUrl('edit', ['record' => $record]);
+            ->recordUrl(function (Trabajo $record): ?string {
+                if (auth()->user()->can('update_trabajo')) {
+                    return static::getUrl('edit', ['record' => $record]);
+                }
+                return null;
             })
             ->striped()
             ->filters([
                 Filter::make('control_o_fecha_salida_null')
                     ->label('Control vehicular')
-                    ->query(fn($query) => $query->where('control', true)->orWhereNull('fecha_salida')),
+                    ->query(fn($query) => $query->where('control', true)->orWhereNull('fecha_salida'))
+                    ->hidden(fn() => !auth()->user()->can('update_trabajo')),
                 TernaryFilter::make('estado_trabajo')
                     ->label('Estado del Trabajo')
                     ->placeholder('Todos')
@@ -516,7 +524,8 @@ class TrabajoResource extends Resource
                         'COBRADO' => 'Cobrado',
                         'POR COBRAR' => 'Por Cobrar',
                     ])
-                    ->placeholder('Todos'),
+                    ->placeholder('Todos')
+                    ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
                 DateRangeFilter::make('fecha_ingreso'),
                 DateRangeFilter::make('fecha_salida'),
                 TrashedFilter::make(),
@@ -542,7 +551,8 @@ class TrabajoResource extends Resource
                             ->send();
                     })
                     ->button()
-                    ->size(ActionSize::Medium),
+                    ->size(ActionSize::Medium)
+                    ->hidden(fn() => !auth()->user()->can('update_trabajo')),
 
                 Action::make('reabrir')->requiresConfirmation()
                     ->modalHeading('Reabrir Trabajo')
@@ -563,7 +573,8 @@ class TrabajoResource extends Resource
                             ->send();
                     })
                     ->button()
-                    ->size(ActionSize::Medium),
+                    ->size(ActionSize::Medium)
+                    ->hidden(fn() => !auth()->user()->can('update_trabajo')),
 
                 ActionGroup::make([
 
@@ -619,14 +630,16 @@ class TrabajoResource extends Resource
                         })
                         ->modalHeading('Configuración de Descarga')
                         ->modalButton('Descargar')
-                        ->modalWidth('md'),
+                        ->modalWidth('md')
+                        ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
 
                     Action::make('Descargar evidencias')
                         ->icon('heroicon-s-photo')
                         ->url(
                             fn(Trabajo $trabajo): string => route('trabajo.pdf.evidencia', ['trabajo' => $trabajo]),
                             shouldOpenInNewTab: true
-                        ),
+                        )
+                        ->hidden(fn() => !auth()->user()->can('view_evidencia')),
                 ])
                     ->button()
                     ->label('Descargar')

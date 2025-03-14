@@ -47,7 +47,7 @@
                                 </div>
                                 <label for="inputEmail" class="mb-2">Contraseña</label>
                                 <div class="input-group mb-3">
-                                    <input class="form-control" style="height: 3.5rem;" id="inputPassword"
+                                    <input class="form-control" style="height: 3.5rem;" id="inputPassword" value="{{ old('password') }}"
                                         type="password" name="password" placeholder="Contraseña" minlength="8" required>
                                     <span class="input-group-text" id="togglePassword"
                                         style="width:3.5rem; cursor: pointer">

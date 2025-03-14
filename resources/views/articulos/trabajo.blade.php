@@ -1,5 +1,14 @@
 <x-layout>
 
+    @push('styles')
+        <style>
+            .articulos-table td {
+                vertical-align: top;
+                padding: 0.25rem 0 0.25rem 0;
+            }
+        </style>
+    @endpush
+
     <h1 class="mb-3">Artículos para {{ $trabajo->vehiculo->placa }}</h1>
 
     <div class="d-flex justify-content-between mb-3">
@@ -35,28 +44,63 @@
 
     <p>Esta es la lista de todos los artículos que solicitaste para este vehícuo.</p>
 
+    @if(session('success'))
+        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="accordion" id="articulosAcordion">
         @forelse ($trabajo->trabajoArticulos as $index => $trabajoArticulo)
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading-{{ $index }}">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapse-{{ $index }}" aria-expanded="false" aria-controls="collapse-{{ $index }}">
-                        {{ $trabajoArticulo->articulo->subCategoria->categoria->nombre }} -
-                        {{ $trabajoArticulo->articulo->subCategoria->nombre }} -
-                        {{ $trabajoArticulo->articulo->especificacion }}
-                        {{ $trabajoArticulo->articulo->marca }}
-                        {{ $trabajoArticulo->articulo->color }} -
-                        {{ $trabajoArticulo->articulo->tamano_presentacion }}
-                    </button>
+                    <form action="{{ route('gestion.trabajos.articulos.confirmar', $trabajoArticulo) }}" method="POST">
+                        <div class="d-flex align-items-center w-100 input-group">
+                            <button class="btn border-0 collapsed flex-grow-1 text-start py-3" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapse-{{ $index }}" aria-expanded="false" aria-controls="collapse-{{ $index }}">
+                                {{ $trabajoArticulo->articulo->subCategoria->categoria->nombre }}
+                                {{ $trabajoArticulo->articulo->subCategoria->nombre }}
+                                {{ $trabajoArticulo->articulo->especificacion }}
+                                {{ $trabajoArticulo->articulo->marca }}
+                                {{ $trabajoArticulo->articulo->color }} -
+                                {{ $trabajoArticulo->articulo->tamano_presentacion }}
+                            </button>
+                            @if ($trabajoArticulo->confirmado)
+                                <button class="btn btn-secondary border-0 py-3 px-4" disabled>
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            @else
+                                    @csrf
+                                    <button class="btn btn-success border-0 py-3 px-4" type="submit">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                            @endif
+                        </div>
+                    </form>
                 </h2>
                 <div id="collapse-{{ $index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ $index }}"
                     data-bs-parent="#articulosAcordion">
                     <div class="accordion-body">
-                        <p><i class="fas text-secondary fa-fw me-2 fa-box"></i> Cantidad: {{ \App\Services\FractionService::decimalToFraction($trabajoArticulo->cantidad) }}</p>
-                        <p><i class="fas text-secondary fa-fw me-2 fa-calendar-alt"></i> Día:
-                            {{ $trabajoArticulo->fecha->isoFormat('dddd, D [de] MMMM') }}</p>
-                        <p class="mb-0"><i class="fas text-secondary fa-fw me-2 fa-clock"></i> Hora:
-                            {{ $trabajoArticulo->hora->format('h:i A') }}</p>
+                        <table class="articulos-table">
+                            <tr>
+                                <td><i class="fas text-secondary fa-fw me-2 fa-box"></i></td>
+                                <td><b>Cantidad:</b> {{ \App\Services\FractionService::decimalToFraction($trabajoArticulo->cantidad) }}</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas text-secondary fa-fw me-2 fa-calendar-alt"></i></td>
+                                <td><b>Día:</b> {{ $trabajoArticulo->fecha->isoFormat('dddd, D [de] MMMM') }}</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas text-secondary fa-fw me-2 fa-clock"></i></td>
+                                <td><b>Hora:</b> {{ $trabajoArticulo->hora->format('h:i A') }}</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fa-solid text-secondary fa-fw me-2 fa-user"></i></td>
+                                <td><b>Responsable:</b> {{ $trabajoArticulo->responsable->name }}</td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>

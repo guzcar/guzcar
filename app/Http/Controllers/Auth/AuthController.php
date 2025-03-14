@@ -43,7 +43,7 @@ class AuthController extends Controller
         // Si falla, regresa con errores
         return back()->withErrors([
             'email' => 'Credenciales incorrectas.',
-        ])->onlyInput('email');
+        ])->onlyInput('email', 'password');
     }
 
     /**

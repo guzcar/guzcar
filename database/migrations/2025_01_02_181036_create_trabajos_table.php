@@ -59,7 +59,7 @@ return new class extends Migration {
                 SET fecha_base = DATE_FORMAT(NEW.fecha_ingreso, '%y%m%d'); -- Formato: Año (2 dígitos), Mes, Día
 
                 -- Obtener la hora actual (HH)
-                SET hora_base = DATE_FORMAT(NOW(), '%H'); -- Hora actual (0-23)
+                SET hora_base = DATE_FORMAT(NEW.created_at, '%H'); -- Hora actual (0-23)
                 SET hora_actual = hora_base; -- Inicia con la hora actual
 
                 -- Buscar la primera hora disponible, iniciando en la hora actual
