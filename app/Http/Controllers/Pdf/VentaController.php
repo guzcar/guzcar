@@ -11,7 +11,13 @@ class VentaController extends Controller
 {
     public function downloadPdf(Venta $venta)
     {
-        $venta->load('ventaArticulos.articulo');
+        $venta->load(
+            'ventaArticulos.articulo.categoria',
+            'ventaArticulos.articulo.subCategoria',
+            'ventaArticulos.articulo.marca',
+            'ventaArticulos.articulo.unidad',
+            'ventaArticulos.articulo.presentacion'
+        );
 
         $subtotal = $venta->ventaArticulos->sum(function ($ventaArticulo) {
             return $ventaArticulo->cantidad * $ventaArticulo->precio;

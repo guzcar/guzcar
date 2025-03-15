@@ -28,16 +28,37 @@ class VentaArticuloRelationManager extends RelationManager
                     ->label('Artículo')
                     ->columnSpanFull()
                     ->options(function () {
-                        return Articulo::with(['subCategoria.categoria'])
+                        return Articulo::with(['categoria', 'subCategoria', 'marca', 'unidad', 'presentacion']) // Cargar relaciones necesarias
                             ->get()
                             ->mapWithKeys(function ($articulo) {
-                                $categoria = $articulo->subCategoria->categoria->nombre;
-                                $subCategoria = $articulo->subCategoria->nombre;
-                                $especificacion = $articulo->especificacion ? " - {$articulo->especificacion}" : '';
-                                $marca = $articulo->marca;
-                                $tamanoPresentacion = $articulo->tamano_presentacion;
+                                $categoria = $articulo->categoria->nombre ?? null;
+                                $marca = $articulo->marca->nombre ?? null;
+                                $subCategoria = $articulo->subCategoria->nombre ?? null;
+                                $especificacion = $articulo->especificacion ?? null;
+                                $presentacion = $articulo->presentacion->nombre ?? null;
+                                $medida = $articulo->medida ?? null;
+                                $unidad = $articulo->unidad->nombre ?? null;
+                                $color = $articulo->color ?? null;
 
-                                $label = "{$categoria} {$subCategoria}{$especificacion} - {$marca} - {$tamanoPresentacion}";
+                                $labelParts = [];
+                                if ($categoria)
+                                    $labelParts[] = $categoria;
+                                if ($marca)
+                                    $labelParts[] = $marca;
+                                if ($subCategoria)
+                                    $labelParts[] = $subCategoria;
+                                if ($especificacion)
+                                    $labelParts[] = $especificacion;
+                                if ($presentacion)
+                                    $labelParts[] = $presentacion;
+                                if ($medida)
+                                    $labelParts[] = $medida;
+                                if ($unidad)
+                                    $labelParts[] = $unidad;
+                                if ($color)
+                                    $labelParts[] = $color;
+
+                                $label = implode(' ', $labelParts);
 
                                 return [$articulo->id => $label];
                             });
@@ -55,7 +76,7 @@ class VentaArticuloRelationManager extends RelationManager
                     ->label('Precio de venta')
                     ->required()
                     ->numeric()
-                    ->minValue(fn (Forms\Get $get) => $get('min_precio') ?? 0)
+                    ->minValue(fn(Forms\Get $get) => $get('min_precio') ?? 0)
                     ->prefix('S/ ')
                     ->maxValue(42949672.95)
                     ->dehydrated(),
@@ -74,17 +95,36 @@ class VentaArticuloRelationManager extends RelationManager
                 TextColumn::make('articulo')
                     ->label('Artículo')
                     ->state(function (VentaArticulo $record) {
-
                         $articulo = $record->articulo;
 
-                        $categoria = $articulo->subCategoria->categoria->nombre;
-                        $subCategoria = $articulo->subCategoria->nombre;
-                        $especificacion = $articulo->especificacion ? " - {$articulo->especificacion}" : '';
-                        $marca = $articulo->marca;
-                        $color = $articulo->color ? " {$articulo->color}" : '';
-                        $tamano_presentacion = $articulo->tamano_presentacion;
+                        $categoria = $articulo->categoria->nombre ?? null;
+                        $marca = $articulo->marca->nombre ?? null;
+                        $subCategoria = $articulo->subCategoria->nombre ?? null;
+                        $especificacion = $articulo->especificacion ?? null;
+                        $presentacion = $articulo->presentacion->nombre ?? null;
+                        $medida = $articulo->medida ?? null;
+                        $unidad = $articulo->unidad->nombre ?? null;
+                        $color = $articulo->color ?? null;
 
-                        $label = "{$categoria} {$subCategoria}{$especificacion} - {$marca}{$color} - {$tamano_presentacion}";
+                        $labelParts = [];
+                        if ($categoria)
+                            $labelParts[] = $categoria;
+                        if ($marca)
+                            $labelParts[] = $marca;
+                        if ($subCategoria)
+                            $labelParts[] = $subCategoria;
+                        if ($especificacion)
+                            $labelParts[] = $especificacion;
+                        if ($presentacion)
+                            $labelParts[] = $presentacion;
+                        if ($medida)
+                            $labelParts[] = $medida;
+                        if ($unidad)
+                            $labelParts[] = $unidad;
+                        if ($color)
+                            $labelParts[] = $color;
+
+                        $label = implode(' ', $labelParts);
 
                         return $label;
                     }),

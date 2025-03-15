@@ -43,9 +43,16 @@ class ArticuloController extends Controller
         return view('articulos.index', compact('articulos'));
     }
 
-    public function confirmar(TrabajoArticulo $trabajoArticulo)
+    public function confirmarTrabajo(TrabajoArticulo $trabajoArticulo)
     {
-        $trabajoArticulo->confirmado = true; 
+        $trabajoArticulo->confirmado = true;
+        $trabajoArticulo->save();
+        return back()->with('success', 'El artículo ha sido confirmado');
+    }
+
+    public function confirmarIndex(TrabajoArticulo $trabajoArticulo)
+    {
+        $trabajoArticulo->confirmado = true;
         $trabajoArticulo->save();
         return back()->with('success', 'El artículo ha sido confirmado');
     }

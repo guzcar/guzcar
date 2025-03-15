@@ -47,63 +47,89 @@
     @if(session('success'))
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
             {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
     <div class="accordion" id="articulosAcordion">
         @forelse ($trabajo->trabajoArticulos as $index => $trabajoArticulo)
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="heading-{{ $index }}">
-                    <form action="{{ route('gestion.trabajos.articulos.confirmar', $trabajoArticulo) }}" method="POST">
-                        <div class="d-flex align-items-center w-100 input-group">
-                            <button class="btn border-0 collapsed flex-grow-1 text-start py-3" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapse-{{ $index }}" aria-expanded="false" aria-controls="collapse-{{ $index }}">
-                                {{ $trabajoArticulo->articulo->subCategoria->categoria->nombre }}
-                                {{ $trabajoArticulo->articulo->subCategoria->nombre }}
-                                {{ $trabajoArticulo->articulo->especificacion }}
-                                {{ $trabajoArticulo->articulo->marca }}
-                                {{ $trabajoArticulo->articulo->color }} -
-                                {{ $trabajoArticulo->articulo->tamano_presentacion }}
-                            </button>
-                            @if ($trabajoArticulo->confirmado)
-                                <button class="btn btn-secondary border-0 py-3 px-4" disabled>
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            @else
-                                    @csrf
-                                    <button class="btn btn-success border-0 py-3 px-4" type="submit">
-                                        <i class="fas fa-check"></i>
+                @php
+                    $articulo = $trabajoArticulo->articulo;
+                    $labelParts = [];
+                    if ($articulo->categoria)
+                        $labelParts[] = $articulo->categoria->nombre;
+                    if ($articulo->marca)
+                        $labelParts[] = $articulo->marca->nombre;
+                    if ($articulo->subCategoria)
+                        $labelParts[] = $articulo->subCategoria->nombre;
+                    if ($articulo->especificacion)
+                        $labelParts[] = $articulo->especificacion;
+                    if ($articulo->presentacion)
+                        $labelParts[] = $articulo->presentacion->nombre;
+                    if ($articulo->medida)
+                        $labelParts[] = $articulo->medida;
+                    if ($articulo->unidad)
+                        $labelParts[] = $articulo->unidad->nombre;
+                    if ($articulo->color)
+                        $labelParts[] = $articulo->color;
+                    $label = implode(' ', $labelParts);
+                @endphp
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-{{ $index }}">
+                        <table class="w-100">
+                            <tr>
+                                <td>
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-{{ $index }}" aria-expanded="false"
+                                        aria-controls="collapse-{{ $index }}">
+                                        {{ $label }}
                                     </button>
-                            @endif
-                        </div>
-                    </form>
-                </h2>
-                <div id="collapse-{{ $index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ $index }}"
-                    data-bs-parent="#articulosAcordion">
-                    <div class="accordion-body">
-                        <table class="articulos-table">
-                            <tr>
-                                <td><i class="fas text-secondary fa-fw me-2 fa-box"></i></td>
-                                <td><b>Cantidad:</b> {{ \App\Services\FractionService::decimalToFraction($trabajoArticulo->cantidad) }}</td>
-                            </tr>
-                            <tr>
-                                <td><i class="fas text-secondary fa-fw me-2 fa-calendar-alt"></i></td>
-                                <td><b>Día:</b> {{ $trabajoArticulo->fecha->isoFormat('dddd, D [de] MMMM') }}</td>
-                            </tr>
-                            <tr>
-                                <td><i class="fas text-secondary fa-fw me-2 fa-clock"></i></td>
-                                <td><b>Hora:</b> {{ $trabajoArticulo->hora->format('h:i A') }}</td>
-                            </tr>
-                            <tr>
-                                <td><i class="fa-solid text-secondary fa-fw me-2 fa-user"></i></td>
-                                <td><b>Responsable:</b> {{ $trabajoArticulo->responsable->name }}</td>
+                                </td>
+                                <td class="px-2" style="width: 1rem;">
+                                    <form action="{{ route('gestion.trabajos.articulos.confirmar.trabajo', $trabajoArticulo) }}"
+                                        method="POST"></form>
+                                    @if ($trabajoArticulo->confirmado)
+                                        <button class="btn btn-secondary border-0 py-2 px-3" disabled>
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    @else
+                                        @csrf
+                                        <button class="btn btn-success border-0 py-2 px-3" type="submit">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    @endif
+                                    </form>
+                                </td>
                             </tr>
                         </table>
+                    </h2>
+
+                    <div id="collapse-{{ $index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ $index }}"
+                        data-bs-parent="#articulosAcordion">
+                        <div class="accordion-body">
+                            <table class="articulos-table">
+                                <tr>
+                                    <td><i class="fas text-secondary fa-fw me-2 fa-box"></i></td>
+                                    <td><b>Cantidad:</b>
+                                        {{ \App\Services\FractionService::decimalToFraction($trabajoArticulo->cantidad) }}</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas text-secondary fa-fw me-2 fa-calendar-alt"></i></td>
+                                    <td><b>Día:</b> {{ $trabajoArticulo->fecha->isoFormat('dddd, D [de] MMMM') }}</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas text-secondary fa-fw me-2 fa-clock"></i></td>
+                                    <td><b>Hora:</b> {{ $trabajoArticulo->hora->format('h:i A') }}</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa-solid text-secondary fa-fw me-2 fa-user"></i></td>
+                                    <td><b>Responsable:</b> {{ $trabajoArticulo->responsable->name }}</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
         @empty
             <div class="card">
                 <div class="card-body">
