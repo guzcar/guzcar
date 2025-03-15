@@ -31,17 +31,39 @@ class TrabajoArticulosRelationManager extends RelationManager
                     ->label('Artículo')
                     ->required()
                     ->options(function () {
-                        return Articulo::with(['subCategoria.categoria'])
+                        return Articulo::with(['subCategoria.categoria', 'marca']) // Cargar relaciones necesarias
                             ->get()
                             ->mapWithKeys(function ($articulo) {
-                                $categoria = $articulo->subCategoria->categoria->nombre;
-                                $subCategoria = $articulo->subCategoria->nombre;
-                                $especificacion = $articulo->especificacion ? " - {$articulo->especificacion}" : '';
-                                $marca = $articulo->marca;
-                                $color = $articulo->color ? " {$articulo->color}" : '';
-                                $tamano_presentacion = $articulo->tamano_presentacion;
+                                $categoria = $articulo->categoria->nombre ?? null; // Acceder directamente a la categoría
+                                $marca = $articulo->marca->nombre ?? null; // Acceder al nombre de la marca
+                                $subCategoria = $articulo->subCategoria->nombre ?? null;
+                                $especificacion = $articulo->especificacion ?? null;
+                                $presentacion = $articulo->presentacion->nombre ?? null; // Acceder al nombre de la presentación
+                                $medida = $articulo->medida ?? null;
+                                $unidad = $articulo->unidad->nombre ?? null; // Acceder al nombre de la unidad
+                                $color = $articulo->color ?? null;
 
-                                $label = "{$categoria} {$subCategoria}{$especificacion} - {$marca}{$color} - {$tamano_presentacion}";
+                                // Construye el label dinámicamente
+                                $labelParts = [];
+                                if ($categoria)
+                                    $labelParts[] = $categoria;
+                                if ($marca)
+                                    $labelParts[] = $marca;
+                                if ($subCategoria)
+                                    $labelParts[] = $subCategoria;
+                                if ($especificacion)
+                                    $labelParts[] = $especificacion;
+                                if ($presentacion)
+                                    $labelParts[] = $presentacion;
+                                if ($medida)
+                                    $labelParts[] = $medida;
+                                if ($unidad)
+                                    $labelParts[] = $unidad;
+                                if ($color)
+                                    $labelParts[] = $color;
+
+                                // Une las partes con un espacio
+                                $label = implode(' ', $labelParts);
 
                                 return [$articulo->id => $label];
                             });
@@ -136,14 +158,39 @@ class TrabajoArticulosRelationManager extends RelationManager
                     ->label('Artículo')
                     ->state(function (TrabajoArticulo $record) {
                         $articulo = $record->articulo;
-                        $categoria = $articulo->subCategoria->categoria->nombre;
-                        $subCategoria = $articulo->subCategoria->nombre;
-                        $especificacion = $articulo->especificacion ? " - {$articulo->especificacion}" : '';
-                        $marca = $articulo->marca;
-                        $color = $articulo->color ? " {$articulo->color}" : '';
-                        $tamano_presentacion = $articulo->tamano_presentacion;
 
-                        $label = "{$categoria} {$subCategoria}{$especificacion} - {$marca}{$color} - {$tamano_presentacion}";
+                        // Campos que se concatenarán en el label
+                        $categoria = $articulo->categoria->nombre ?? null; // Acceder directamente a la categoría
+                        $marca = $articulo->marca->nombre ?? null; // Acceder al nombre de la marca
+                        $subCategoria = $articulo->subCategoria->nombre ?? null;
+                        $especificacion = $articulo->especificacion ?? null;
+                        $presentacion = $articulo->presentacion->nombre ?? null; // Acceder al nombre de la presentación
+                        $medida = $articulo->medida ?? null;
+                        $unidad = $articulo->unidad->nombre ?? null; // Acceder al nombre de la unidad
+                        $color = $articulo->color ?? null;
+
+                        // Construye el label dinámicamente
+                        $labelParts = [];
+                        if ($categoria)
+                            $labelParts[] = $categoria;
+                        if ($marca)
+                            $labelParts[] = $marca;
+                        if ($subCategoria)
+                            $labelParts[] = $subCategoria;
+                        if ($especificacion)
+                            $labelParts[] = $especificacion;
+                        if ($presentacion)
+                            $labelParts[] = $presentacion;
+                        if ($medida)
+                            $labelParts[] = $medida;
+                        if ($unidad)
+                            $labelParts[] = $unidad;
+                        if ($color)
+                            $labelParts[] = $color;
+
+                        // Une las partes con un espacio
+                        $label = implode(' ', $labelParts);
+
                         return $label;
                     }),
                 TextColumn::make('articulo.ubicaciones.codigo')

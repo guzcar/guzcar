@@ -2,10 +2,11 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TrabajoPagoDetalleResource\Pages;
-use App\Filament\Resources\TrabajoPagoDetalleResource\RelationManagers;
-use App\Models\TrabajoPagoDetalle;
+use App\Filament\Resources\ArticuloUnidadResource\Pages;
+use App\Filament\Resources\ArticuloUnidadResource\RelationManagers;
+use App\Models\ArticuloUnidad;
 use Filament\Forms;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -17,30 +18,33 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
-class TrabajoPagoDetalleResource extends Resource
+class ArticuloUnidadResource extends Resource
 {
-    protected static ?string $model = TrabajoPagoDetalle::class;
+    protected static ?string $model = ArticuloUnidad::class;
 
-    protected static ?string $navigationGroup = 'Configuración de taller';
+    protected static ?string $navigationGroup = 'Configuración de logística';
 
-    protected static ?int $navigationSort = 210;
-
-    protected static ?string $modelLabel = 'Detalles de pago';
-
-    protected static ?string $pluralModelLabel = 'Detalles de pagos';
-
-    protected static ?string $navigationLabel = 'Detalles de pagos';
+    protected static ?int $navigationSort = 180;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $modelLabel = 'Unidad de medida';
+
+    protected static ?string $pluralModelLabel = 'Unidades de medida';
+
+    protected static ?string $navigationLabel = 'Unidades de medida';
+
+    protected static ?string $slug = 'articulo-unidades';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre')
-                    ->required()
+                TextInput::make('nombre')
                     ->unique(ignoreRecord: true)
-                    ->maxLength(255),
+                    ->required()
+                    ->maxLength(255)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -49,7 +53,8 @@ class TrabajoPagoDetalleResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('nombre')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')
@@ -61,7 +66,6 @@ class TrabajoPagoDetalleResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])
@@ -71,10 +75,8 @@ class TrabajoPagoDetalleResource extends Resource
             ])
             ->bulkActions([
                 ExportBulkAction::make(),
-                // BulkActionGroup::make([
-                //     DeleteBulkAction::make(),
-                //     ForceDeleteBulkAction::make(),
-                //     RestoreBulkAction::make(),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
                 // ]),
             ]);
     }
@@ -89,9 +91,9 @@ class TrabajoPagoDetalleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTrabajoPagoDetalles::route('/'),
-            // 'create' => Pages\CreateTrabajoPagoDetalle::route('/create'),
-            // 'edit' => Pages\EditTrabajoPagoDetalle::route('/{record}/edit'),
+            'index' => Pages\ListArticuloUnidads::route('/'),
+            // 'create' => Pages\CreateArticuloUnidad::route('/create'),
+            // 'edit' => Pages\EditArticuloUnidad::route('/{record}/edit'),
         ];
     }
 }

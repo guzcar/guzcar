@@ -17,18 +17,18 @@ class EditArticulo extends EditRecord
         ];
     }
 
-    protected function fillForm(): void
-    {
-        $data = $this->getRecord()->attributesToArray();
+    // protected function fillForm(): void
+    // {
+    //     $data = $this->getRecord()->attributesToArray();
 
-        $articulo = $this->getRecord();
-        $subCategoria = $articulo->subCategoria;
+    //     $articulo = $this->getRecord();
+    //     $subCategoria = $articulo->subCategoria;
 
-        $data['sub_categoria_id'] = $articulo->sub_categoria_id;
-        $data['categoria_id'] = $subCategoria->categoria_id;
+    //     $data['sub_categoria_id'] = $articulo->sub_categoria_id;
+    //     $data['categoria_id'] = $subCategoria->categoria_id;
 
-        $this->fillFormWithDataAndCallHooks($articulo, $data);
-    }
+    //     $this->fillFormWithDataAndCallHooks($articulo, $data);
+    // }
 
     protected function getRedirectUrl(): string
     {

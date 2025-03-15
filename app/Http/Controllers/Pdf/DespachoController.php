@@ -11,7 +11,13 @@ class DespachoController extends Controller
 {
     public function downloadPdf(Despacho $despacho)
     {
-        $despacho->load('trabajoArticulos.articulo');
+        $despacho->load(
+            'trabajoArticulos.articulo.categoria',
+            'trabajoArticulos.articulo.subCategoria',
+            'trabajoArticulos.articulo.marca',
+            'trabajoArticulos.articulo.unidad',
+            'trabajoArticulos.articulo.presentacion'
+        );
 
         $pdf = Pdf::loadView('pdf.despacho', compact('despacho'));
 

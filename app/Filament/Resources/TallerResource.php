@@ -30,9 +30,9 @@ class TallerResource extends Resource
 {
     protected static ?string $model = Taller::class;
 
-    protected static ?string $navigationGroup = 'Configuración';
+    protected static ?string $navigationGroup = 'Configuración de taller';
 
-    protected static ?int $navigationSort = 130;
+    protected static ?int $navigationSort = 190;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

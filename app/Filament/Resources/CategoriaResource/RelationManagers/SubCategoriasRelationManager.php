@@ -28,6 +28,7 @@ class SubCategoriasRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('nombre')
+            ->heading('Grados / Números')
             ->columns([
                 Tables\Columns\TextColumn::make('nombre'),
             ])
@@ -35,7 +36,8 @@ class SubCategoriasRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->label('Crear sub categoría'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

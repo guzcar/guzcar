@@ -5,22 +5,19 @@ namespace App\Filament\Resources\TrabajoResource\RelationManagers;
 use App\Models\TrabajoArticulo;
 use App\Services\FractionService;
 use Filament\Forms;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class TrabajoArticulosRelationManager extends RelationManager
 {
     protected static string $relationship = 'trabajoArticulos';
 
-    protected static ?string $title = 'Articulos';
+    protected static ?string $title = 'Artículos';
 
     public function form(Form $form): Form
     {
@@ -32,15 +29,8 @@ class TrabajoArticulosRelationManager extends RelationManager
                     ->columnSpanFull()
                     ->afterStateHydrated(function (TextInput $component, $record) {
                         $articulo = $record->articulo;
-                        $categoria = $articulo->subCategoria->categoria->nombre;
-                        $subCategoria = $articulo->subCategoria->nombre;
-                        $especificacion = $articulo->especificacion ? " - {$articulo->especificacion}" : '';
-                        $marca = $articulo->marca;
-                        $color = $articulo->color ? " {$articulo->color}" : '';
-                        $tamano_presentacion = $articulo->tamano_presentacion;
-
-                        $nombreCompleto = "{$categoria} {$subCategoria}{$especificacion} - {$marca}{$color} - {$tamano_presentacion}";
-                        $component->state($nombreCompleto);
+                        $label = $this->buildArticuloLabel($articulo);
+                        $component->state($label);
                     }),
                 TextInput::make('cantidad_fraccion')
                     ->label('Cantidad')
@@ -67,15 +57,7 @@ class TrabajoArticulosRelationManager extends RelationManager
                     ->label('Artículo')
                     ->state(function (TrabajoArticulo $record) {
                         $articulo = $record->articulo;
-                        $categoria = $articulo->subCategoria->categoria->nombre;
-                        $subCategoria = $articulo->subCategoria->nombre;
-                        $especificacion = $articulo->especificacion ? " - {$articulo->especificacion}" : '';
-                        $marca = $articulo->marca;
-                        $color = $articulo->color ? " {$articulo->color}" : '';
-                        $tamano_presentacion = $articulo->tamano_presentacion;
-
-                        $label = "{$categoria} {$subCategoria}{$especificacion} - {$marca}{$color} - {$tamano_presentacion}";
-                        return $label;
+                        return $this->buildArticuloLabel($articulo);
                     }),
                 TextColumn::make('precio')
                     ->label('Precio')
@@ -93,7 +75,7 @@ class TrabajoArticulosRelationManager extends RelationManager
                     ->alignRight()
                     ->state(function (TrabajoArticulo $record): string {
                         return number_format($record->precio * $record->cantidad, 2, '.', '');
-                    })
+                    }),
             ])
             ->filters([
                 //
@@ -106,7 +88,44 @@ class TrabajoArticulosRelationManager extends RelationManager
                 // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                ExportBulkAction::make()
+                ExportBulkAction::make(),
             ]);
+    }
+
+    /**
+     * Construye el label del artículo dinámicamente.
+     */
+    private function buildArticuloLabel($articulo): string
+    {
+        $categoria = $articulo->categoria->nombre ?? null;
+        $marca = $articulo->marca->nombre ?? null;
+        $subCategoria = $articulo->subCategoria->nombre ?? null;
+        $especificacion = $articulo->especificacion ?? null;
+        $presentacion = $articulo->presentacion->nombre ?? null;
+        $medida = $articulo->medida ?? null;
+        $unidad = $articulo->unidad->nombre ?? null;
+        $color = $articulo->color ?? null;
+
+        // Construye el label dinámicamente
+        $labelParts = [];
+        if ($categoria)
+            $labelParts[] = $categoria;
+        if ($marca)
+            $labelParts[] = $marca;
+        if ($subCategoria)
+            $labelParts[] = $subCategoria;
+        if ($especificacion)
+            $labelParts[] = $especificacion;
+        if ($presentacion)
+            $labelParts[] = $presentacion;
+        if ($medida)
+            $labelParts[] = $medida;
+        if ($unidad)
+            $labelParts[] = $unidad;
+        if ($color)
+            $labelParts[] = $color;
+
+        // Une las partes con un espacio
+        return implode(' ', $labelParts);
     }
 }

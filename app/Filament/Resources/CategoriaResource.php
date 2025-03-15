@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CategoriaResource\Pages;
 use App\Filament\Resources\CategoriaResource\RelationManagers;
 use App\Filament\Resources\CategoriaResource\RelationManagers\SubCategoriasRelationManager;
+use App\Models\ArticuloCategoria;
 use App\Models\Categoria;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
@@ -28,11 +29,11 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class CategoriaResource extends Resource
 {
-    protected static ?string $model = Categoria::class;
+    protected static ?string $model = ArticuloCategoria::class;
 
-    protected static ?string $navigationGroup = 'Configuración';
+    protected static ?string $navigationGroup = 'Configuración de logística';
 
-    protected static ?int $navigationSort = 160;
+    protected static ?int $navigationSort = 150;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -47,6 +48,9 @@ class CategoriaResource extends Resource
         return $form
             ->schema([
                 TextInput::make('nombre')
+                    ->unique(ignoreRecord: true)
+                    ->required()
+                    ->maxLength(255)
             ]);
     }
 
@@ -55,7 +59,8 @@ class CategoriaResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('nombre')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')

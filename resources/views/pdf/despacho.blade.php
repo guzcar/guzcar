@@ -76,12 +76,38 @@
                         <tr>
                             <td style="text-align: center;">{{ $i }}</td>
                             <td>
-                                {{ $trabajoArticulo->articulo->subCategoria->categoria->nombre }}
-                                {{ $trabajoArticulo->articulo->subCategoria->nombre }}
-                                {{ $trabajoArticulo->articulo->especificacion }} -
-                                {{ $trabajoArticulo->articulo->marca }}
-                                {{ $trabajoArticulo->articulo->color }} -
-                                {{ $trabajoArticulo->articulo->tamano_presentacion }}
+                                @php
+                                    $articulo = $trabajoArticulo->articulo;
+
+                                    $categoria = $articulo->categoria->nombre ?? null;
+                                    $presentacion = $articulo->presentacion->nombre ?? null;
+                                    $subCategoria = $articulo->subCategoria->nombre ?? null;
+                                    $especificacion = $articulo->especificacion ?? null;
+                                    $marca = $articulo->marca->nombre ?? null;
+                                    $medida = $articulo->medida ?? null;
+                                    $unidad = $articulo->unidad->nombre ?? null;
+                                    $color = $articulo->color ?? null;
+
+                                    $labelParts = [];
+                                    if ($categoria)
+                                        $labelParts[] = $categoria;
+                                    if ($marca)
+                                        $labelParts[] = $marca;
+                                    if ($subCategoria)
+                                        $labelParts[] = $subCategoria;
+                                    if ($especificacion)
+                                        $labelParts[] = $especificacion;
+                                    if ($presentacion)
+                                        $labelParts[] = $presentacion;
+                                    if ($medida)
+                                        $labelParts[] = $medida;
+                                    if ($unidad)
+                                        $labelParts[] = $unidad;
+                                    if ($color)
+                                        $labelParts[] = $color;
+
+                                    echo implode(' ', $labelParts);
+                                @endphp
                             </td>
                             <td style="text-align: center;">
                                 {{ \App\Services\FractionService::decimalToFraction($trabajoArticulo->cantidad) }}
@@ -128,5 +154,5 @@
         </tr>
     </table>
 
-    <p style="margin-top: 3rem;">Automotores GUZCAR S.A.C.</p>
+    {{-- <p style="margin-top: 3rem;">Automotores GUZCAR S.A.C.</p> --}}
 </x-pdf-layout>

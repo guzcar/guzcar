@@ -4,23 +4,20 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('trabajo_tecnicos', function (Blueprint $table) {
+        Schema::create('articulo_sub_categorias', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tecnico_id')
-                ->constrained('users')
+            $table->string('nombre');
+            $table->foreignId('categoria_id')
+                ->constrained('articulo_categorias')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
-            $table->foreignId('trabajo_id')
-                ->constrained('trabajos')
-                ->onDelete('restrict')
-                ->onUpdate('cascade');
-            $table->boolean('finalizado')->default(false);
             $table->timestamps();
         });
     }
@@ -30,6 +27,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('trabajo_tecnicos');
+        Schema::dropIfExists('articulo_sub_categorias');
     }
 };

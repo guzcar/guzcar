@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Categoria extends Model
+class ArticuloCategoria extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -14,6 +14,6 @@ class Categoria extends Model
 
     public function subCategorias()
     {
-        return $this->hasMany(SubCategoria::class);
+        return $this->hasMany(ArticuloSubCategoria::class, 'categoria_id');
     }
 }

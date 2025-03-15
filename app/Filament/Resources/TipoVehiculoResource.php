@@ -29,9 +29,9 @@ class TipoVehiculoResource extends Resource
 {
     protected static ?string $model = TipoVehiculo::class;
 
-    protected static ?string $navigationGroup = 'Configuración';
+    protected static ?string $navigationGroup = 'Configuración de taller';
 
-    protected static ?int $navigationSort = 140;
+    protected static ?int $navigationSort = 200;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

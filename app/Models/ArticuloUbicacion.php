@@ -12,7 +12,10 @@ class ArticuloUbicacion extends Pivot
 
     protected $table = 'articulo_ubicaciones';
 
-    protected $fillable = ['articulo_id', 'ubicacion_id'];
+    protected $fillable = [
+        'articulo_id',
+        'ubicacion_id'
+    ];
 
     public function articulo()
     {

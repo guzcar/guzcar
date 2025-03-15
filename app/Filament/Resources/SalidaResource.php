@@ -96,16 +96,40 @@ class SalidaResource extends Resource
                                     ->label('Artículo')
                                     ->columnSpanFull()
                                     ->options(function () {
-                                        return Articulo::with(['subCategoria.categoria'])
+                                        return Articulo::with(['categoria', 'subCategoria.categoria', 'marca', 'unidad', 'presentacion'])
                                             ->get()
                                             ->mapWithKeys(function ($articulo) {
-                                                $categoria = $articulo->subCategoria->categoria->nombre;
-                                                $subCategoria = $articulo->subCategoria->nombre;
-                                                $especificacion = $articulo->especificacion ? " - {$articulo->especificacion}" : '';
-                                                $marca = $articulo->marca;
-                                                $tamanoPresentacion = $articulo->tamano_presentacion;
+                                                // Campos que se concatenarán en el label
+                                                $categoria = $articulo->categoria->nombre ?? null;
+                                                $subCategoria = $articulo->subCategoria->nombre ?? null;
+                                                $especificacion = $articulo->especificacion ?? null;
+                                                $marca = $articulo->marca->nombre ?? null;
+                                                $presentacion = $articulo->presentacion->nombre ?? null;
+                                                $medida = $articulo->medida ?? null;
+                                                $unidad = $articulo->unidad->nombre ?? null;
+                                                $color = $articulo->color ?? null;
 
-                                                $label = "{$categoria} {$subCategoria}{$especificacion} - {$marca} - {$tamanoPresentacion}";
+                                                // Construye el label dinámicamente
+                                                $labelParts = [];
+                                                if ($categoria)
+                                                    $labelParts[] = $categoria;
+                                                if ($subCategoria)
+                                                    $labelParts[] = $subCategoria;
+                                                if ($especificacion)
+                                                    $labelParts[] = $especificacion;
+                                                if ($marca)
+                                                    $labelParts[] = $marca;
+                                                if ($presentacion)
+                                                    $labelParts[] = $presentacion;
+                                                if ($medida)
+                                                    $labelParts[] = $medida;
+                                                if ($unidad)
+                                                    $labelParts[] = $unidad;
+                                                if ($color)
+                                                    $labelParts[] = $color;
+
+                                                // Une las partes con un espacio
+                                                $label = implode(' ', $labelParts);
 
                                                 return [$articulo->id => $label];
                                             });
@@ -318,11 +342,18 @@ class SalidaResource extends Resource
                         ->offIcon('heroicon-c-x-mark'),
                 ]),
                 ColumnGroup::make('Artículo', [
-                    TextColumn::make('articulo.subcategoria.categoria.nombre')
+                    TextColumn::make('articulo.categoria.nombre')
+                        ->label('Artículo')
                         ->searchable(isIndividual: true)
                         ->sortable(),
+                    TextColumn::make('articulo.marca.nombre')
+                        ->label('Marca')
+                        ->placeholder('Sin marca')
+                        ->sortable()
+                        ->searchable(isIndividual: true),
                     TextColumn::make('articulo.subcategoria.nombre')
-                        ->label('Sub-Categoría')
+                        ->placeholder('Sin grado o número')
+                        ->label('Grado / Número')
                         ->searchable(isIndividual: true)
                         ->sortable(),
                     TextColumn::make('articulo.especificacion')
@@ -331,22 +362,29 @@ class SalidaResource extends Resource
                         ->searchable(isIndividual: true)
                         ->sortable()
                         ->toggleable(isToggledHiddenByDefault: false),
-                    TextColumn::make('articulo.marca')
-                        ->label('Marca')
+                    TextColumn::make('articulo.presentacion.nombre')
+                        ->label('Presentación')
+                        ->placeholder('Sin presentación')
                         ->sortable()
                         ->searchable(isIndividual: true),
-                    TextColumn::make('articulo.tamano_presentacion')
-                        ->label('Presentación')
-                        ->searchable(isIndividual: true)
+                    TextColumn::make('articulo.medida')
+                        ->label('Medida')
+                        ->placeholder('0.00')
                         ->alignCenter()
                         ->sortable()
-                        ->toggleable(isToggledHiddenByDefault: false),
+                        ->searchable(),
+                    TextColumn::make('articulo.unidad.nombre')
+                        ->label('Unidad')
+                        ->placeholder('N/A')
+                        ->alignCenter()
+                        ->sortable()
+                        ->searchable(),
                     TextColumn::make('articulo.color')
                         ->label('Color')
                         ->placeholder('Sin color')
                         ->sortable()
-                        ->searchable()
-                        ->toggleable(isToggledHiddenByDefault: true),
+                        ->searchable(isIndividual: true)
+                        ->toggleable(isToggledHiddenByDefault: false),
                 ]),
                 ColumnGroup::make('Salida', [
                     TextColumn::make('precio')

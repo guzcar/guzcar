@@ -112,22 +112,49 @@
         </thead>
         <tbody>
             @forelse($articulosAgrupados as $articulo)
-                <tr>
-                    <td>
-                        {{ $articulo['articulo']->subCategoria->categoria->nombre }}
-                        {{ $articulo['articulo']->subCategoria->nombre }}
-                        {{ $articulo['articulo']->especificacion }}
-                        {{ $articulo['articulo']->marca }}
-                        {{ $articulo['articulo']->color }} - {{ $articulo['articulo']->tamano_presentacion }}
-                    </td>
-                    <td style="text-align: right">S/ {{ $articulo['precio'] }}</td>
-                    <td style="text-align: center">
-                        {{ \App\Services\FractionService::decimalToFraction($articulo['cantidad']) }}
-                    </td>
-                    <td style="text-align: right">S/
-                        {{ number_format($articulo['cantidad'] * $articulo['precio'], 2, '.', '') }}
-                    </td>
-                </tr>
+                        <tr>
+                            <td>
+                                @php
+                                    $articuloData = $articulo['articulo'];
+                                    
+                                    $categoria = $articuloData->categoria->nombre ?? null;
+                                    $marca = $articuloData->marca->nombre ?? null;
+                                    $subCategoria = $articuloData->subCategoria->nombre ?? null;
+                                    $especificacion = $articuloData->especificacion ?? null;
+                                    $presentacion = $articuloData->presentacion->nombre ?? null;
+                                    $medida = $articuloData->medida ?? null;
+                                    $unidad = $articuloData->unidad->nombre ?? null;
+                                    $color = $articuloData->color ?? null;
+
+                                    $labelParts = [];
+                                    if ($categoria)
+                                        $labelParts[] = $categoria;
+                                    if ($marca)
+                                        $labelParts[] = $marca;
+                                    if ($subCategoria)
+                                        $labelParts[] = $subCategoria;
+                                    if ($especificacion)
+                                        $labelParts[] = $especificacion;
+                                    if ($presentacion)
+                                        $labelParts[] = $presentacion;
+                                    if ($medida)
+                                        $labelParts[] = $medida;
+                                    if ($unidad)
+                                        $labelParts[] = $unidad;
+                                    if ($color)
+                                        $labelParts[] = $color;
+
+                                    echo implode(' ', $labelParts);
+                                @endphp
+                            </td>
+                            <td style="text-align: right">S/ {{ $articulo['precio'] }}</td>
+                            <td style="text-align: center">
+                                {{ \App\Services\FractionService::decimalToFraction($articulo['cantidad']) }}
+                            </td>
+                            <td style="text-align: right">S/
+                                {{ number_format($articulo['cantidad'] * $articulo['precio'], 2, '.', '') }}
+                            </td>
+                        </tr>
             @empty
                 <tr>
                     <td class="empty-case"></td>

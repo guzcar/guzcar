@@ -401,7 +401,7 @@ class TrabajoResource extends Resource
                     ->label('Tipo')
                     ->sortable()
                     ->searchable(isIndividual: true)
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('vehiculo.marca')
                     ->label('Marca')
                     ->sortable()

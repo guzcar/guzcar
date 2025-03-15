@@ -41,11 +41,8 @@
         </tr>
     </table>
 
-
     @if ($venta->vehiculo)
-
         <h3 style="font-weight: normal;">VEHÍCULO</h3>
-
         <table style="width: 50%; border-collapse: collapse;">
             <tr>
                 <td style="vertical-align: top; padding-right: 0.5rem">
@@ -68,7 +65,6 @@
                 </td>
             </tr>
         </table>
-
     @endif
 
     <h3>ARTÍCULOS</h3>
@@ -84,21 +80,47 @@
         </thead>
         <tbody>
             @forelse ($venta->ventaArticulos as $ventaArticulo)
-                <tr>
-                    <td>
-                        {{ $ventaArticulo->articulo->subCategoria->categoria->nombre }}
-                        {{ $ventaArticulo->articulo->subCategoria->nombre }}
-                        {{ $ventaArticulo->articulo->especificacion }}
-                        {{ $ventaArticulo->articulo->marca }}
-                        {{ $ventaArticulo->articulo->color }} -
-                        {{ $ventaArticulo->articulo->tamano_presentacion }}
-                    </td>
-                    <td style="text-align: right">S/ {{ $ventaArticulo->precio }}</td>
-                    <td style="text-align: center">{{ $ventaArticulo->cantidad }}</td>
-                    <td style="text-align: right">S/
-                        {{ number_format($ventaArticulo->cantidad * $ventaArticulo->precio, 2, '.', '') }}
-                    </td>
-                </tr>
+                        <tr>
+                            <td>
+                                @php
+                                    $articulo = $ventaArticulo->articulo;
+
+                                    $categoria = $articulo->categoria->nombre ?? null;
+                                    $marca = $articulo->marca->nombre ?? null;
+                                    $subCategoria = $articulo->subCategoria->nombre ?? null;
+                                    $especificacion = $articulo->especificacion ?? null;
+                                    $presentacion = $articulo->presentacion->nombre ?? null;
+                                    $medida = $articulo->medida ?? null;
+                                    $unidad = $articulo->unidad->nombre ?? null;
+                                    $color = $articulo->color ?? null;
+
+                                    $labelParts = [];
+                                    if ($categoria)
+                                        $labelParts[] = $categoria;
+                                    if ($marca)
+                                        $labelParts[] = $marca;
+                                    if ($subCategoria)
+                                        $labelParts[] = $subCategoria;
+                                    if ($especificacion)
+                                        $labelParts[] = $especificacion;
+                                    if ($presentacion)
+                                        $labelParts[] = $presentacion;
+                                    if ($medida)
+                                        $labelParts[] = $medida;
+                                    if ($unidad)
+                                        $labelParts[] = $unidad;
+                                    if ($color)
+                                        $labelParts[] = $color;
+
+                                    echo implode(' ', $labelParts);
+                                @endphp
+                            </td>
+                            <td style="text-align: right">S/ {{ $ventaArticulo->precio }}</td>
+                            <td style="text-align: center">{{ $ventaArticulo->cantidad }}</td>
+                            <td style="text-align: right">S/
+                                {{ number_format($ventaArticulo->cantidad * $ventaArticulo->precio, 2, '.', '') }}
+                            </td>
+                        </tr>
             @empty
                 <tr>
                     <td class="empty-case"></td>
@@ -143,7 +165,6 @@
     </table>
 
     @if ($venta->observacion)
-
         <h3>OBSERVACIONES</h3>
         <p>{{ $venta->observacion }}</p>
     @endif

@@ -17,8 +17,11 @@ class TrabajoController extends Controller
     public function report($id)
     {
         $trabajo = Trabajo::with([
-            'trabajoArticulos.articulo.subCategoria.categoria', // Cargar relaciones anidadas
-            'trabajoArticulos.articulo' // Cargar la relación de artículo
+            'trabajoArticulos.articulo.categoria', // Cargar relación de categoría directamente
+            'trabajoArticulos.articulo.subCategoria', // Cargar relación de subcategoría
+            'trabajoArticulos.articulo.marca', // Cargar relación de marca
+            'trabajoArticulos.articulo.unidad', // Cargar relación de unidad
+            'trabajoArticulos.articulo.presentacion', // Cargar relación de presentación
         ])->find($id);
 
         $vehiculo = $trabajo->vehiculo;
