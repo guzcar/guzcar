@@ -30,6 +30,7 @@ return new class extends Migration {
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

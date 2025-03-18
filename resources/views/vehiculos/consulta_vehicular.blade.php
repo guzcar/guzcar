@@ -8,7 +8,7 @@
             <input type="text" id="placa" name="placa" class="form-control" placeholder="ABC-123" minlength="7"
                 value="{{ old('placa', $placa ?? '') }}"
                 required>
-            <button class="btn btn-light border py-3 px-4" type="submit">
+            <button class="btn btn-light border py-2 px-3" type="submit">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <span class="ms-2">Buscar</span>
             </button>
@@ -43,8 +43,8 @@
             </li>
         </ul>
         <div class="d-flex gap-3 w-100">
-            <a href="{{ route('consulta.vehiculo.articulos', $vehiculo->id) }}" class="btn btn-primary p-3 w-50">Artículos</a>
-            <a href="{{ route('consulta.vehiculo.servicios', $vehiculo->id) }}" class="btn btn-primary p-3 w-50">Servicios</a>
+            <a href="{{ route('consulta.vehiculo.articulos', $vehiculo->id) }}" class="btn btn-primary p-2 w-50">Artículos</a>
+            <a href="{{ route('consulta.vehiculo.servicios', $vehiculo->id) }}" class="btn btn-primary p-2 w-50">Servicios</a>
         </div>
     @elseif(request()->has('placa'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">

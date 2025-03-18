@@ -43,8 +43,8 @@ return new class extends Migration {
             $table->decimal('costo');
             $table->decimal('precio')->nullable();
             $table->unsignedInteger('stock')->default(0);
-            $table->decimal('abiertos')->unsigned()->default(0);
-            $table->decimal('mermas')->unsigned()->default(0);
+            $table->unsignedInteger('abiertos')->default(0);
+            $table->unsignedInteger('mermas')->default(0);
             $table->boolean('fraccionable')->default(false);
             $table->timestamps();
             $table->softDeletes();

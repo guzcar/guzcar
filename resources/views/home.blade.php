@@ -43,8 +43,14 @@
                                             <ul class="dropdown-menu">
                                                 <li>
                                                     <a class="dropdown-item" href="{{ route('gestion.evidencias.index', $trabajo) }}">
-                                                        <i class="text-secondary fa-fw me-2 fa-solid fa-image"></i>
-                                                        Evidencias
+                                                        <i class="text-secondary fa-fw me-2 fa-regular fa-image"></i>
+                                                        Mis evidencias
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('gestion.evidencias.all', $trabajo) }}">
+                                                        <i class="text-secondary fa-fw me-2 fa-solid fa-images"></i>
+                                                        Todas las evidencias
                                                     </a>
                                                 </li>
                                                 <li>

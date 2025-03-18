@@ -132,8 +132,8 @@ class DespachoResource extends Resource
                     ->searchable(isIndividual: true)
                     ->url(function ($record) {
                         if ($record->trabajo) {
-                            $url = TrabajoResource::getUrl('edit', ['record' => $record->trabajo->id]);
-                            return "{$url}?activeRelationManager=2";
+                            return TrabajoResource::getUrl('edit', ['record' => $record->trabajo->id]);
+                            // return "{$url}?activeRelationManager=2";
                         }
                         return null;
                     })

@@ -147,28 +147,28 @@ class VehiculoResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('placa')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable()
                     ->placeholder('Sin Placa'),
                 TextColumn::make('tipoVehiculo.nombre')
                     ->label('Tipo')
                     ->numeric()
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 TextColumn::make('marca')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 TextColumn::make('modelo')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable()
                     ->wrap()
                     ->lineClamp(2),
                 TextColumn::make('color')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 TextColumn::make('clientes.nombre')
                     ->placeholder('Sin Clientes')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->badge()
                     ->wrap(),
                 TextColumn::make('created_at')

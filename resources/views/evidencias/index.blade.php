@@ -39,13 +39,12 @@
     @error('evidencias')
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <p class="my-0">{{ $message }}</p>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @enderror
 
     <div class="card">
-        <div class="card-body p-0">
+        <div class="card-body p-0 border-bottom-0">
             <div class="table-responsive">
                 <table class="table mb-0 table-striped table-hover">
                     <thead>
@@ -114,8 +113,7 @@
 
                             {{-- Modal para editar --}}
                             <div class="modal fade" id="editarEvidencia{{ $evidencia->id }}" tabindex="-1"
-                                data-bs-backdrop="static" aria-labelledby="editarEvidenciaLabel{{ $evidencia->id }}"
-                                aria-hidden="true">
+                                aria-labelledby="editarEvidenciaLabel{{ $evidencia->id }}" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <form action="{{ route('gestion.evidencias.update', [$trabajo, $evidencia]) }}"
@@ -143,7 +141,7 @@
                                                         </a>
                                                     @endif
                                                 </div>
-                                                <div class="mb-3">
+                                                <div>
                                                     <label for="observacion{{ $evidencia->id }}"
                                                         class="form-label">Observación</label>
                                                     <textarea name="observacion" class="form-control"
@@ -172,11 +170,17 @@
                 </table>
             </div>
         </div>
+        @if ($evidencias->hasPages())
+            <div class="card-footer border-top-0">
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $evidencias->links('pagination::bootstrap-4') }}
+                </div>
+            </div>
+        @endif
     </div>
 
     {{-- Modal para crear nueva evidencia --}}
-    <div class="modal fade" id="nuevaEvidencia" data-bs-backdrop="static" tabindex="-1"
-        aria-labelledby="nuevaEvidenciaLabel" aria-hidden="true">
+    <div class="modal fade" id="nuevaEvidencia" tabindex="-1" aria-labelledby="nuevaEvidenciaLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form action="{{ route('gestion.evidencias.store', $trabajo) }}" method="POST"
@@ -213,37 +217,15 @@
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                const handlePreview = (input, previewContainerId) => {
-                    const file = input.files[0];
-                    const previewContainer = document.getElementById(previewContainerId);
-
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            if (file.type.startsWith('image/')) {
-                                previewContainer.innerHTML =
-                                    `<img src="${e.target.result}" class="img-fluid" style="max-width: 200px;">`;
-                            } else if (file.type.startsWith('video/')) {
-                                previewContainer.innerHTML =
-                                    `<i class="fa-solid fa-video fa-3x text-muted"></i>`;
-                            } else {
-                                previewContainer.innerHTML =
-                                    `<i class="fa-solid fa-file fa-3x text-muted"></i>`;
-                            }
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        previewContainer.innerHTML = `
-                            <i class="fa-solid fa-image fa-3x text-muted"></i>
-                            <p class="text-muted mt-2 mb-0">Haz clic para subir una evidencia</p>
-                        `;
-                    }
-                };
-
-                // Modal de "Nuevo"
-                const nuevaEvidenciaInput = document.getElementById('evidencias');
-                nuevaEvidenciaInput.addEventListener('change', function () {
-                    handlePreview(this, 'preview-nueva');
+                // Manejar el foco al cerrar los modales
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    modal.addEventListener('hidden.bs.modal', function () {
+                        const triggerButton = document.querySelector(`[data-bs-target="#${modal.id}"]`);
+                        if (triggerButton) {
+                            triggerButton.focus(); // Devuelve el foco al botón que abrió el modal
+                        }
+                    });
                 });
             });
         </script>

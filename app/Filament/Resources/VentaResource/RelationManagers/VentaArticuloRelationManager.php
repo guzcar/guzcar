@@ -4,12 +4,15 @@ namespace App\Filament\Resources\VentaResource\RelationManagers;
 
 use App\Models\Articulo;
 use App\Models\VentaArticulo;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,7 +31,7 @@ class VentaArticuloRelationManager extends RelationManager
                     ->label('Artículo')
                     ->columnSpanFull()
                     ->options(function () {
-                        return Articulo::with(['categoria', 'subCategoria', 'marca', 'unidad', 'presentacion']) // Cargar relaciones necesarias
+                        return Articulo::with(['categoria', 'subCategoria', 'marca', 'unidad', 'presentacion'])
                             ->get()
                             ->mapWithKeys(function ($articulo) {
                                 $categoria = $articulo->categoria->nombre ?? null;
@@ -70,20 +73,38 @@ class VentaArticuloRelationManager extends RelationManager
                         if ($articulo = Articulo::find($state)) {
                             $set('precio', $articulo->precio ?? $articulo->costo);
                             $set('min_precio', $articulo->costo);
+                            $set('stock_disponible', $articulo->stock); // Guardar el stock disponible
+                        } else {
+                            $set('stock_disponible', null); // Limpiar el stock si no hay artículo seleccionado
                         }
                     }),
                 TextInput::make('precio')
                     ->label('Precio de venta')
                     ->required()
                     ->numeric()
-                    ->minValue(fn(Forms\Get $get) => $get('min_precio') ?? 0)
+                    ->minValue(fn(Forms\Get $get) => $get('min_precio') / 2 ?? 0)
                     ->prefix('S/ ')
                     ->maxValue(42949672.95)
                     ->dehydrated(),
                 TextInput::make('cantidad')
+                    ->hint(function (Forms\Get $get) {
+                        $stockDisponible = $get('stock_disponible');
+                        return $stockDisponible !== null ? "Stock: $stockDisponible" : "Stock: 0";
+                    })
                     ->default(1)
                     ->required()
                     ->numeric()
+                    ->minValue(1)
+                    ->rules([
+                        function (Forms\Get $get) {
+                            return function (string $attribute, $value, Closure $fail) use ($get) {
+                                $stockDisponible = $get('stock_disponible');
+                                if ($stockDisponible !== null && $value > $stockDisponible) {
+                                    $fail("La cantidad no puede ser mayor al stock disponible ($stockDisponible).");
+                                }
+                            };
+                        },
+                    ])
             ]);
     }
 
@@ -127,7 +148,8 @@ class VentaArticuloRelationManager extends RelationManager
                         $label = implode(' ', $labelParts);
 
                         return $label;
-                    }),
+                    })
+                    ->wrap(),
                 TextColumn::make('articulo.ubicaciones.codigo')
                     ->label('Ubicación')
                     ->placeholder('Sin ubicación')
@@ -152,13 +174,20 @@ class VentaArticuloRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->mutateRecordDataUsing(function (array $data, VentaArticulo $record): array {
+                        $articulo = Articulo::find($data['articulo_id']);
+                        if ($articulo) {
+                            $data['stock_disponible'] = $articulo->stock + $record->cantidad;
+                        }
+                        return $data;
+                    }),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
+                BulkActionGroup::make([
                     ExportBulkAction::make(),
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

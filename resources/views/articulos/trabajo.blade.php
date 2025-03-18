@@ -88,17 +88,17 @@
                                 </td>
                                 <td class="px-2" style="width: 1rem;">
                                     <form action="{{ route('gestion.trabajos.articulos.confirmar.trabajo', $trabajoArticulo) }}"
-                                        method="POST"></form>
-                                    @if ($trabajoArticulo->confirmado)
-                                        <button class="btn btn-secondary border-0 py-2 px-3" disabled>
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    @else
-                                        @csrf
-                                        <button class="btn btn-success border-0 py-2 px-3" type="submit">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    @endif
+                                        method="POST">
+                                        @if ($trabajoArticulo->confirmado)
+                                            <button class="btn btn-secondary border-0 py-2 px-3" disabled>
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        @else
+                                            @csrf
+                                            <button class="btn btn-success border-0 py-2 px-3" type="submit">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        @endif
                                     </form>
                                 </td>
                             </tr>

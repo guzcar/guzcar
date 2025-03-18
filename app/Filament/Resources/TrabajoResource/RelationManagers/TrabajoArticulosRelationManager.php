@@ -58,7 +58,8 @@ class TrabajoArticulosRelationManager extends RelationManager
                     ->state(function (TrabajoArticulo $record) {
                         $articulo = $record->articulo;
                         return $this->buildArticuloLabel($articulo);
-                    }),
+                    })
+                    ->wrap(),
                 TextColumn::make('precio')
                     ->label('Precio')
                     ->prefix('S/ ')
