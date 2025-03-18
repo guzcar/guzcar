@@ -30,8 +30,8 @@
         </li>
     </ul>
 
-    @forelse ($evidencias as $evidencia)
-        <div class="row mt-3">
+    <div class="row mt-3">
+        @forelse ($evidencias as $evidencia)
             <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
                 <div class="card">
                     <div class="card-img-top bg-light"
@@ -62,14 +62,16 @@
                     </div>
                 </div>
             </div>
-        </div>
-    @empty
-        <div class="card">
-            <div class="card-body">
-                <p class="text-center text-secondary py-4 mb-0">Aún no hay evidencias para este vehículo.</p>
+        @empty
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-center text-secondary py-4 mb-0">Aún no hay evidencias para este vehículo.</p>
+                    </div>
+                </div>
             </div>
-        </div>
-    @endforelse
+        @endforelse
+    </div> <!-- Cierra el div row aquí -->
 
     <div class="d-flex justify-content-center mt-3">
         {{ $evidencias->links('pagination::bootstrap-4') }}
