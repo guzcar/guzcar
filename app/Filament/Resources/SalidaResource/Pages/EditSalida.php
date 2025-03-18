@@ -14,19 +14,47 @@ class EditSalida extends EditRecord
     {
         $record = $this->record;
 
-        $data['responsable'] = $record->responsable->name;
-        $data['stock'] = $record->articulo->stock;
-        $data['abiertos'] = $record->articulo->abiertos;
-
+        // Obtener el artículo asociado
         $articulo = $record->articulo;
 
-        if ($articulo) {
+        // Cargar datos básicos
+        $data['responsable'] = $record->responsable->name;
+        $data['stock'] = $articulo->stock;
+        $data['abiertos'] = $articulo->abiertos;
 
+        if ($articulo) {
             $data['fraccionable'] = $articulo->fraccionable;
             $data['abiertos'] = $articulo->fraccionable ? $articulo->abiertos : null;
 
+            // Obtener la cantidad y el movimiento
             $cantidad = $record->cantidad;
+            $movimiento = $record->movimiento;
 
+            // Ajustar stock y abiertos según el movimiento
+            switch ($movimiento) {
+                case 'consumo_completo':
+                    // Sumar la cantidad al stock (ya que se está editando)
+                    $data['stock'] += $cantidad;
+                    break;
+
+                case 'abrir_nuevo':
+                    // Sumar 1 al stock (ya que se está editando)
+                    $data['stock'] += 1;
+                    // Restar 1 a los abiertos (ya que se está editando)
+                    $data['abiertos'] -= 1;
+                    break;
+
+                case 'terminar_abierto':
+                    // Sumar 1 a los abiertos (ya que se está editando)
+                    $data['abiertos'] += 1;
+                    break;
+
+                case 'consumo_parcial':
+                    // No se ajusta stock ni abiertos en consumo parcial
+                    break;
+            }
+
+            // Manejar la cantidad fraccionada
             if ($articulo->fraccionable) {
                 if (in_array($cantidad, [0.25, 0.50, 0.75, 1])) {
                     $data['cantidad_fraccion'] = $cantidad;

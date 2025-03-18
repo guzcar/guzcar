@@ -25,9 +25,16 @@ class EvidenciaController extends Controller
 
         $evidencias = Evidencia::where('trabajo_id', $trabajo->id)
             ->where('user_id', $user->id)
-            ->get();
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return view('evidencias.index', compact('evidencias', 'trabajo'));
+    }
+
+    public function all(Trabajo $trabajo)
+    {
+        $evidencias = $trabajo->evidencias()->orderBy('created_at', 'desc')->paginate(10);
+        return view('evidencias.all', compact('trabajo', 'evidencias'));
     }
 
     /**

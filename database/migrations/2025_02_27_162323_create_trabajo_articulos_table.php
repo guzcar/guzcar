@@ -38,146 +38,126 @@ return new class extends Migration {
                 ->constrained('users')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
-            $table->enum('movimiento', ['cerrado', 'abierto'])->default('cerrado');
+            $table->enum('movimiento', [
+                'consumo_completo',
+                'abrir_nuevo',
+                'terminar_abierto',
+                'consumo_parcial',
+            ])->default('consumo_completo');
             $table->text('observacion')->nullable();
             $table->boolean('confirmado')->default(false);
             $table->timestamps();
         });
 
-        DB::unprepared("
-            CREATE TRIGGER after_trabajo_articulos_insert
+        DB::unprepared('
+            CREATE TRIGGER proforma_before_trabajo_articulos_insert
+            BEFORE INSERT ON trabajo_articulos
+            FOR EACH ROW
+            BEGIN
+                DECLARE articulo_precio DECIMAL(10, 2);
+                DECLARE articulo_costo DECIMAL(10, 2);
+
+                -- Obtener el precio y costo del artículo
+                SELECT precio, costo INTO articulo_precio, articulo_costo
+                FROM articulos
+                WHERE id = NEW.articulo_id;
+
+                -- Establecer el precio en trabajo_articulos
+                IF articulo_precio IS NOT NULL THEN
+                    SET NEW.precio = articulo_precio;
+                ELSEIF articulo_costo IS NOT NULL THEN
+                    SET NEW.precio = articulo_costo;
+                ELSE
+                    SET NEW.precio = 0;
+                END IF;
+            END
+        ');
+
+        DB::unprepared('
+            CREATE TRIGGER inventario_after_trabajo_articulos_insert
             AFTER INSERT ON trabajo_articulos
             FOR EACH ROW
             BEGIN
-                DECLARE stock_diff INT;
-                DECLARE abiertos_diff DECIMAL(10,2);
-                DECLARE new_stock INT;
-                DECLARE new_abiertos DECIMAL(10,2);
-
-                IF NEW.movimiento = 'cerrado' THEN
-                    -- Reducir el stock en el valor redondeado hacia arriba
-                    SET stock_diff = CEIL(NEW.cantidad);
-                    -- Aumentar abiertos en el excedente
-                    SET abiertos_diff = stock_diff - NEW.cantidad;
-
-                    -- Calcular el nuevo stock y abiertos
-                    SET new_stock = GREATEST((SELECT stock FROM articulos WHERE id = NEW.articulo_id) - stock_diff, 0);
-                    SET new_abiertos = GREATEST((SELECT abiertos FROM articulos WHERE id = NEW.articulo_id) + abiertos_diff, 0);
-
-                    -- Actualizar la tabla articulos
+                IF NEW.movimiento = "consumo_completo" THEN
                     UPDATE articulos
-                    SET stock = new_stock,
-                        abiertos = new_abiertos
+                    SET stock = stock - CEIL(NEW.cantidad)
                     WHERE id = NEW.articulo_id;
-                ELSE
-                    -- Reducir abiertos directamente
-                    SET new_abiertos = GREATEST((SELECT abiertos FROM articulos WHERE id = NEW.articulo_id) - NEW.cantidad, 0);
-
-                    -- Actualizar la tabla articulos
+                ELSEIF NEW.movimiento = "abrir_nuevo" THEN
                     UPDATE articulos
-                    SET abiertos = new_abiertos
+                    SET stock = stock - 1,
+                        abiertos = abiertos + 1
+                    WHERE id = NEW.articulo_id;
+                ELSEIF NEW.movimiento = "terminar_abierto" THEN
+                    UPDATE articulos
+                    SET abiertos = abiertos - 1
                     WHERE id = NEW.articulo_id;
                 END IF;
-            END;
-        ");
+            END
+        ');
 
-        DB::unprepared("
-            CREATE TRIGGER after_trabajo_articulos_update
+        DB::unprepared('
+            CREATE TRIGGER inventario_after_trabajo_articulos_update
             AFTER UPDATE ON trabajo_articulos
             FOR EACH ROW
             BEGIN
-                DECLARE stock_diff INT;
-                DECLARE abiertos_diff DECIMAL(10,2);
-                DECLARE new_stock INT;
-                DECLARE new_abiertos DECIMAL(10,2);
-
-                -- Revertir el efecto del registro antiguo
-                IF OLD.movimiento = 'cerrado' THEN
-                    SET stock_diff = CEIL(OLD.cantidad);
-                    SET abiertos_diff = stock_diff - OLD.cantidad;
-
-                    -- Calcular el nuevo stock y abiertos
-                    SET new_stock = GREATEST((SELECT stock FROM articulos WHERE id = OLD.articulo_id) + stock_diff, 0);
-                    SET new_abiertos = GREATEST((SELECT abiertos FROM articulos WHERE id = OLD.articulo_id) - abiertos_diff, 0);
-
-                    -- Actualizar la tabla articulos
+                -- Revertir cambios anteriores
+                IF OLD.movimiento = "consumo_completo" THEN
                     UPDATE articulos
-                    SET stock = new_stock,
-                        abiertos = new_abiertos
+                    SET stock = stock + CEIL(OLD.cantidad)
                     WHERE id = OLD.articulo_id;
-                ELSE
-                    -- Revertir la reducción de abiertos
-                    SET new_abiertos = GREATEST((SELECT abiertos FROM articulos WHERE id = OLD.articulo_id) + OLD.cantidad, 0);
-
-                    -- Actualizar la tabla articulos
+                ELSEIF OLD.movimiento = "abrir_nuevo" THEN
                     UPDATE articulos
-                    SET abiertos = new_abiertos
+                    SET stock = stock + 1,
+                        abiertos = abiertos - 1
+                    WHERE id = OLD.articulo_id;
+                ELSEIF OLD.movimiento = "terminar_abierto" THEN
+                    UPDATE articulos
+                    SET abiertos = abiertos + 1
                     WHERE id = OLD.articulo_id;
                 END IF;
-
-                -- Aplicar el efecto del nuevo registro
-                IF NEW.movimiento = 'cerrado' THEN
-                    SET stock_diff = CEIL(NEW.cantidad);
-                    SET abiertos_diff = stock_diff - NEW.cantidad;
-
-                    -- Calcular el nuevo stock y abiertos
-                    SET new_stock = GREATEST((SELECT stock FROM articulos WHERE id = NEW.articulo_id) - stock_diff, 0);
-                    SET new_abiertos = GREATEST((SELECT abiertos FROM articulos WHERE id = NEW.articulo_id) + abiertos_diff, 0);
-
-                    -- Actualizar la tabla articulos
+        
+                -- Aplicar nuevos cambios
+                IF NEW.movimiento = "consumo_completo" THEN
                     UPDATE articulos
-                    SET stock = new_stock,
-                        abiertos = new_abiertos
+                    SET stock = stock - CEIL(NEW.cantidad)
                     WHERE id = NEW.articulo_id;
-                ELSE
-                    -- Reducir abiertos directamente
-                    SET new_abiertos = GREATEST((SELECT abiertos FROM articulos WHERE id = NEW.articulo_id) - NEW.cantidad, 0);
-
-                    -- Actualizar la tabla articulos
+                ELSEIF NEW.movimiento = "abrir_nuevo" THEN
                     UPDATE articulos
-                    SET abiertos = new_abiertos
+                    SET stock = stock - 1,
+                        abiertos = abiertos + 1
+                    WHERE id = NEW.articulo_id;
+                ELSEIF NEW.movimiento = "terminar_abierto" THEN
+                    UPDATE articulos
+                    SET abiertos = abiertos - 1
                     WHERE id = NEW.articulo_id;
                 END IF;
-            END;
-        ");
+            END
+        ');
 
-        DB::unprepared("
-            CREATE TRIGGER after_trabajo_articulos_delete
+        DB::unprepared('
+            CREATE TRIGGER inventario_after_trabajo_articulos_delete
             AFTER DELETE ON trabajo_articulos
             FOR EACH ROW
             BEGIN
-                DECLARE stock_diff INT;
-                DECLARE abiertos_diff DECIMAL(10,2);
-                DECLARE new_stock INT;
-                DECLARE new_abiertos DECIMAL(10,2);
-
-                IF OLD.movimiento = 'cerrado' THEN
-                    SET stock_diff = CEIL(OLD.cantidad);
-                    SET abiertos_diff = stock_diff - OLD.cantidad;
-
-                    -- Calcular el nuevo stock y abiertos
-                    SET new_stock = GREATEST((SELECT stock FROM articulos WHERE id = OLD.articulo_id) + stock_diff, 0);
-                    SET new_abiertos = GREATEST((SELECT abiertos FROM articulos WHERE id = OLD.articulo_id) - abiertos_diff, 0);
-
-                    -- Actualizar la tabla articulos
+                IF OLD.movimiento = "consumo_completo" THEN
                     UPDATE articulos
-                    SET stock = new_stock,
-                        abiertos = new_abiertos
+                    SET stock = stock + CEIL(OLD.cantidad)
                     WHERE id = OLD.articulo_id;
-                ELSE
-                    -- Revertir la reducción de abiertos
-                    SET new_abiertos = GREATEST((SELECT abiertos FROM articulos WHERE id = OLD.articulo_id) + OLD.cantidad, 0);
-
-                    -- Actualizar la tabla articulos
+                ELSEIF OLD.movimiento = "abrir_nuevo" THEN
                     UPDATE articulos
-                    SET abiertos = new_abiertos
+                    SET stock = stock + 1,
+                        abiertos = abiertos - 1
+                    WHERE id = OLD.articulo_id;
+                ELSEIF OLD.movimiento = "terminar_abierto" THEN
+                    UPDATE articulos
+                    SET abiertos = abiertos + 1
                     WHERE id = OLD.articulo_id;
                 END IF;
-            END;
-        ");
+            END
+        ');
 
         DB::unprepared("
-            CREATE TRIGGER after_insert_trabajo_articulo
+            CREATE TRIGGER finanzas_after_insert_trabajo_articulo
             AFTER INSERT ON trabajo_articulos
             FOR EACH ROW
             BEGIN
@@ -202,7 +182,7 @@ return new class extends Migration {
         ");
 
         DB::unprepared("
-            CREATE TRIGGER after_update_trabajo_articulo
+            CREATE TRIGGER finanzas_after_update_trabajo_articulo
             AFTER UPDATE ON trabajo_articulos
             FOR EACH ROW
             BEGIN
@@ -227,7 +207,7 @@ return new class extends Migration {
         ");
 
         DB::unprepared("
-            CREATE TRIGGER after_delete_trabajo_articulo
+            CREATE TRIGGER finanzas_after_delete_trabajo_articulo
             AFTER DELETE ON trabajo_articulos
             FOR EACH ROW
             BEGIN
@@ -252,7 +232,7 @@ return new class extends Migration {
         ");
 
         DB::unprepared("
-            CREATE TRIGGER after_insert_trabajo_servicio
+            CREATE TRIGGER finanzas_after_insert_trabajo_servicio
             AFTER INSERT ON trabajo_servicios
             FOR EACH ROW
             BEGIN
@@ -277,7 +257,7 @@ return new class extends Migration {
         ");
 
         DB::unprepared("
-            CREATE TRIGGER after_update_trabajo_servicio
+            CREATE TRIGGER finanzas_after_update_trabajo_servicio
             AFTER UPDATE ON trabajo_servicios
             FOR EACH ROW
             BEGIN
@@ -302,7 +282,7 @@ return new class extends Migration {
         ");
 
         DB::unprepared("
-            CREATE TRIGGER after_delete_trabajo_servicio
+            CREATE TRIGGER finanzas_after_delete_trabajo_servicio
             AFTER DELETE ON trabajo_servicios
             FOR EACH ROW
             BEGIN
@@ -327,7 +307,7 @@ return new class extends Migration {
         ");
 
         DB::unprepared("
-            CREATE TRIGGER before_insert_trabajo_articulo
+            CREATE TRIGGER despacho_before_insert_trabajo_articulo
             BEFORE INSERT ON trabajo_articulos
             FOR EACH ROW
             BEGIN
@@ -369,7 +349,7 @@ return new class extends Migration {
         ");
 
         DB::unprepared("
-            CREATE TRIGGER after_update_despacho
+            CREATE TRIGGER despacho_after_update_despacho
             AFTER UPDATE ON despachos
             FOR EACH ROW
             BEGIN
@@ -391,20 +371,22 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('trabajo_articulos');
-        
-        DB::unprepared('DROP TRIGGER IF EXISTS before_insert_trabajo_articulo;');
-        DB::unprepared('DROP TRIGGER IF EXISTS after_update_despacho;');
 
-        DB::unprepared("DROP TRIGGER IF EXISTS after_trabajo_articulos_insert");
-        DB::unprepared("DROP TRIGGER IF EXISTS after_trabajo_articulos_update");
-        DB::unprepared("DROP TRIGGER IF EXISTS after_trabajo_articulos_delete");
+        DB::unprepared('DROP TRIGGER IF EXISTS despacho_before_insert_trabajo_articulo;');
+        DB::unprepared('DROP TRIGGER IF EXISTS despacho_after_update_despacho;');
 
-        DB::unprepared("DROP TRIGGER IF EXISTS after_insert_trabajo_articulo");
-        DB::unprepared("DROP TRIGGER IF EXISTS after_update_trabajo_articulo");
-        DB::unprepared("DROP TRIGGER IF EXISTS after_delete_trabajo_articulo");
+        DB::unprepared('DROP TRIGGER IF EXISTS proforma_before_trabajo_articulos_insert');
 
-        DB::unprepared("DROP TRIGGER IF EXISTS after_insert_trabajo_servicio");
-        DB::unprepared("DROP TRIGGER IF EXISTS after_update_trabajo_servicio");
-        DB::unprepared("DROP TRIGGER IF EXISTS after_delete_trabajo_servicio");
+        DB::unprepared("DROP TRIGGER IF EXISTS inventario_after_trabajo_articulos_insert");
+        DB::unprepared("DROP TRIGGER IF EXISTS inventario_after_trabajo_articulos_update");
+        DB::unprepared("DROP TRIGGER IF EXISTS inventario_after_trabajo_articulos_delete");
+
+        DB::unprepared("DROP TRIGGER IF EXISTS finanzas_after_insert_trabajo_articulo");
+        DB::unprepared("DROP TRIGGER IF EXISTS finanzas_after_update_trabajo_articulo");
+        DB::unprepared("DROP TRIGGER IF EXISTS finanzas_after_delete_trabajo_articulo");
+
+        DB::unprepared("DROP TRIGGER IF EXISTS finanzas_after_insert_trabajo_servicio");
+        DB::unprepared("DROP TRIGGER IF EXISTS finanzas_after_update_trabajo_servicio");
+        DB::unprepared("DROP TRIGGER IF EXISTS finanzas_after_delete_trabajo_servicio");
     }
 };

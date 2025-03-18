@@ -9,6 +9,7 @@ use App\Models\Trabajo;
 use App\Models\TrabajoArticulo;
 use App\Models\User;
 use App\Services\FractionService;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Fieldset;
@@ -22,6 +23,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -65,6 +67,7 @@ class SalidaResource extends Resource
                     ->schema([
                         Section::make()
                             ->schema([
+                                // Responsable (solo lectura)
                                 TextInput::make('responsable')
                                     ->label('Responsable de entrega')
                                     ->required()
@@ -76,90 +79,78 @@ class SalidaResource extends Resource
                                             $component->state($userName);
                                         }
                                     }),
+
+                                // Fecha y hora
                                 DatePicker::make('fecha')
                                     ->required()
                                     ->default(now()),
                                 TimePicker::make('hora')
                                     ->required()
                                     ->default(now()),
+
+                                // Movimiento (solo para artículos fraccionables)
                                 Select::make('movimiento')
                                     ->label('Movimiento')
                                     ->options([
-                                        'cerrado' => 'Abrir y gastar',
-                                        'abierto' => 'Gastar abierto',
+                                        'consumo_completo' => 'Consumo completo',
+                                        'abrir_nuevo' => 'Abrir nuevo',
+                                        'terminar_abierto' => 'Terminar abierto',
+                                        'consumo_parcial' => 'Consumo parcial',
                                     ])
-                                    ->default('cerrado')
+                                    ->default('consumo_completo')
                                     ->required()
                                     ->placeholder('')
                                     ->hidden(fn($get) => !$get('articulo_id') || !Articulo::find($get('articulo_id'))?->fraccionable),
+
+                                // Artículo (deshabilitado en edición)
                                 Select::make('articulo_id')
+                                    ->required()
                                     ->label('Artículo')
                                     ->columnSpanFull()
                                     ->options(function () {
                                         return Articulo::with(['categoria', 'subCategoria.categoria', 'marca', 'unidad', 'presentacion'])
                                             ->get()
                                             ->mapWithKeys(function ($articulo) {
-                                                // Campos que se concatenarán en el label
-                                                $categoria = $articulo->categoria->nombre ?? null;
-                                                $subCategoria = $articulo->subCategoria->nombre ?? null;
-                                                $especificacion = $articulo->especificacion ?? null;
-                                                $marca = $articulo->marca->nombre ?? null;
-                                                $presentacion = $articulo->presentacion->nombre ?? null;
-                                                $medida = $articulo->medida ?? null;
-                                                $unidad = $articulo->unidad->nombre ?? null;
-                                                $color = $articulo->color ?? null;
-
-                                                // Construye el label dinámicamente
-                                                $labelParts = [];
-                                                if ($categoria)
-                                                    $labelParts[] = $categoria;
-                                                if ($subCategoria)
-                                                    $labelParts[] = $subCategoria;
-                                                if ($especificacion)
-                                                    $labelParts[] = $especificacion;
-                                                if ($marca)
-                                                    $labelParts[] = $marca;
-                                                if ($presentacion)
-                                                    $labelParts[] = $presentacion;
-                                                if ($medida)
-                                                    $labelParts[] = $medida;
-                                                if ($unidad)
-                                                    $labelParts[] = $unidad;
-                                                if ($color)
-                                                    $labelParts[] = $color;
-
-                                                // Une las partes con un espacio
+                                                $labelParts = array_filter([
+                                                    $articulo->categoria->nombre ?? null,
+                                                    $articulo->marca->nombre ?? null,
+                                                    $articulo->subCategoria->nombre ?? null,
+                                                    $articulo->especificacion ?? null,
+                                                    $articulo->presentacion->nombre ?? null,
+                                                    $articulo->medida ?? null,
+                                                    $articulo->unidad->nombre ?? null,
+                                                    $articulo->color ?? null,
+                                                ]);
                                                 $label = implode(' ', $labelParts);
-
                                                 return [$articulo->id => $label];
                                             });
                                     })
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
+                                    ->disabled(fn($context) => $context === 'edit') // Deshabilitar en edición
                                     ->afterStateUpdated(function ($state, Forms\Set $set) {
                                         $articulo = Articulo::find($state);
                                         if ($articulo) {
-                                            $set('precio', $articulo->costo);
                                             $set('stock', $articulo->stock);
+                                            $set('precio', $articulo->precio);
                                             $set('fraccionable', $articulo->fraccionable);
-
-                                            if ($articulo->fraccionable) {
-                                                $set('abiertos', $articulo->abiertos);
-                                            } else {
-                                                $set('abiertos', null);
-                                            }
+                                            $set('abiertos', $articulo->fraccionable ? $articulo->abiertos : null);
 
                                             $ubicaciones = $articulo->articuloUbicaciones
-                                                ->filter(function ($articuloUbicacion) {
-                                                    return $articuloUbicacion->ubicacion !== null;
-                                                })
-                                                ->map(function ($articuloUbicacion) {
-                                                    return $articuloUbicacion->ubicacion->codigo;
-                                                });
+                                                ->filter(fn($articuloUbicacion) => $articuloUbicacion->ubicacion !== null)
+                                                ->map(fn($articuloUbicacion) => $articuloUbicacion->ubicacion->codigo);
                                             $set('ubicaciones', $ubicaciones->toArray());
                                         }
                                     }),
+
+                                TextInput::make('precio')
+                                    ->label('Precio en servicio')
+                                    ->numeric()
+                                    ->prefix('S/ ')
+                                    ->maxValue(42949672.95),
+
+                                // Cantidad (dependiendo de si es fraccionable)
                                 Grid::make()
                                     ->schema(function ($get) {
                                         $fraccionable = $get('fraccionable');
@@ -171,7 +162,7 @@ class SalidaResource extends Resource
                                                         '0.25' => '1/4',
                                                         '0.50' => '1/2',
                                                         '0.75' => '3/4',
-                                                        '1' => '1',
+                                                        '1.00' => '1',
                                                         'custom' => 'Ingresar valor exacto',
                                                     ])
                                                     ->required()
@@ -186,44 +177,110 @@ class SalidaResource extends Resource
                                                     ->label('Cantidad exacta')
                                                     ->numeric()
                                                     ->hidden(fn($get) => $get('cantidad_fraccion') !== 'custom')
-                                                    ->reactive()
+                                                    // ->reactive()
                                                     ->required()
                                                     ->afterStateUpdated(function ($state, Forms\Set $set) {
                                                         if ($state !== null) {
                                                             $set('cantidad', $state);
                                                         }
                                                     }),
-                                                Hidden::make('cantidad'),
-                                                TextInput::make('precio')
-                                                    ->label('Costo para el servicio')
-                                                    ->required()
-                                                    ->numeric()
-                                                    ->prefix('S/ ')
-                                                    ->maxValue(42949672.95)
-                                                    ->dehydrated(),
+                                                Hidden::make('cantidad')
+                                                    ->rules([
+                                                        function (Forms\Get $get) {
+                                                            return function (string $attribute, $value, Closure $fail) use ($get) {
+                                                                $movimiento = $get('movimiento');
+                                                                $stockDisponible = $get('stock');
+                                                                $abiertos = $get('abiertos');
+
+                                                                switch ($movimiento) {
+                                                                    case 'consumo_completo':
+                                                                        if ($value > $stockDisponible) {
+                                                                            $fail("La cantidad no puede ser mayor al stock disponible ($stockDisponible).");
+                                                                            Notification::make()
+                                                                                ->title('Error')
+                                                                                ->body("La cantidad no puede ser mayor al stock disponible ($stockDisponible).")
+                                                                                ->danger()
+                                                                                ->send();
+                                                                        }
+                                                                        break;
+                                                                    case 'abrir_nuevo':
+                                                                        if ($value >= 1) {
+                                                                            $fail("La cantidad debe ser menor a 1.");
+                                                                            Notification::make()
+                                                                                ->title('Error')
+                                                                                ->body("La cantidad debe ser menor a 1.")
+                                                                                ->danger()
+                                                                                ->send();
+                                                                        } elseif ($stockDisponible < 1) {
+                                                                            $fail("No hay suficiente stock para abrir un nuevo artículo.");
+                                                                            Notification::make()
+                                                                                ->title('Error')
+                                                                                ->body("No hay suficiente stock para abrir un nuevo artículo.")
+                                                                                ->danger()
+                                                                                ->send();
+                                                                        }
+                                                                        break;
+                                                                    case 'terminar_abierto':
+                                                                        if ($abiertos < 1) {
+                                                                            $fail("No hay artículos abiertos para terminar.");
+                                                                            Notification::make()
+                                                                                ->title('Error')
+                                                                                ->body("No hay artículos abiertos para terminar.")
+                                                                                ->danger()
+                                                                                ->send();
+                                                                        }
+                                                                        break;
+                                                                    case 'consumo_parcial':
+                                                                        if ($value >= 1) {
+                                                                            $fail("La cantidad debe ser menor a 1.");
+                                                                            Notification::make()
+                                                                                ->title('Error')
+                                                                                ->body("La cantidad debe ser menor a 1.")
+                                                                                ->danger()
+                                                                                ->send();
+                                                                        } elseif ($abiertos < 1) {
+                                                                            $fail("No hay artículos abiertos para gastar.");
+                                                                            Notification::make()
+                                                                                ->title('Error')
+                                                                                ->body("No hay artículos abiertos para gastar.")
+                                                                                ->danger()
+                                                                                ->send();
+                                                                        }
+                                                                        break;
+                                                                }
+                                                            };
+                                                        },
+                                                    ]),
                                             ];
                                         } else {
                                             return [
                                                 TextInput::make('cantidad')
                                                     ->label('Cantidad')
                                                     ->required()
-                                                    ->numeric(),
-                                                TextInput::make('precio')
-                                                    ->label('Costo para el servicio')
-                                                    ->required()
                                                     ->numeric()
-                                                    ->prefix('S/ ')
-                                                    ->maxValue(42949672.95)
-                                                    ->dehydrated(),
+                                                    ->rules([
+                                                        function (Forms\Get $get) {
+                                                            return function (string $attribute, $value, Closure $fail) use ($get) {
+                                                                $stockDisponible = $get('stock');
+                                                                if ($value > $stockDisponible) {
+                                                                    $fail("La cantidad no puede ser mayor al stock disponible ($stockDisponible).");
+                                                                }
+                                                            };
+                                                        },
+                                                    ]),
                                             ];
                                         }
                                     }),
+
+                                // Observación
                                 Textarea::make('observacion')
                                     ->columnSpanFull(),
                             ])
                             ->heading('Salida de Inventario')
                             ->columns(['xl' => 2, 'lg' => 2, 'md' => 2, 'sm' => 2])
                             ->columnSpan(['xl' => 3, 'lg' => 3, 'md' => 3, 'sm' => 5]),
+
+                        // Sección de detalles (stock, abiertos, ubicaciones)
                         Grid::make()
                             ->schema([
                                 Section::make()
@@ -239,23 +296,15 @@ class SalidaResource extends Resource
                                             ->label('Trabajo en vehículo')
                                             ->prefixIcon('heroicon-s-truck')
                                             ->options(function () {
-                                                // Obtener la fecha actual
-                                                $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
-                                    
+                                                $fechaActual = now()->format('Y-m-d');
                                                 return Trabajo::with(['vehiculo'])
                                                     ->where(function ($query) use ($fechaActual) {
-                                                        $query->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
-                                                            ->orWhereDate('fecha_salida', '>=', $fechaActual); // Filtra por fecha_salida igual a la fecha actual
+                                                        $query->whereNull('fecha_salida')
+                                                            ->orWhereDate('fecha_salida', '>=', $fechaActual);
                                                     })
                                                     ->get()
                                                     ->mapWithKeys(function ($trabajo) {
-                                                        $codigo = $trabajo->codigo;
-                                                        $placa = $trabajo->vehiculo->placa;
-                                                        $tipo = $trabajo->vehiculo->tipoVehiculo->nombre;
-                                                        $marca = $trabajo->vehiculo->marca;
-                                                        $modelo = $trabajo->vehiculo->modelo;
-                                                        $color = $trabajo->vehiculo->color;
-                                                        $label = "{$placa} {$tipo} {$marca} {$modelo} {$color} ({$codigo})";
+                                                        $label = "{$trabajo->vehiculo->placa} {$trabajo->vehiculo->tipoVehiculo->nombre} {$trabajo->vehiculo->marca} {$trabajo->vehiculo->modelo} {$trabajo->vehiculo->color} ({$trabajo->codigo})";
                                                         return [$trabajo->id => $label];
                                                     });
                                             })
@@ -281,25 +330,19 @@ class SalidaResource extends Resource
                                                     ->content(function ($get) {
                                                         $ubicaciones = $get('ubicaciones');
                                                         if (empty($ubicaciones)) {
-                                                            return new HtmlString(
-                                                                '<span class="text-gray-400 dark:text-gray-500">Sin ubicaciones</span>'
-                                                            );
+                                                            return new HtmlString('<span class="text-gray-400 dark:text-gray-500">Sin ubicaciones</span>');
                                                         }
-
                                                         $badges = array_map(function ($ubicacion) {
                                                             return <<<HTML
                                                             <div class="flex w-max">
-                                                                <span style="--c-50:var(--primary-50);--c-400:var(--primary-400);--c-600:var(--primary-600);" class="fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset px-2 min-w-[theme(spacing.6)] py-1 fi-color-custom bg-custom-50 text-custom-600 ring-custom-600/10 dark:bg-custom-400/10 dark:text-custom-400 dark:ring-custom-400/30 fi-color-primary">
+                                                                <span class="fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset px-2 min-w-[theme(spacing.6)] py-1 fi-color-custom bg-custom-50 text-custom-600 ring-custom-600/10 dark:bg-custom-400/10 dark:text-custom-400 dark:ring-custom-400/30 fi-color-primary">
                                                                     <span class="grid">
-                                                                        <span class="truncate">
-                                                                            $ubicacion
-                                                                        </span>
+                                                                        <span class="truncate">$ubicacion</span>
                                                                     </span>
                                                                 </span>
                                                             </div>
-                                                        HTML;
+                                                            HTML;
                                                         }, $ubicaciones);
-
                                                         return new HtmlString('<div class="flex gap-1.5 flex-wrap">' . implode('', $badges) . '</div>');
                                                     })
                                                     ->columnSpan(['xl' => 2, 'lg' => 4, 'md' => 4, 'sm' => 4]),
@@ -405,8 +448,8 @@ class SalidaResource extends Resource
                         ->searchable(isIndividual: true)
                         ->url(function ($record) {
                             if ($record->trabajo) {
-                                $url = TrabajoResource::getUrl('edit', ['record' => $record->trabajo->id]);
-                                return "{$url}?activeRelationManager=2";
+                                return TrabajoResource::getUrl('edit', ['record' => $record->trabajo->id]);
+                                // return "{$url}?activeRelationManager=2";
                             }
                             return null;
                         })

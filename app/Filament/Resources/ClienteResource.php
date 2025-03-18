@@ -66,14 +66,14 @@ class ClienteResource extends Resource
             ->columns([
                 TextColumn::make('identificador')
                     ->label('RUC / DNI')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable()
                     ->placeholder('Sin ID'),
                 TextColumn::make('nombre')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 PhoneColumn::make('telefono')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->placeholder('Sin telefono'),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')

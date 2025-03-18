@@ -61,8 +61,8 @@ class EvidenciaResource extends Resource
                         ->label('Código')
                         ->searchable(isIndividual: true)
                         ->url(function ($record) {
-                            $url = TrabajoResource::getUrl('edit', ['record' => $record->trabajo_id]);
-                            return "{$url}?activeRelationManager=2";
+                            return TrabajoResource::getUrl('edit', ['record' => $record->trabajo_id]);
+                            // return "{$url}?activeRelationManager=2";
                         })
                         ->color('primary'),
                     TextColumn::make('trabajo.fecha_ingreso')

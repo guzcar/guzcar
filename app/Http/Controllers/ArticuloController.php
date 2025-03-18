@@ -38,7 +38,7 @@ class ArticuloController extends Controller
             ])
             ->orderBy('fecha', 'desc')
             ->orderBy('hora', 'desc')
-            ->get();
+            ->paginate(10);
 
         return view('articulos.index', compact('articulos'));
     }

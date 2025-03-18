@@ -57,6 +57,21 @@ class TrabajoArticulo extends Model
 
     protected static function booted()
     {
+        static::saving(function ($trabajoArticulo) {
+            if ($trabajoArticulo->despacho_id) {
+                $despacho = Despacho::find($trabajoArticulo->despacho_id);
+                if ($despacho) {
+                    $trabajoArticulo->fecha = $despacho->fecha;
+                    $trabajoArticulo->hora = $despacho->hora;
+                    $trabajoArticulo->tecnico_id = $despacho->tecnico_id;
+                    $trabajoArticulo->responsable_id = $despacho->responsable_id;
+                    if (!is_null($despacho->trabajo_id)) {
+                        $trabajoArticulo->trabajo_id = $despacho->trabajo_id;
+                    }
+                }
+            }
+        });
+
         static::saved(function ($trabajoArticulo) {
             $trabajo = $trabajoArticulo->trabajo;
             TrabajoService::actualizarTrabajoPorId($trabajo);

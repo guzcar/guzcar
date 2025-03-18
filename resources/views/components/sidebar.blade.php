@@ -15,13 +15,13 @@
 
             <div class="sb-sidenav-menu-heading">HISTORIAL</div>
 
-            <a class="nav-link {{ request()->routeIs('consulta.*') ? 'active bg-light' : '' }}" href="{{ route('consulta.vehicular') }}">
-                <div class="sb-nav-link-icon"><i class="fa-solid fa-magnifying-glass fa-fw me-2"></i></div>
-                Consulta vehicular
-            </a>
             <a class="nav-link {{ request()->routeIs('articulos') ? 'active bg-light' : '' }}" href="{{ route('articulos') }}">
                 <div class="sb-nav-link-icon"><i class="fa-solid fa-box-archive fa-fw me-2"></i></div>
                 Artículos
+            </a>
+            <a class="nav-link {{ request()->routeIs('consulta.*') ? 'active bg-light' : '' }}" href="{{ route('consulta.vehicular') }}">
+                <div class="sb-nav-link-icon"><i class="fa-solid fa-magnifying-glass fa-fw me-2"></i></div>
+                Consulta vehicular
             </a>
         </div>
     </div>

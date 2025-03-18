@@ -100,10 +100,11 @@ class TrabajoResource extends Resource
                                         $tipoVehiculo = $record->tipoVehiculo->nombre;
                                         $marca = $record->marca;
                                         $modelo = $record->modelo;
+                                        $color = $record->color;
                                         if (!empty($placa)) {
-                                            return "{$placa} - {$tipoVehiculo} - {$marca} {$modelo}";
+                                            return "{$placa} {$tipoVehiculo} {$marca} {$modelo} {$color}";
                                         } else {
-                                            return "{$tipoVehiculo} - {$marca} {$modelo}";
+                                            return "{$tipoVehiculo} {$marca} {$modelo} {$color}";
                                         }
                                     })
                                     ->searchable()
