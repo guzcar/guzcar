@@ -9,8 +9,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class TrabajoArticulosRelationManager extends RelationManager
@@ -60,6 +63,12 @@ class TrabajoArticulosRelationManager extends RelationManager
                         return $this->buildArticuloLabel($articulo);
                     })
                     ->wrap(),
+                TextColumn::make('presupuesto')
+                    ->label('Presupuesto')
+                    ->formatStateUsing(fn($state) => $state ? 'Incluido' : 'Excluido')
+                    ->badge()
+                    ->color(fn($state) => $state ? 'success' : 'danger')
+                    ->alignCenter(),
                 TextColumn::make('precio')
                     ->label('Precio')
                     ->prefix('S/ ')
@@ -90,6 +99,26 @@ class TrabajoArticulosRelationManager extends RelationManager
             ])
             ->bulkActions([
                 ExportBulkAction::make(),
+                BulkActionGroup::make([
+                    BulkAction::make('marcarComoSi')
+                        ->label('Incluir en el Presupuesto')
+                        ->action(function (Collection $records) {
+                            $records->each(function ($record) {
+                                $record->presupuesto = true; // Cambiar a "SI"
+                                $record->save();
+                            });
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                    BulkAction::make('marcarComoNo')
+                        ->label('Excluir del Presupuesto')
+                        ->action(function (Collection $records) {
+                            $records->each(function ($record) {
+                                $record->presupuesto = false; // Cambiar a "NO"
+                                $record->save();
+                            });
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                ]),
             ]);
     }
 

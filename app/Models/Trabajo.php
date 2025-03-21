@@ -23,6 +23,11 @@ class Trabajo extends Model
         'desembolso'
     ];
 
+    protected $casts = [
+        'fecha_ingreso' => 'date',
+        'fecha_salida' => 'date',
+    ];
+
     public function taller()
     {
         return $this->belongsTo(Taller::class)->withTrashed();
@@ -74,6 +79,11 @@ class Trabajo extends Model
         return $this->belongsToMany(Articulo::class, 'trabajo_articulos', 'trabajo_id', 'articulo_id')
             ->withPivot(['fecha', 'hora', 'precio', 'cantidad', 'tecnico_id', 'responsable_id', 'movimiento', 'observacion'])
             ->withTimestamps();
+    }
+
+    public function otros()
+    {
+        return $this->hasMany(TrabajoOtro::class, 'trabajo_id');
     }
 
     /**

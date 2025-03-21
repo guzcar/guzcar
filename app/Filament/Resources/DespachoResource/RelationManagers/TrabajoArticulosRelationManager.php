@@ -13,6 +13,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -146,25 +147,64 @@ class TrabajoArticulosRelationManager extends RelationManager
                                                     case 'consumo_completo':
                                                         if ($value > $stockDisponible) {
                                                             $fail("La cantidad no puede ser mayor al stock disponible ($stockDisponible).");
+                                                            // Notificación de error
+                                                            Notification::make()
+                                                                ->title('Error en consumo completo')
+                                                                ->danger()
+                                                                ->body("La cantidad no puede ser mayor al stock disponible ($stockDisponible).")
+                                                                ->send();
                                                         }
                                                         break;
+
                                                     case 'abrir_nuevo':
                                                         if ($value >= 1) {
                                                             $fail("La cantidad debe ser menor a 1.");
+                                                            // Notificación de error
+                                                            Notification::make()
+                                                                ->title('Error al abrir nuevo artículo')
+                                                                ->danger()
+                                                                ->body("La cantidad debe ser menor a 1.")
+                                                                ->send();
                                                         } elseif ($stockDisponible < 1) {
                                                             $fail("No hay suficiente stock para abrir un nuevo artículo.");
+                                                            // Notificación de error
+                                                            Notification::make()
+                                                                ->title('Error al abrir nuevo artículo')
+                                                                ->danger()
+                                                                ->body("No hay suficiente stock para abrir un nuevo artículo.")
+                                                                ->send();
                                                         }
                                                         break;
+
                                                     case 'terminar_abierto':
                                                         if ($abiertos < 1) {
                                                             $fail("No hay artículos abiertos para terminar.");
+                                                            // Notificación de error
+                                                            Notification::make()
+                                                                ->title('Error al terminar artículo abierto')
+                                                                ->danger()
+                                                                ->body("No hay artículos abiertos para terminar.")
+                                                                ->send();
                                                         }
                                                         break;
+
                                                     case 'consumo_parcial':
                                                         if ($value >= 1) {
                                                             $fail("La cantidad debe ser menor a 1.");
+                                                            // Notificación de error
+                                                            Notification::make()
+                                                                ->title('Error en consumo parcial')
+                                                                ->danger()
+                                                                ->body("La cantidad debe ser menor a 1.")
+                                                                ->send();
                                                         } elseif ($abiertos < 1) {
                                                             $fail("No hay artículos abiertos para gastar.");
+                                                            // Notificación de error
+                                                            Notification::make()
+                                                                ->title('Error en consumo parcial')
+                                                                ->danger()
+                                                                ->body("No hay artículos abiertos para gastar.")
+                                                                ->send();
                                                         }
                                                         break;
                                                 }
@@ -272,7 +312,7 @@ class TrabajoArticulosRelationManager extends RelationManager
                             $data['abiertos'] = $articulo->fraccionable ? $articulo->abiertos : null;
 
                             // Ajustar stock y abiertos según el movimiento
-                            $cantidad = $record->cantidad;
+                            $cantidad = ceil($record->cantidad);
                             $movimiento = $record->movimiento;
 
                             switch ($movimiento) {

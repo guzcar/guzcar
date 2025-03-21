@@ -46,6 +46,7 @@ return new class extends Migration {
             ])->default('consumo_completo');
             $table->text('observacion')->nullable();
             $table->boolean('confirmado')->default(false);
+            $table->boolean('presupuesto')->default(true);
             $table->timestamps();
         });
 
@@ -157,156 +158,6 @@ return new class extends Migration {
         ');
 
         DB::unprepared("
-            CREATE TRIGGER finanzas_after_insert_trabajo_articulo
-            AFTER INSERT ON trabajo_articulos
-            FOR EACH ROW
-            BEGIN
-                DECLARE total_articulos DECIMAL(10, 2);
-                DECLARE total_servicios DECIMAL(10, 2);
-
-                -- Calcular el total de artículos para el trabajo
-                SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_articulos
-                FROM trabajo_articulos
-                WHERE trabajo_id = NEW.trabajo_id;
-
-                -- Calcular el total de servicios para el trabajo
-                SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_servicios
-                FROM trabajo_servicios
-                WHERE trabajo_id = NEW.trabajo_id;
-
-                -- Actualizar el campo `importe` en la tabla `trabajos`
-                UPDATE trabajos
-                SET importe = total_articulos + total_servicios
-                WHERE id = NEW.trabajo_id;
-            END;
-        ");
-
-        DB::unprepared("
-            CREATE TRIGGER finanzas_after_update_trabajo_articulo
-            AFTER UPDATE ON trabajo_articulos
-            FOR EACH ROW
-            BEGIN
-                DECLARE total_articulos DECIMAL(10, 2);
-                DECLARE total_servicios DECIMAL(10, 2);
-
-                -- Calcular el total de artículos para el trabajo
-                SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_articulos
-                FROM trabajo_articulos
-                WHERE trabajo_id = NEW.trabajo_id;
-
-                -- Calcular el total de servicios para el trabajo
-                SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_servicios
-                FROM trabajo_servicios
-                WHERE trabajo_id = NEW.trabajo_id;
-
-                -- Actualizar el campo `importe` en la tabla `trabajos`
-                UPDATE trabajos
-                SET importe = total_articulos + total_servicios
-                WHERE id = NEW.trabajo_id;
-            END;
-        ");
-
-        DB::unprepared("
-            CREATE TRIGGER finanzas_after_delete_trabajo_articulo
-            AFTER DELETE ON trabajo_articulos
-            FOR EACH ROW
-            BEGIN
-                DECLARE total_articulos DECIMAL(10, 2);
-                DECLARE total_servicios DECIMAL(10, 2);
-
-                -- Calcular el total de artículos para el trabajo
-                SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_articulos
-                FROM trabajo_articulos
-                WHERE trabajo_id = OLD.trabajo_id;
-
-                -- Calcular el total de servicios para el trabajo
-                SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_servicios
-                FROM trabajo_servicios
-                WHERE trabajo_id = OLD.trabajo_id;
-
-                -- Actualizar el campo `importe` en la tabla `trabajos`
-                UPDATE trabajos
-                SET importe = total_articulos + total_servicios
-                WHERE id = OLD.trabajo_id;
-            END;
-        ");
-
-        DB::unprepared("
-            CREATE TRIGGER finanzas_after_insert_trabajo_servicio
-            AFTER INSERT ON trabajo_servicios
-            FOR EACH ROW
-            BEGIN
-                DECLARE total_articulos DECIMAL(10, 2);
-                DECLARE total_servicios DECIMAL(10, 2);
-
-                -- Calcular el total de servicios para el trabajo
-                SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_servicios
-                FROM trabajo_servicios
-                WHERE trabajo_id = NEW.trabajo_id;
-
-                -- Calcular el total de artículos para el trabajo
-                SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_articulos
-                FROM trabajo_articulos
-                WHERE trabajo_id = NEW.trabajo_id;
-
-                -- Actualizar el campo `importe` en la tabla `trabajos`
-                UPDATE trabajos
-                SET importe = total_articulos + total_servicios
-                WHERE id = NEW.trabajo_id;
-            END;
-        ");
-
-        DB::unprepared("
-            CREATE TRIGGER finanzas_after_update_trabajo_servicio
-            AFTER UPDATE ON trabajo_servicios
-            FOR EACH ROW
-            BEGIN
-                DECLARE total_articulos DECIMAL(10, 2);
-                DECLARE total_servicios DECIMAL(10, 2);
-
-                -- Calcular el total de servicios para el trabajo
-                SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_servicios
-                FROM trabajo_servicios
-                WHERE trabajo_id = NEW.trabajo_id;
-
-                -- Calcular el total de artículos para el trabajo
-                SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_articulos
-                FROM trabajo_articulos
-                WHERE trabajo_id = NEW.trabajo_id;
-
-                -- Actualizar el campo `importe` en la tabla `trabajos`
-                UPDATE trabajos
-                SET importe = total_articulos + total_servicios
-                WHERE id = NEW.trabajo_id;
-            END;
-        ");
-
-        DB::unprepared("
-            CREATE TRIGGER finanzas_after_delete_trabajo_servicio
-            AFTER DELETE ON trabajo_servicios
-            FOR EACH ROW
-            BEGIN
-                DECLARE total_articulos DECIMAL(10, 2);
-                DECLARE total_servicios DECIMAL(10, 2);
-
-                -- Calcular el total de servicios para el trabajo
-                SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_servicios
-                FROM trabajo_servicios
-                WHERE trabajo_id = OLD.trabajo_id;
-
-                -- Calcular el total de artículos para el trabajo
-                SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_articulos
-                FROM trabajo_articulos
-                WHERE trabajo_id = OLD.trabajo_id;
-
-                -- Actualizar el campo `importe` en la tabla `trabajos`
-                UPDATE trabajos
-                SET importe = total_articulos + total_servicios
-                WHERE id = OLD.trabajo_id;
-            END;
-        ");
-
-        DB::unprepared("
             CREATE TRIGGER despacho_before_insert_trabajo_articulo
             BEFORE INSERT ON trabajo_articulos
             FOR EACH ROW
@@ -380,13 +231,5 @@ return new class extends Migration {
         DB::unprepared("DROP TRIGGER IF EXISTS inventario_after_trabajo_articulos_insert");
         DB::unprepared("DROP TRIGGER IF EXISTS inventario_after_trabajo_articulos_update");
         DB::unprepared("DROP TRIGGER IF EXISTS inventario_after_trabajo_articulos_delete");
-
-        DB::unprepared("DROP TRIGGER IF EXISTS finanzas_after_insert_trabajo_articulo");
-        DB::unprepared("DROP TRIGGER IF EXISTS finanzas_after_update_trabajo_articulo");
-        DB::unprepared("DROP TRIGGER IF EXISTS finanzas_after_delete_trabajo_articulo");
-
-        DB::unprepared("DROP TRIGGER IF EXISTS finanzas_after_insert_trabajo_servicio");
-        DB::unprepared("DROP TRIGGER IF EXISTS finanzas_after_update_trabajo_servicio");
-        DB::unprepared("DROP TRIGGER IF EXISTS finanzas_after_delete_trabajo_servicio");
     }
 };

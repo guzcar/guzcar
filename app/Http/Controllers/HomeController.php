@@ -16,15 +16,17 @@ class HomeController extends Controller
     {
         $user = auth()->user();
 
-        // Obtener la fecha actual
+        // Obtener la fecha actual y la de ayer
         $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
+        $fechaAyer = now()->subDay()->format('Y-m-d'); // Fecha de ayer
 
-        // Obtener trabajos asignados al usuario con fecha_salida == null o fecha_salida == fecha actual
+        // Obtener trabajos asignados al usuario con fecha_salida == null, hoy o ayer
         $trabajos = $user->trabajos()
             ->orderBy('created_at', 'desc')
-            ->where(function ($query) use ($fechaActual) {
+            ->where(function ($query) use ($fechaActual, $fechaAyer) {
                 $query->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
-                    ->orWhereDate('fecha_salida', '>=', $fechaActual); // Filtra por fecha_salida igual a la fecha actual
+                    ->orWhereDate('fecha_salida', $fechaActual) // Filtra por fecha_salida igual a la fecha actual
+                    ->orWhereDate('fecha_salida', $fechaAyer); // Filtra por fecha_salida igual a la fecha de ayer
             })
             ->wherePivot('finalizado', false) // Filtra por finalizado == false en la tabla intermedia
             ->get();

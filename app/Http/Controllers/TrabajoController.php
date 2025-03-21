@@ -14,13 +14,15 @@ class TrabajoController extends Controller
      */
     public function asignarTrabajos()
     {
-        // Obtener la fecha actual
+        // Obtener la fecha actual y la de ayer
         $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
+        $fechaAyer = now()->subDay()->format('Y-m-d'); // Fecha de ayer
 
-        // Obtener trabajos que no tengan fecha_salida o cuya fecha_salida sea igual a la fecha actual
-        $trabajos = Trabajo::where(function ($query) use ($fechaActual) {
+        // Obtener trabajos que no tengan fecha_salida o cuya fecha_salida sea igual a la fecha actual o ayer
+        $trabajos = Trabajo::where(function ($query) use ($fechaActual, $fechaAyer) {
             $query->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
-                ->orWhereDate('fecha_salida', '>=', $fechaActual); // Filtra por fecha_salida igual a la fecha actual
+                ->orWhereDate('fecha_salida', $fechaActual) // Filtra por fecha_salida igual a la fecha actual
+                ->orWhereDate('fecha_salida', $fechaAyer); // Filtra por fecha_salida igual a la fecha de ayer
         })
             ->whereDoesntHave('tecnicos', function ($query) {
                 $query->where('tecnico_id', auth()->id()); // Filtra por trabajos no asignados al técnico actual
