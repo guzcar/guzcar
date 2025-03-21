@@ -92,13 +92,14 @@ class DespachoResource extends Resource
                                     ->prefixIcon('heroicon-s-truck')
                                     ->options(function () {
                                         // Obtener la fecha actual
-                                        $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
+                                        // $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
                             
                                         return Trabajo::with(['vehiculo'])
-                                            ->where(function ($query) use ($fechaActual) {
-                                                $query->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
-                                                    ->orWhereDate('fecha_salida', '>=', $fechaActual); // Filtra por fecha_salida igual a la fecha actual
-                                            })
+                                            // ->where(function ($query) use ($fechaActual) {
+                                            //     $query->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
+                                            //         ->orWhereDate('fecha_salida', '>=', $fechaActual); // Filtra por fecha_salida igual a la fecha actual
+                                            // })
+                                            ->orderBy('created_at', 'desc')
                                             ->get()
                                             ->mapWithKeys(function ($trabajo) {
                                                 $codigo = $trabajo->codigo;

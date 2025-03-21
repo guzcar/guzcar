@@ -30,9 +30,13 @@ class EvidenciasRelationManager extends RelationManager
                 Grid::make()
                     ->schema([
                         FileUpload::make('evidencia_url')
-                            ->label('Evidencia')
+                            ->label('Evidencias')
                             ->directory('evidencia')
                             ->required()
+                            ->multiple()
+                            ->reorderable()
+                            ->appendFiles()
+                            ->panelLayout('grid')
                             ->columnSpan(1)
                             ->maxSize(500 * 1024),
                         Grid::make()
@@ -142,11 +146,38 @@ class EvidenciasRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->using(function (array $data, string $model) {
+                        // Obtener los archivos subidos
+                        $archivos = $data['evidencia_url'];
+                        $descripcion = $data['observacion'] ?? null;
+                        $user_id = $data['user_id']; // Asegúrate de obtener el user_id
+            
+                        // Crear un registro para cada archivo
+                        $primerModelo = null;
+                        foreach ($archivos as $index => $archivo) {
+                            $evidencia = Evidencia::create([
+                                'trabajo_id' => $this->getOwnerRecord()->id,
+                                'user_id' => $user_id, // Asignar el user_id
+                                'evidencia_url' => $archivo,
+                                'observacion' => $index === 0 ? $descripcion : null, // Solo la primera descripción
+                            ]);
+
+                            // Guardar el primer modelo creado
+                            if ($index === 0) {
+                                $primerModelo = $evidencia;
+                            }
+                        }
+
+                        // Retornar el primer modelo creado
+                        return $primerModelo;
+                    })
+                    ->successNotificationTitle('Evidencias subidas correctamente'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

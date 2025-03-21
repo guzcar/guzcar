@@ -12,10 +12,16 @@
     <h1 class="mb-3">Artículos para {{ $trabajo->vehiculo->placa }}</h1>
 
     <div class="d-flex justify-content-between mb-3">
-        <a class="btn btn-light border" href="{{ route('home') }}">Volver</a>
+        <a class="btn btn-light border py-2" href="{{ route('home') }}">Volver</a>
     </div>
 
     <ul class="list-group mb-3">
+        <li class="list-group-item">
+            <div class="d-flex">
+                <span class="fw-bold" style="min-width: 100px;">Tipo</span>
+                <span>{{ $trabajo->vehiculo->tipoVehiculo->nombre }}</span>
+            </div>
+        </li>
         <li class="list-group-item">
             <div class="d-flex">
                 <span class="fw-bold" style="min-width: 100px;">Marca</span>
@@ -36,10 +42,20 @@
         </li>
         <li class="list-group-item">
             <div class="d-flex">
-                <span class="fw-bold" style="min-width: 100px;">Tipo</span>
-                <span>{{ $trabajo->vehiculo->tipoVehiculo->nombre }}</span>
+                <span class="fw-bold" style="min-width: 100px;">Ingreso</span>
+                <span>{{ $trabajo->fecha_ingreso->isoFormat('dddd, D [de] MMMM') }}</span>
             </div>
         </li>
+        @if ($trabajo->fecha_salida)
+            <li class="list-group-item">
+                <div class="d-flex">
+                    <span class="fw-bold" style="min-width: 100px;">Salida</span>
+                    <span class="text-danger">
+                        {{ $trabajo->fecha_salida->isoFormat('dddd, D [de] MMMM') }}
+                    </span>
+                </div>
+            </li>
+        @endif
     </ul>
 
     <p>Esta es la lista de todos los artículos que solicitaste para este vehícuo.</p>

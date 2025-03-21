@@ -23,6 +23,7 @@ class TrabajoArticulo extends Model
         'movimiento',
         'observacion',
         'confirmado',
+        'presupuesto',
     ];
 
     protected $casts = [

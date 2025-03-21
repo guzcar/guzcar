@@ -68,18 +68,18 @@
     <table class="table-container">
         <thead>
             <tr>
-                <th>Servicio</th>
-                <th style="width: 95px">Costo</th>
                 <th style="width: 95px">Cantidad</th>
+                <th>Descripción</th>
+                <th style="width: 95px">Costo</th>
                 <th style="width: 100px">Sub-Total</th>
             </tr>
         </thead>
         <tbody>
             @forelse($trabajo->servicios as $trabajoServicio)
                 <tr>
+                    <td style="text-align: center">{{ $trabajoServicio->cantidad }}</td>
                     <td>{{ $trabajoServicio->servicio->nombre }}</td>
                     <td style="text-align: right">S/ {{ $trabajoServicio->precio }}</td>
-                    <td style="text-align: center">{{ $trabajoServicio->cantidad }}</td>
                     <td style="text-align: right">S/
                         {{ number_format($trabajoServicio->cantidad * $trabajoServicio->precio, 2, '.', '') }}
                     </td>
@@ -104,69 +104,85 @@
     <table class="table-container">
         <thead>
             <tr>
-                <th>Artículo</th>
-                <th style="width: 95px">Costo</th>
                 <th style="width: 95px">Cantidad</th>
+                <th>Descripción</th>
+                <th style="width: 95px">Costo</th>
                 <th style="width: 100px">Sub-Total</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($articulosAgrupados as $articulo)
-                        <tr>
-                            <td>
-                                @php
-                                    $articuloData = $articulo['articulo'];
-                                    
-                                    $categoria = $articuloData->categoria->nombre ?? null;
-                                    $marca = $articuloData->marca->nombre ?? null;
-                                    $subCategoria = $articuloData->subCategoria->nombre ?? null;
-                                    $especificacion = $articuloData->especificacion ?? null;
-                                    $presentacion = $articuloData->presentacion->nombre ?? null;
-                                    $medida = $articuloData->medida ?? null;
-                                    $unidad = $articuloData->unidad->nombre ?? null;
-                                    $color = $articuloData->color ?? null;
+            @if($articulosAgrupados->isNotEmpty()) <!-- Validar si hay artículos -->
+                    @foreach($articulosAgrupados as $articulo)
+                            <tr>
+                                <td style="text-align: center">
+                                    {{ \App\Services\FractionService::decimalToFraction($articulo['cantidad']) }}
+                                </td>
+                                <td>
+                                    @php
+                                        $articuloData = $articulo['articulo'];
+                                        $categoria = $articuloData->categoria->nombre ?? null;
+                                        $marca = $articuloData->marca->nombre ?? null;
+                                        $subCategoria = $articuloData->subCategoria->nombre ?? null;
+                                        $especificacion = $articuloData->especificacion ?? null;
+                                        $presentacion = $articuloData->presentacion->nombre ?? null;
+                                        $medida = $articuloData->medida ?? null;
+                                        $unidad = $articuloData->unidad->nombre ?? null;
+                                        $color = $articuloData->color ?? null;
 
-                                    $labelParts = [];
-                                    if ($categoria)
-                                        $labelParts[] = $categoria;
-                                    if ($marca)
-                                        $labelParts[] = $marca;
-                                    if ($subCategoria)
-                                        $labelParts[] = $subCategoria;
-                                    if ($especificacion)
-                                        $labelParts[] = $especificacion;
-                                    if ($presentacion)
-                                        $labelParts[] = $presentacion;
-                                    if ($medida)
-                                        $labelParts[] = $medida;
-                                    if ($unidad)
-                                        $labelParts[] = $unidad;
-                                    if ($color)
-                                        $labelParts[] = $color;
+                                        $labelParts = [];
+                                        if ($categoria)
+                                            $labelParts[] = $categoria;
+                                        if ($marca)
+                                            $labelParts[] = $marca;
+                                        if ($subCategoria)
+                                            $labelParts[] = $subCategoria;
+                                        if ($especificacion)
+                                            $labelParts[] = $especificacion;
+                                        if ($presentacion)
+                                            $labelParts[] = $presentacion;
+                                        if ($medida)
+                                            $labelParts[] = $medida;
+                                        if ($unidad)
+                                            $labelParts[] = $unidad;
+                                        if ($color)
+                                            $labelParts[] = $color;
 
-                                    echo implode(' ', $labelParts);
-                                @endphp
-                            </td>
-                            <td style="text-align: right">S/ {{ $articulo['precio'] }}</td>
-                            <td style="text-align: center">
-                                {{ \App\Services\FractionService::decimalToFraction($articulo['cantidad']) }}
-                            </td>
-                            <td style="text-align: right">S/
-                                {{ number_format($articulo['cantidad'] * $articulo['precio'], 2, '.', '') }}
-                            </td>
-                        </tr>
-            @empty
+                                        echo implode(' ', $labelParts);
+                                    @endphp
+                                </td>
+                                <td style="text-align: right">S/ {{ $articulo['precio'] }}</td>
+                                <td style="text-align: right">S/
+                                    {{ number_format($articulo['cantidad'] * $articulo['precio'], 2, '.', '') }}
+                                </td>
+                            </tr>
+                    @endforeach
+            @endif
+
+            <!-- Sección para trabajo_otros -->
+            @forelse($trabajo->otros as $trabajoOtro)
                 <tr>
-                    <td class="empty-case"></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td style="text-align: center">{{ $trabajoOtro->cantidad }}</td>
+                    <td>{{ $trabajoOtro->descripcion }}</td>
+                    <td style="text-align: right">S/ {{ $trabajoOtro->precio }}</td>
+                    <td style="text-align: right">S/
+                        {{ number_format($trabajoOtro->cantidad * $trabajoOtro->precio, 2, '.', '') }}
+                    </td>
                 </tr>
+            @empty
+                @if($articulosAgrupados->isEmpty()) <!-- Si no hay artículos ni trabajo_otros -->
+                    <tr>
+                        <td class="empty-case" colspan="4">No hay repuestos, materiales u otros.</td>
+                    </tr>
+                @endif
             @endforelse
-            <tr>
-                <td colspan="3" style="border: 0"></td>
-                <td style="text-align: right"><b>S/ {{ number_format($subtotal_articulos, 2, '.', '') }}</b></td>
-            </tr>
+
+            @if($articulosAgrupados->isNotEmpty() || $trabajo->otros->isNotEmpty())
+                <tr>
+                    <td colspan="3" style="border: 0"></td>
+                    <td style="text-align: right"><b>S/
+                            {{ number_format($subtotal_articulos + $subtotal_trabajo_otros, 2, '.', '') }}</b></td>
+                </tr>
+            @endif
         </tbody>
     </table>
 

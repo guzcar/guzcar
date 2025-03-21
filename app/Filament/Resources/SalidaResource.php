@@ -296,12 +296,13 @@ class SalidaResource extends Resource
                                             ->label('Trabajo en vehículo')
                                             ->prefixIcon('heroicon-s-truck')
                                             ->options(function () {
-                                                $fechaActual = now()->format('Y-m-d');
+                                                // $fechaActual = now()->format('Y-m-d');
                                                 return Trabajo::with(['vehiculo'])
-                                                    ->where(function ($query) use ($fechaActual) {
-                                                        $query->whereNull('fecha_salida')
-                                                            ->orWhereDate('fecha_salida', '>=', $fechaActual);
-                                                    })
+                                                    // ->where(function ($query) use ($fechaActual) {
+                                                    //     $query->whereNull('fecha_salida')
+                                                    //         ->orWhereDate('fecha_salida', '>=', $fechaActual);
+                                                    // })
+                                                    ->orderBy('created_at', 'desc')
                                                     ->get()
                                                     ->mapWithKeys(function ($trabajo) {
                                                         $label = "{$trabajo->vehiculo->placa} {$trabajo->vehiculo->tipoVehiculo->nombre} {$trabajo->vehiculo->marca} {$trabajo->vehiculo->modelo} {$trabajo->vehiculo->color} ({$trabajo->codigo})";

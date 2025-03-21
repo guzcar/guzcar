@@ -10,7 +10,7 @@
     @endpush
 
     <h1 class="mb-3">Artículos</h1>
-    <a class="btn btn-light border mb-3" href="{{ route('home') }}">Volver al Inicio</a>
+    <a class="btn btn-light border mb-3 py-2" href="{{ route('home') }}">Volver al Inicio</a>
 
     <p>Esta es la lista de artículos que solicitaste del almacén en esta semana.</p>
 

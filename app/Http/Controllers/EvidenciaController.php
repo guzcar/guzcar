@@ -19,7 +19,7 @@ class EvidenciaController extends Controller
     {
         $user = auth()->user();
 
-        if (!$trabajo->usuarios->contains($user) /*|| $trabajo->fecha_salida !== null*/) {
+        if (!$trabajo->usuarios->contains($user)) {
             abort(403, 'Forbidden');
         }
 

@@ -17,11 +17,15 @@ class TrabajoController extends Controller
     public function report($id)
     {
         $trabajo = Trabajo::with([
-            'trabajoArticulos.articulo.categoria', // Cargar relación de categoría directamente
-            'trabajoArticulos.articulo.subCategoria', // Cargar relación de subcategoría
-            'trabajoArticulos.articulo.marca', // Cargar relación de marca
-            'trabajoArticulos.articulo.unidad', // Cargar relación de unidad
-            'trabajoArticulos.articulo.presentacion', // Cargar relación de presentación
+            'trabajoArticulos' => function ($query) {
+                $query->where('presupuesto', true); // Solo artículos con presupuesto true
+            },
+            'trabajoArticulos.articulo.categoria',
+            'trabajoArticulos.articulo.subCategoria',
+            'trabajoArticulos.articulo.marca',
+            'trabajoArticulos.articulo.unidad',
+            'trabajoArticulos.articulo.presentacion',
+            'otros', // Cargar el nuevo modelo trabajo_otros
         ])->find($id);
 
         $vehiculo = $trabajo->vehiculo;
@@ -47,12 +51,12 @@ class TrabajoController extends Controller
 
         // Agrupar artículos por ID y precio, sumando sus cantidades
         $articulosAgrupados = $trabajo->trabajoArticulos->groupBy(function ($articulo) {
-            return $articulo->articulo_id . '-' . $articulo->precio; // Agrupa por ID y precio
+            return $articulo->articulo_id . '-' . $articulo->precio;
         })->map(function ($grupo) {
             return [
-                'articulo' => $grupo->first()->articulo, // Tomamos el primer artículo del grupo
-                'precio' => $grupo->first()->precio, // Tomamos el precio del primer artículo
-                'cantidad' => $grupo->sum('cantidad'), // Sumamos las cantidades
+                'articulo' => $grupo->first()->articulo,
+                'precio' => $grupo->first()->precio,
+                'cantidad' => $grupo->sum('cantidad'),
             ];
         });
 
@@ -61,7 +65,12 @@ class TrabajoController extends Controller
             return $articulo['cantidad'] * $articulo['precio'];
         });
 
-        $total = $subtotal_articulos + $subtotal_servicios;
+        // Subtotal de trabajo_otros
+        $subtotal_trabajo_otros = $trabajo->otros->sum(function ($trabajoOtro) {
+            return $trabajoOtro->cantidad * $trabajoOtro->precio;
+        });
+
+        $total = $subtotal_articulos + $subtotal_servicios + $subtotal_trabajo_otros;
 
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('pdf.trabajo', compact(
@@ -71,7 +80,8 @@ class TrabajoController extends Controller
             'subtotal_servicios',
             'subtotal_articulos',
             'articulosAgrupados',
-            'total', // Pasamos los artículos agrupados a la vista
+            'subtotal_trabajo_otros',
+            'total',
         ))->setPaper('A4', 'portrait');
 
         $codenow = now()->format('ymdhis');

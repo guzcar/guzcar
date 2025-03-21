@@ -27,7 +27,7 @@ class EditSalida extends EditRecord
             $data['abiertos'] = $articulo->fraccionable ? $articulo->abiertos : null;
 
             // Obtener la cantidad y el movimiento
-            $cantidad = $record->cantidad;
+            $cantidad = ceil($record->cantidad);
             $movimiento = $record->movimiento;
 
             // Ajustar stock y abiertos según el movimiento
