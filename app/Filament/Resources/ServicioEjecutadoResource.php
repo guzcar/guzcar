@@ -105,9 +105,11 @@ class ServicioEjecutadoResource extends Resource
                         ->lineClamp(2),
                     TextColumn::make('precio')
                         ->prefix('S/ ')
-                        ->alignRight(),
+                        ->alignRight()
+                        ->visible(fn() => auth()->user()->can('update_servicio::ejecutado')),
                     TextColumn::make('cantidad')
-                        ->alignCenter(),
+                        ->alignCenter()
+                        ->visible(fn() => auth()->user()->can('update_servicio::ejecutado')),
                     TextColumn::make('subtotal')
                         ->label('Subtotal')
                         ->prefix('S/ ')
@@ -115,6 +117,7 @@ class ServicioEjecutadoResource extends Resource
                         ->state(function (TrabajoServicio $record): string {
                             return number_format($record->precio * $record->cantidad, 2, '.', '');
                         })
+                        ->visible(fn() => auth()->user()->can('update_servicio::ejecutado'))
                 ]),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')

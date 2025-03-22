@@ -110,7 +110,7 @@ class ArticuloResource extends Resource
                                         TextInput::make('nombre')
                                             ->label('Nombre de la subcategoría')
                                             ->required(),
-                                            // ->unique('articulo_sub_categorias', 'nombre'),
+                                        // ->unique('articulo_sub_categorias', 'nombre'),
                                         Hidden::make('categoria_id')
                                             ->default(fn(Get $get) => $get('categoria_id')),
                                     ])
@@ -305,14 +305,16 @@ class ArticuloResource extends Resource
                     ->prefix('S/ ')
                     ->alignRight()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->visible(fn() => auth()->user()->can('update_articulo')),
                 TextColumn::make('precio')
                     ->label('Precio de venta')
                     ->prefix('S/ ')
                     ->placeholder('S/ 0.00')
                     ->alignRight()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->visible(fn() => auth()->user()->can('update_articulo')),
                 TextColumn::make('stock')
                     ->alignCenter()
                     ->sortable()
