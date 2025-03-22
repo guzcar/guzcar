@@ -315,7 +315,10 @@ class ArticuloResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('stock')
                     ->alignCenter()
-                    ->sortable(),
+                    ->sortable()
+                    ->formatStateUsing(function ($state) {
+                        return FractionService::decimalToFraction((float) $state);
+                    }),
                 TextColumn::make('abiertos')
                     ->alignCenter()
                     ->sortable()

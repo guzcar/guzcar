@@ -79,10 +79,25 @@ return new class extends Migration {
             AFTER INSERT ON trabajo_articulos
             FOR EACH ROW
             BEGIN
+                DECLARE es_fraccionable BOOLEAN;
+        
+                -- Obtener el valor de fraccionable del artículo
+                SELECT fraccionable INTO es_fraccionable
+                FROM articulos
+                WHERE id = NEW.articulo_id;
+        
                 IF NEW.movimiento = "consumo_completo" THEN
-                    UPDATE articulos
-                    SET stock = stock - CEIL(NEW.cantidad)
-                    WHERE id = NEW.articulo_id;
+                    IF es_fraccionable = FALSE THEN
+                        -- Si no es fraccionable, restar la cantidad directamente
+                        UPDATE articulos
+                        SET stock = stock - NEW.cantidad
+                        WHERE id = NEW.articulo_id;
+                    ELSE
+                        -- Si es fraccionable, aplicar CEIL
+                        UPDATE articulos
+                        SET stock = stock - CEIL(NEW.cantidad)
+                        WHERE id = NEW.articulo_id;
+                    END IF;
                 ELSEIF NEW.movimiento = "abrir_nuevo" THEN
                     UPDATE articulos
                     SET stock = stock - 1,
@@ -101,11 +116,26 @@ return new class extends Migration {
             AFTER UPDATE ON trabajo_articulos
             FOR EACH ROW
             BEGIN
+                DECLARE es_fraccionable BOOLEAN;
+
+                -- Obtener el valor de fraccionable del artículo
+                SELECT fraccionable INTO es_fraccionable
+                FROM articulos
+                WHERE id = OLD.articulo_id;
+
                 -- Revertir cambios anteriores
                 IF OLD.movimiento = "consumo_completo" THEN
-                    UPDATE articulos
-                    SET stock = stock + CEIL(OLD.cantidad)
-                    WHERE id = OLD.articulo_id;
+                    IF es_fraccionable = FALSE THEN
+                        -- Si no es fraccionable, sumar la cantidad directamente
+                        UPDATE articulos
+                        SET stock = stock + OLD.cantidad
+                        WHERE id = OLD.articulo_id;
+                    ELSE
+                        -- Si es fraccionable, aplicar CEIL
+                        UPDATE articulos
+                        SET stock = stock + CEIL(OLD.cantidad)
+                        WHERE id = OLD.articulo_id;
+                    END IF;
                 ELSEIF OLD.movimiento = "abrir_nuevo" THEN
                     UPDATE articulos
                     SET stock = stock + 1,
@@ -116,12 +146,24 @@ return new class extends Migration {
                     SET abiertos = abiertos + 1
                     WHERE id = OLD.articulo_id;
                 END IF;
-        
+
                 -- Aplicar nuevos cambios
+                SELECT fraccionable INTO es_fraccionable
+                FROM articulos
+                WHERE id = NEW.articulo_id;
+
                 IF NEW.movimiento = "consumo_completo" THEN
-                    UPDATE articulos
-                    SET stock = stock - CEIL(NEW.cantidad)
-                    WHERE id = NEW.articulo_id;
+                    IF es_fraccionable = FALSE THEN
+                        -- Si no es fraccionable, restar la cantidad directamente
+                        UPDATE articulos
+                        SET stock = stock - NEW.cantidad
+                        WHERE id = NEW.articulo_id;
+                    ELSE
+                        -- Si es fraccionable, aplicar CEIL
+                        UPDATE articulos
+                        SET stock = stock - CEIL(NEW.cantidad)
+                        WHERE id = NEW.articulo_id;
+                    END IF;
                 ELSEIF NEW.movimiento = "abrir_nuevo" THEN
                     UPDATE articulos
                     SET stock = stock - 1,
@@ -140,10 +182,25 @@ return new class extends Migration {
             AFTER DELETE ON trabajo_articulos
             FOR EACH ROW
             BEGIN
+                DECLARE es_fraccionable BOOLEAN;
+
+                -- Obtener el valor de fraccionable del artículo
+                SELECT fraccionable INTO es_fraccionable
+                FROM articulos
+                WHERE id = OLD.articulo_id;
+
                 IF OLD.movimiento = "consumo_completo" THEN
-                    UPDATE articulos
-                    SET stock = stock + CEIL(OLD.cantidad)
-                    WHERE id = OLD.articulo_id;
+                    IF es_fraccionable = FALSE THEN
+                        -- Si no es fraccionable, sumar la cantidad directamente
+                        UPDATE articulos
+                        SET stock = stock + OLD.cantidad
+                        WHERE id = OLD.articulo_id;
+                    ELSE
+                        -- Si es fraccionable, aplicar CEIL
+                        UPDATE articulos
+                        SET stock = stock + CEIL(OLD.cantidad)
+                        WHERE id = OLD.articulo_id;
+                    END IF;
                 ELSEIF OLD.movimiento = "abrir_nuevo" THEN
                     UPDATE articulos
                     SET stock = stock + 1,
