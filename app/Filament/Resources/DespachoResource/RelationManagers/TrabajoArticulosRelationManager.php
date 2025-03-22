@@ -312,7 +312,7 @@ class TrabajoArticulosRelationManager extends RelationManager
                             $data['abiertos'] = $articulo->fraccionable ? $articulo->abiertos : null;
 
                             // Ajustar stock y abiertos según el movimiento
-                            $cantidad = ceil($record->cantidad);
+                            $cantidad = $record->cantidad;
                             $movimiento = $record->movimiento;
 
                             switch ($movimiento) {
