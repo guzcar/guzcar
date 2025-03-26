@@ -13,6 +13,32 @@
 
     <div class="d-flex justify-content-between mb-3">
         <a class="btn btn-light border py-2" href="{{ route('home') }}">Volver</a>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Confirmar todo
+        </button>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmar todo</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Asegúrese de haber recibido y utilizado todos los artículos correctamente antes de confirmar. ¿Está
+                    seguro de continuar?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                    <form action="{{ route('gestion.trabajos.articulos.confirmar.trabajo.todos', $trabajo->id) }}"
+                        method="post">
+                        @csrf
+                        <button type="submit" class="btn btn-success">Confirmar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <ul class="list-group mb-3">
@@ -63,6 +89,13 @@
     @if(session('success'))
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
             {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif

@@ -60,7 +60,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     public function getFilamentAvatarUrl(): ?string
     {
-        return $this->avatar_url ? Storage::url($this->avatar_url) : null ;
+        return $this->avatar_url ? Storage::url($this->avatar_url) : null;
     }
 
     protected static function booted(): void
@@ -98,6 +98,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
     public function trabajos(): BelongsToMany
     {
-        return $this->belongsToMany(Trabajo::class, 'trabajo_tecnicos', 'tecnico_id', 'trabajo_id');
+        return $this->belongsToMany(Trabajo::class, 'trabajo_tecnicos', 'tecnico_id', 'trabajo_id')
+            ->withPivot(['finalizado', 'created_at']);
     }
 }

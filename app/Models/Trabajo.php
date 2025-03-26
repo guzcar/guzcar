@@ -20,7 +20,8 @@ class Trabajo extends Model
         'fecha_ingreso',
         'fecha_salida',
         'descripcion_servicio',
-        'desembolso'
+        'desembolso',
+        'disponible'
     ];
 
     protected $casts = [

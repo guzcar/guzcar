@@ -49,7 +49,7 @@ class ArticuloResource extends Resource
 
     protected static ?string $navigationGroup = 'Logística';
 
-    protected static ?int $navigationSort = 40;
+    protected static ?int $navigationSort = 70;
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 

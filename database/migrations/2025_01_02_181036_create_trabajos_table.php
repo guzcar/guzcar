@@ -28,6 +28,7 @@ return new class extends Migration {
             $table->decimal('importe')->default(0);
             $table->decimal('a_cuenta')->default(0);
             $table->enum('desembolso', ['A CUENTA', 'COBRADO', 'POR COBRAR'])->nullable();
+            $table->boolean('disponible')->default('false');
             $table->timestamps();
             $table->softDeletes();
         });

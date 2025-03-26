@@ -9,23 +9,20 @@ class TrabajoController extends Controller
 {
     /**
      * Mostrar los trabajos disponibles para asignación.
-     * 
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function asignarTrabajos()
     {
-        // Obtener la fecha actual y la de ayer
-        $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
-        $fechaAyer = now()->subDay()->format('Y-m-d'); // Fecha de ayer
+        $hoy = now()->format('Y-m-d');
+        $ayer = now()->subDay()->format('Y-m-d');
 
-        // Obtener trabajos que no tengan fecha_salida o cuya fecha_salida sea igual a la fecha actual o ayer
-        $trabajos = Trabajo::where(function ($query) use ($fechaActual, $fechaAyer) {
-            $query->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
-                ->orWhereDate('fecha_salida', $fechaActual) // Filtra por fecha_salida igual a la fecha actual
-                ->orWhereDate('fecha_salida', $fechaAyer); // Filtra por fecha_salida igual a la fecha de ayer
+        $trabajos = Trabajo::whereDoesntHave('tecnicos', function ($query) {
+            $query->where('tecnico_id', auth()->id());
         })
-            ->whereDoesntHave('tecnicos', function ($query) {
-                $query->where('tecnico_id', auth()->id()); // Filtra por trabajos no asignados al técnico actual
+            ->where(function ($query) use ($hoy, $ayer) {
+                $query->whereNull('fecha_salida')
+                    ->orWhereDate('fecha_salida', $hoy)
+                    ->orWhereDate('fecha_salida', $ayer)
+                    ->orWhere('disponible', true);
             })
             ->orderBy('created_at', 'desc')
             ->get();
@@ -35,61 +32,77 @@ class TrabajoController extends Controller
 
     /**
      * Asignar un trabajo al usuario actual.
-     * 
-     * @param \App\Models\Trabajo $trabajo
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function asignar(Trabajo $trabajo)
     {
-        // Obtener la fecha actual
-        $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
+        $hoy = now()->format('Y-m-d');
+        $ayer = now()->subDay()->format('Y-m-d');
 
-        $user = auth()->user();
+        $puedeAsignar = Trabajo::where('id', $trabajo->id)
+            ->whereDoesntHave('tecnicos', function ($query) {
+                $query->where('tecnico_id', auth()->id());
+            })
+            ->where(function ($query) use ($hoy, $ayer) {
+                $query->whereNull('fecha_salida')
+                    ->orWhereDate('fecha_salida', $hoy)
+                    ->orWhereDate('fecha_salida', $ayer)
+                    ->orWhere('disponible', true);
+            })
+            ->exists();
 
-        if ($trabajo->fecha_salida !== null && $trabajo->fecha_salida < $fechaActual) {
-            abort(403, 'Forbidden');
+        if (!$puedeAsignar) {
+            abort(403, 'No tienes permiso para asignar este trabajo');
         }
 
-        $trabajo->usuarios()->attach($user->id);
+        auth()->user()->trabajos()->attach($trabajo->id, [
+            'finalizado' => false,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
 
-        return redirect()->route('home')->with('success', 'Trabajo asignado correctamente.');
+        return redirect()->route('home')->with('success', 'Trabajo asignado correctamente');
     }
 
     /**
      * Finalizar un trabajo asignado.
-     * 
-     * @param \App\Models\Trabajo $trabajo
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function finalizar(Trabajo $trabajo)
     {
-        $user = auth()->user();
+        // Verificar si el trabajo está asignado y no finalizado
+        $trabajoAsignado = auth()->user()->trabajos()
+            ->where('trabajo_id', $trabajo->id)
+            ->wherePivot('finalizado', false)
+            ->exists();
 
-        if (!$trabajo->usuarios()->where('tecnico_id', $user->id)->exists()) {
-            abort(403, 'Forbidden');
+        if (!$trabajoAsignado) {
+            abort(403, 'No puedes finalizar un trabajo no asignado o ya finalizado');
         }
 
-        $trabajo->usuarios()->updateExistingPivot($user->id, ['finalizado' => true]);
+        auth()->user()->trabajos()->updateExistingPivot($trabajo->id, [
+            'finalizado' => true,
+            'updated_at' => now()
+        ]);
 
-        return redirect()->route('home')->with('success', 'Trabajo finalizado correctamente.');
+        return redirect()->route('home')->with('success', 'Trabajo finalizado correctamente');
     }
 
     /**
      * Abandonar un trabajo asignado.
-     * 
-     * @param \App\Models\Trabajo $trabajo
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function abandonar(Trabajo $trabajo)
     {
-        $user = auth()->user();
+        // Verificar si el trabajo está asignado y no finalizado
+        // $trabajoAsignado = auth()->user()->trabajos()
+        //     ->where('trabajo_id', $trabajo->id)
+        //     ->wherePivot('finalizado', false)
+        //     ->exists();
 
-        if (!$trabajo->usuarios()->where('tecnico_id', $user->id)->exists()) {
-            abort(403, 'Forbidden');
-        }
+        // if (!$trabajoAsignado) {
+        //     abort(403, 'No puedes abandonar un trabajo no asignado o ya finalizado');
+        // }
 
-        $trabajo->usuarios()->detach($user->id);
+        auth()->user()->trabajos()->detach($trabajo->id);
 
-        return redirect()->route('home')->with('success', 'Has abandonado el trabajo.');
+        return redirect()->route('home')->with('success', 'Has abandonado el trabajo');
     }
 }

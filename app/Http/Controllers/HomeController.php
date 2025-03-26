@@ -13,24 +13,26 @@ class HomeController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function index()
-    {
-        $user = auth()->user();
+{
+    $user = auth()->user();
 
-        // Obtener la fecha actual y la de ayer
-        $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
-        $fechaAyer = now()->subDay()->format('Y-m-d'); // Fecha de ayer
+    // Fechas para comparación
+    $hoy = now()->format('Y-m-d');
+    $ayer = now()->subDay()->format('Y-m-d');
 
-        // Obtener trabajos asignados al usuario con fecha_salida == null, hoy o ayer
-        $trabajos = $user->trabajos()
-            ->orderBy('created_at', 'desc')
-            ->where(function ($query) use ($fechaActual, $fechaAyer) {
-                $query->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
-                    ->orWhereDate('fecha_salida', $fechaActual) // Filtra por fecha_salida igual a la fecha actual
-                    ->orWhereDate('fecha_salida', $fechaAyer); // Filtra por fecha_salida igual a la fecha de ayer
-            })
-            ->wherePivot('finalizado', false) // Filtra por finalizado == false en la tabla intermedia
-            ->get();
+    // Primero: Solo mis vehículos asignados no finalizados
+    $trabajos = $user->trabajos()
+        ->wherePivot('finalizado', false)
+        ->where(function ($query) use ($hoy, $ayer) {
+            // Segundo: De esos, solo los que cumplen condiciones de fecha o disponibilidad
+            $query->whereNull('fecha_salida')
+                ->orWhereDate('fecha_salida', $hoy)
+                ->orWhereDate('fecha_salida', $ayer)
+                ->orWhere('disponible', true); // Permiso especial
+        })
+        ->orderBy('trabajo_tecnicos.created_at', 'desc') // Ordenar por created_at de la tabla intermedia
+        ->get();
 
-        return view('home', compact('trabajos'));
-    }
+    return view('home', compact('trabajos'));
+}
 }
