@@ -15,7 +15,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td style="width: 50px">Placa</td>
+                            <td style="width: 80px">Placa</td>
                             <td>{{ $vehiculo->placa }}</td>
                         </tr>
                         <tr>
@@ -63,12 +63,12 @@
         </tr>
     </table>
 
-    <h3>SERVICIOS EJECUTADOS</h3>
+    <h3>SERVICIOS</h3>
 
     <table class="table-container">
         <thead>
             <tr>
-                <th style="width: 95px">Cantidad</th>
+                <th style="width: 80px">Cantidad</th>
                 <th>Descripción</th>
                 <th style="width: 95px">Costo</th>
                 <th style="width: 100px">Sub-Total</th>
@@ -78,7 +78,10 @@
             @forelse($trabajo->servicios as $trabajoServicio)
                 <tr>
                     <td style="text-align: center">{{ $trabajoServicio->cantidad }}</td>
-                    <td>{{ $trabajoServicio->servicio->nombre }}</td>
+                    <td>
+                        <p style="margin: 0px;"><b>{{ $trabajoServicio->servicio->nombre }}</b></p>
+                        <p style="margin: 0px;">{{ $trabajoServicio->detalle }}</p>
+                    </td>
                     <td style="text-align: right">S/ {{ $trabajoServicio->precio }}</td>
                     <td style="text-align: right">S/
                         {{ number_format($trabajoServicio->cantidad * $trabajoServicio->precio, 2, '.', '') }}
@@ -104,7 +107,7 @@
     <table class="table-container">
         <thead>
             <tr>
-                <th style="width: 95px">Cantidad</th>
+                <th style="width: 80px">Cantidad</th>
                 <th>Descripción</th>
                 <th style="width: 95px">Costo</th>
                 <th style="width: 100px">Sub-Total</th>
@@ -171,7 +174,10 @@
             @empty
                 @if($articulosAgrupados->isEmpty()) <!-- Si no hay artículos ni trabajo_otros -->
                     <tr>
-                        <td class="empty-case" colspan="4">No hay repuestos, materiales u otros.</td>
+                        <td class="empty-case"></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                 @endif
             @endforelse
@@ -205,18 +211,32 @@
                 <td style="border: 0"></td>
                 <td style="border: 0;">Total:</td>
                 <th style="width: 100px; text-align: right;">
-                    S/ {{ number_format($total * (1 + request('igv_porcentaje') / 100), 2, '.', '') }}</th>
+                    S/ {{ number_format($total_con_igv = $total * (1 + request('igv_porcentaje') / 100), 2, '.', '') }}</th>
             </tr>
         @else
             <tr>
                 <td style="border: 0"></td>
                 <td style="border: 0; width: 95px;">Total:</td>
-                <th style="width: 100px; text-align: right;">S/ {{ number_format($total, 2, '.', '') }}</th>
+                <th style="width: 100px; text-align: right;">S/ {{ number_format($total_con_igv = $total, 2, '.', '') }}
+                </th>
             </tr>
         @endif
     </table>
 
-    {{-- Fin de la parte que quiero mejorar --}}
+    @php
+        // Usamos $total_con_igv que ya contiene el monto correcto (con o sin IGV)
+        $numberToWords = new NumberToWords\NumberToWords();
+        $numberTransformer = $numberToWords->getNumberTransformer('es');
+
+        // Separar parte entera y decimal
+        $entero = floor($total_con_igv);
+        $decimal = round(($total_con_igv - $entero) * 100);
+
+        // Convertir a palabras y formatear
+        $palabras = strtoupper($numberTransformer->toWords($entero)) . " CON $decimal/100 SOLES";
+    @endphp
+
+    <p>SON: {{ $palabras }}</p>
 
     <p>Tiempo de ejecución: <b>{{ $tiempo }}</b></p>
 

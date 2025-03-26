@@ -21,6 +21,7 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -320,6 +321,9 @@ class TrabajoResource extends Resource
                                     ->hiddenOn('edit'),
                                 Section::make()
                                     ->schema([
+                                        Toggle::make('disponible')
+                                            ->label('Activar fuera de plazo')
+                                            ->hiddenOn('create'),
                                         Repeater::make('tecnicos')
                                             ->label('')
                                             ->createItemButtonLabel('Añadir técnico')
@@ -346,6 +350,16 @@ class TrabajoResource extends Resource
                                                             ->columnSpan(1)
                                                     ])
                                                     ->columns(3),
+                                                // Grid::make()
+                                                //     ->schema([
+                                                //         Placeholder::make('created_at')
+                                                //             ->label('Fecha de asignación')
+                                                //             ->content(fn($record) => $record->created_at->format('d/m/Y H:i:s')),
+                                                //         Placeholder::make('updated_at')
+                                                //             ->label('Fecha de culminación')
+                                                //             ->content(fn($record) => $record ? $record->updated_at->format('d/m/Y H:i:s') : 'No culminado')
+                                                //     ])
+                                                //     ->columns(2)
                                             ])
                                             ->collapsed()
                                             ->itemLabel(fn(array $state): ?string => $state['tecnico_id'] ? User::withTrashed()->find($state['tecnico_id'])->name : null)

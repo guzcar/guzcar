@@ -49,7 +49,7 @@ class SalidaResource extends Resource
 
     protected static ?string $navigationGroup = 'Logística';
 
-    protected static ?int $navigationSort = 60;
+    protected static ?int $navigationSort = 40;
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
 

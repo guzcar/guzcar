@@ -57,6 +57,8 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'trabajo'])->name('gestion.trabajos.articulos');
     Route::post('/trabajos/{trabajoArticulo}/articulos-trabajo', [ArticuloController::class, 'confirmarTrabajo'])->name('gestion.trabajos.articulos.confirmar.trabajo');
     Route::post('/trabajos/{trabajoArticulo}/articulos-index', [ArticuloController::class, 'confirmarIndex'])->name('gestion.trabajos.articulos.confirmar.index');
+    Route::post('/trabajos/{trabajo}/articulos-trabajo-todos', [ArticuloController::class, 'confirmarTrabajoTodos'])->name('gestion.trabajos.articulos.confirmar.trabajo.todos');
+    Route::post('/trabajos/articulos-index-todos', [ArticuloController::class, 'confirmarIndexTodos'])->name('gestion.trabajos.articulos.confirmar.index.todos');
 
     // Consulta Vehicular
     Route::get('/consulta-vehicular', [VehiculoController::class, 'consultaVehicular'])->name('consulta.vehicular');

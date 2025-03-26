@@ -20,6 +20,7 @@ return new class extends Migration {
                 ->constrained('servicios')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
+            $table->text('detalle')->nullable();
             $table->decimal('precio');
             $table->unsignedInteger('cantidad')->default(1);
             $table->timestamps();

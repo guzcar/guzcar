@@ -10,13 +10,48 @@
     @endpush
 
     <h1 class="mb-3">Artículos</h1>
-    <a class="btn btn-light border mb-3 py-2" href="{{ route('home') }}">Volver al Inicio</a>
+
+    <div class="d-flex justify-content-between mb-3">
+        <a class="btn btn-light border py-2" href="{{ route('home') }}">Volver al Inicio</a>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Confirmar Semana
+        </button>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmar todo</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Por favor, confirme que ha recibido y utilizado todos los artículos correctamente antes de proceder
+                    con la confirmación. ¿Está seguro de que todo está en orden?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                    <form action="{{ route('gestion.trabajos.articulos.confirmar.index.todos') }}" method="post">
+                        @csrf
+                        <button type="submit" class="btn btn-success">Confirmar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <p>Esta es la lista de artículos que solicitaste del almacén en esta semana.</p>
 
     @if(session('success'))
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
             {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif

@@ -38,7 +38,7 @@ class DespachoResource extends Resource
 
     protected static ?string $navigationGroup = 'Logística';
 
-    protected static ?int $navigationSort = 70;
+    protected static ?int $navigationSort = 50;
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox-stack';
 

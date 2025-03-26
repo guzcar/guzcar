@@ -6,6 +6,7 @@ use App\Models\Servicio;
 use App\Models\TrabajoServicio;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -66,6 +67,8 @@ class ServiciosRelationManager extends RelationManager
                         }
                     })
                     ->columnSpanFull(),
+                Textarea::make('detalle')
+                    ->columnSpanFull(),
                 TextInput::make('precio')
                     ->numeric()
                     ->prefix('S/ ')
@@ -86,6 +89,9 @@ class ServiciosRelationManager extends RelationManager
                 TextColumn::make('servicio.nombre')
                     ->wrap()
                     ->lineClamp(2),
+                TextColumn::make('detalle')
+                    ->wrap()
+                    ->lineClamp(3),
                 TextColumn::make('precio')
                     ->prefix('S/ ')
                     ->alignRight(),
