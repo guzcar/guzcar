@@ -87,6 +87,33 @@ class Trabajo extends Model
         return $this->hasMany(TrabajoOtro::class, 'trabajo_id');
     }
 
+    public function descuentos(): HasMany
+    {
+        return $this->hasMany(TrabajoDescuento::class, 'trabajo_id');
+    }
+
+    public function importe(): float
+    {
+        $total = 0;
+
+        // Sumar servicios (precio * cantidad)
+        $total += $this->servicios->sum(function ($servicio) {
+            return $servicio->precio * $servicio->cantidad;
+        });
+
+        // Sumar artículos con presupuesto=true (precio * cantidad)
+        $total += $this->trabajoArticulos->where('presupuesto', true)->sum(function ($articulo) {
+            return $articulo->precio * $articulo->cantidad;
+        });
+
+        // Sumar otros conceptos (precio * cantidad)
+        $total += $this->otros->sum(function ($otro) {
+            return $otro->precio * $otro->cantidad;
+        });
+
+        return (float) $total;
+    }
+
     /**
      * Calcula la diferencia entre el importe total y los pagos realizados.
      *
@@ -95,8 +122,8 @@ class Trabajo extends Model
     public function getPorCobrar(): float
     {
         // Obtener los valores de importe y a_cuenta (y convertirlos a float)
-        $importe = (float)$this->importe;
-        $aCuenta = (float)$this->a_cuenta;
+        $importe = (float) $this->importe;
+        $aCuenta = (float) $this->a_cuenta;
 
         // Calcular la diferencia
         $porCobrar = $importe - $aCuenta;

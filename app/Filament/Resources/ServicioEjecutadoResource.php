@@ -60,8 +60,14 @@ class ServicioEjecutadoResource extends Resource
                 ColumnGroup::make('Trabajo', [
                     TextColumn::make('trabajo.codigo')
                         ->label('Código')
-                        ->searchable(isIndividual: true)
-                        ->url(fn($record) => TrabajoResource::getUrl('edit', ['record' => $record->trabajo_id]))
+                        ->searchable(isIndividual: true)->url(function (TrabajoServicio $record): ?string {
+                            if (auth()->user()->can('update_trabajo')) {
+                                return TrabajoResource::getUrl('edit', ['record' => $record->trabajo]);
+                            } elseif (auth()->user()->can('view_trabajo')) {
+                                return TrabajoResource::getUrl('view', ['record' => $record->trabajo]);
+                            }
+                            return null;
+                        })
                         ->color('primary'),
                     TextColumn::make('trabajo.fecha_ingreso')
                         ->label('Fecha de Ingreso')

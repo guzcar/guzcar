@@ -131,10 +131,11 @@ class DespachoResource extends Resource
                     ->placeholder('Sin trabajo')
                     ->sortable()
                     ->searchable(isIndividual: true)
-                    ->url(function ($record) {
-                        if ($record->trabajo) {
-                            return TrabajoResource::getUrl('edit', ['record' => $record->trabajo->id]);
-                            // return "{$url}?activeRelationManager=2";
+                    ->url(function (Despacho $record): ?string {
+                        if ($record->trabajo && auth()->user()->can('update_trabajo')) {
+                            return TrabajoResource::getUrl('edit', ['record' => $record->trabajo]);
+                        } elseif ($record->trabajo && auth()->user()->can('view_trabajo')) {
+                            return TrabajoResource::getUrl('view', ['record' => $record->trabajo]);
                         }
                         return null;
                     })
