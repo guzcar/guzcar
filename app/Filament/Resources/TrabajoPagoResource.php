@@ -64,9 +64,14 @@ class TrabajoPagoResource extends Resource
                 ColumnGroup::make('Trabajo', [
                     TextColumn::make('trabajo.codigo')
                         ->label('Código')
-                        ->searchable(isIndividual: true)->url(function ($record) {
-                            return TrabajoResource::getUrl('edit', ['record' => $record->trabajo_id]);
-                            // return "{$url}?activeRelationManager=3";
+                        ->searchable(isIndividual: true)
+                        ->url(function (TrabajoPago $record): ?string {
+                            if ($record->trabajo && auth()->user()->can('update_trabajo')) {
+                                return TrabajoResource::getUrl('edit', ['record' => $record->trabajo]);
+                            } elseif ($record->trabajo && auth()->user()->can('view_trabajo')) {
+                                return TrabajoResource::getUrl('view', ['record' => $record->trabajo]);
+                            }
+                            return null;
                         })
                         ->color('primary'),
                     TextColumn::make('trabajo.fecha_ingreso')

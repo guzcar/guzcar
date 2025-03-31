@@ -476,6 +476,8 @@ class TrabajoResource extends Resource
                     ->prefix('S/ ')
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
                     ->toggleable(isToggledHiddenByDefault: false),
+                // TextColumn::make('importe_2')
+                //     ->getStateUsing(function),
                 TextColumn::make('a_cuenta')
                     ->alignRight()
                     ->prefix('S/ ')
@@ -510,6 +512,8 @@ class TrabajoResource extends Resource
             ->recordUrl(function (Trabajo $record): ?string {
                 if (auth()->user()->can('update_trabajo')) {
                     return static::getUrl('edit', ['record' => $record]);
+                } elseif (auth()->user()->can('view_trabajo')) {
+                    return static::getUrl('view', ['record' => $record]);
                 }
                 return null;
             })

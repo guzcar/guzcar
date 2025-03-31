@@ -214,7 +214,7 @@ return new class extends Migration {
             AFTER INSERT ON trabajo_otros
             FOR EACH ROW
             BEGIN
-                DECLARE total_articulos DECIMAL(10, 2);
+                DECLARE total_articulos  DECIMAL(10, 2);
                 DECLARE total_servicios DECIMAL(10, 2);
                 DECLARE total_otros DECIMAL(10, 2);
 

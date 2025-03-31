@@ -305,9 +305,9 @@ class SalidaResource extends Resource
                                                     ->orderBy('created_at', 'desc')
                                                     ->get()
                                                     ->mapWithKeys(function ($trabajo) {
-                                                        $label = "{$trabajo->vehiculo->placa} {$trabajo->vehiculo->tipoVehiculo->nombre} {$trabajo->vehiculo->marca} {$trabajo->vehiculo->modelo} {$trabajo->vehiculo->color} ({$trabajo->codigo})";
-                                                        return [$trabajo->id => $label];
-                                                    });
+                                                    $label = "{$trabajo->vehiculo->placa} {$trabajo->vehiculo->tipoVehiculo->nombre} {$trabajo->vehiculo->marca} {$trabajo->vehiculo->modelo} {$trabajo->vehiculo->color} ({$trabajo->codigo})";
+                                                    return [$trabajo->id => $label];
+                                                });
                                             })
                                             ->searchable()
                                             ->preload(),
@@ -371,10 +371,12 @@ class SalidaResource extends Resource
                         ->sortable(),
                     TextColumn::make('responsable.name')
                         ->label('Entrega')
+                        ->formatStateUsing(fn(string $state): string => explode(' ', $state)[0])
                         ->searchable(isIndividual: true)
                         ->sortable(),
                     TextColumn::make('tecnico.name')
                         ->label('Recibe')
+                        ->formatStateUsing(fn(string $state): string => explode(' ', $state)[0])
                         ->searchable(isIndividual: true)
                         ->sortable(),
                     ToggleColumn::make('confirmado')
@@ -386,49 +388,94 @@ class SalidaResource extends Resource
                         ->offIcon('heroicon-c-x-mark'),
                 ]),
                 ColumnGroup::make('Artículo', [
+                    TextColumn::make('articulo')
+                        ->label('Descripción del artículo')
+                        ->state(function (TrabajoArticulo $record) {
+                            $articulo = $record->articulo;
+
+                            // Campos que se concatenarán en el label
+                            $categoria = $articulo->categoria->nombre ?? null; // Acceder directamente a la categoría
+                            $marca = $articulo->marca->nombre ?? null; // Acceder al nombre de la marca
+                            $subCategoria = $articulo->subCategoria->nombre ?? null;
+                            $especificacion = $articulo->especificacion ?? null;
+                            $presentacion = $articulo->presentacion->nombre ?? null; // Acceder al nombre de la presentación
+                            $medida = $articulo->medida ?? null;
+                            $unidad = $articulo->unidad->nombre ?? null; // Acceder al nombre de la unidad
+                            $color = $articulo->color ?? null;
+
+                            // Construye el label dinámicamente
+                            $labelParts = [];
+                            if ($categoria)
+                                $labelParts[] = $categoria;
+                            if ($marca)
+                                $labelParts[] = $marca;
+                            if ($subCategoria)
+                                $labelParts[] = $subCategoria;
+                            if ($especificacion)
+                                $labelParts[] = $especificacion;
+                            if ($presentacion)
+                                $labelParts[] = $presentacion;
+                            if ($medida)
+                                $labelParts[] = $medida;
+                            if ($unidad)
+                                $labelParts[] = $unidad;
+                            if ($color)
+                                $labelParts[] = $color;
+
+                            // Une las partes con un espacio
+                            $label = implode(' ', $labelParts);
+
+                            return $label;
+                        }),
                     TextColumn::make('articulo.categoria.nombre')
                         ->label('Artículo')
                         ->searchable(isIndividual: true)
-                        ->sortable(),
+                        ->sortable()
+                        ->toggleable(isToggledHiddenByDefault: true),
                     TextColumn::make('articulo.marca.nombre')
                         ->label('Marca')
                         ->placeholder('Sin marca')
                         ->sortable()
-                        ->searchable(isIndividual: true),
+                        ->searchable(isIndividual: true)
+                        ->toggleable(isToggledHiddenByDefault: true),
                     TextColumn::make('articulo.subcategoria.nombre')
                         ->placeholder('Sin grado o número')
                         ->label('Grado / Número')
                         ->searchable(isIndividual: true)
-                        ->sortable(),
+                        ->sortable()
+                        ->toggleable(isToggledHiddenByDefault: true),
                     TextColumn::make('articulo.especificacion')
                         ->label('Especificación')
                         ->placeholder('Sin especificación')
                         ->searchable(isIndividual: true)
                         ->sortable()
-                        ->toggleable(isToggledHiddenByDefault: false),
+                        ->toggleable(isToggledHiddenByDefault: true),
                     TextColumn::make('articulo.presentacion.nombre')
                         ->label('Presentación')
                         ->placeholder('Sin presentación')
                         ->sortable()
-                        ->searchable(isIndividual: true),
+                        ->searchable(isIndividual: true)
+                        ->toggleable(isToggledHiddenByDefault: true),
                     TextColumn::make('articulo.medida')
                         ->label('Medida')
                         ->placeholder('0.00')
                         ->alignCenter()
                         ->sortable()
-                        ->searchable(),
+                        ->searchable()
+                        ->toggleable(isToggledHiddenByDefault: true),
                     TextColumn::make('articulo.unidad.nombre')
                         ->label('Unidad')
                         ->placeholder('N/A')
                         ->alignCenter()
                         ->sortable()
-                        ->searchable(),
+                        ->searchable()
+                        ->toggleable(isToggledHiddenByDefault: true),
                     TextColumn::make('articulo.color')
                         ->label('Color')
                         ->placeholder('Sin color')
                         ->sortable()
                         ->searchable(isIndividual: true)
-                        ->toggleable(isToggledHiddenByDefault: false),
+                        ->toggleable(isToggledHiddenByDefault: true),
                 ]),
                 ColumnGroup::make('Salida', [
                     TextColumn::make('precio')
@@ -447,10 +494,11 @@ class SalidaResource extends Resource
                     TextColumn::make('trabajo.codigo')
                         ->label('Código')
                         ->searchable(isIndividual: true)
-                        ->url(function ($record) {
-                            if ($record->trabajo) {
-                                return TrabajoResource::getUrl('edit', ['record' => $record->trabajo->id]);
-                                // return "{$url}?activeRelationManager=2";
+                        ->url(function (TrabajoArticulo $record): ?string {
+                            if ($record->trabajo && auth()->user()->can('update_trabajo')) {
+                                return TrabajoResource::getUrl('edit', ['record' => $record->trabajo]);
+                            } elseif ($record->trabajo && auth()->user()->can('view_trabajo')) {
+                                return TrabajoResource::getUrl('view', ['record' => $record->trabajo]);
                             }
                             return null;
                         })
