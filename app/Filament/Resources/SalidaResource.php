@@ -532,7 +532,7 @@ class SalidaResource extends Resource
                         ->placeholder('Sin Vehiculo')
                         ->searchable(isIndividual: true),
                 ]),
-                TextColumn::make('observación')
+                TextColumn::make('observacion')
                     ->placeholder('Sin observación')
                     ->extraAttributes(['style' => 'width: 15rem'])
                     ->lineClamp(2)
