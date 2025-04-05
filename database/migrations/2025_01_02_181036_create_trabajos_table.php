@@ -13,9 +13,19 @@ return new class extends Migration {
         Schema::create('trabajos', function (Blueprint $table) {
             $table->id();
             $table->boolean('control')->default(false);
-            $table->string('codigo', 16)->unique();
+            $table->string('codigo', 29)->unique();
+            $table->foreignId('cliente_id')
+                ->nullable()
+                ->constrained('clientes')
+                ->onDelete('restrict')
+                ->onUpdate('cascade');
             $table->foreignId('vehiculo_id')
                 ->constrained('vehiculos')
+                ->onDelete('restrict')
+                ->onUpdate('cascade');
+            $table->foreignId('conductor_id')
+                ->nullable()
+                ->constrained('clientes')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
             $table->foreignId('taller_id')
@@ -24,11 +34,14 @@ return new class extends Migration {
                 ->onUpdate('cascade');
             $table->date('fecha_ingreso');
             $table->date('fecha_salida')->nullable();
+            $table->decimal('kilometraje', 10, 2)->nullable();
             $table->text('descripcion_servicio');
             $table->decimal('importe')->default(0);
             $table->decimal('a_cuenta')->default(0);
             $table->enum('desembolso', ['A CUENTA', 'COBRADO', 'POR COBRAR'])->nullable();
             $table->boolean('disponible')->default('false');
+            $table->string('garantia')->nullable();
+            $table->text('observaciones')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -38,7 +51,7 @@ return new class extends Migration {
             BEFORE INSERT ON trabajos
             FOR EACH ROW
             BEGIN
-                DECLARE placa_vehiculo VARCHAR(7);
+                DECLARE placa_vehiculo VARCHAR(20);
                 DECLARE fecha_base VARCHAR(6);
                 DECLARE hora_base INT;
                 DECLARE hora_actual INT;

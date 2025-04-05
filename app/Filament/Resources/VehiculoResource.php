@@ -73,7 +73,7 @@ class VehiculoResource extends Resource
                                     ->required(),
                                 TextInput::make('placa')
                                     ->unique(ignoreRecord: true)
-                                    ->maxLength(7)
+                                    ->maxLength(20)
                                     ->placeholder('ABC-123'),
                                 TextInput::make('marca')
                                     ->required()
@@ -83,6 +83,14 @@ class VehiculoResource extends Resource
                                     ->maxLength(255),
                                 TextInput::make('color')
                                     ->required()
+                                    ->maxLength(255),
+                                TextInput::make('vin')
+                                    ->label('VIN / Chasis')
+                                    ->maxLength(255),
+                                TextInput::make('motor')
+                                    ->maxLength(255),
+                                TextInput::make('ano')
+                                    ->label('Año del modelo')
                                     ->maxLength(255),
                             ])
                             ->heading('Vehículo')
@@ -109,7 +117,9 @@ class VehiculoResource extends Resource
                                                     ->maxLength(255),
                                                 PhoneInput::make('telefono')
                                                     ->defaultCountry('PE')
-                                                    ->initialCountry('pe')
+                                                    ->initialCountry('pe'),
+                                                TextInput::make('direccion')
+                                                    ->label('Dirección')
                                             ])
                                             ->createOptionUsing(function (array $data): int {
                                                 return Cliente::create($data)->getKey();
@@ -125,7 +135,9 @@ class VehiculoResource extends Resource
                                                     ->maxLength(255),
                                                 PhoneInput::make('telefono')
                                                     ->defaultCountry('PE')
-                                                    ->initialCountry('pe')
+                                                    ->initialCountry('pe'),
+                                                TextInput::make('direccion')
+                                                    ->label('Dirección')
                                             ])
                                             ->getOptionLabelUsing(function ($value): ?string {
                                                 $cliente = Cliente::withTrashed()->find($value);

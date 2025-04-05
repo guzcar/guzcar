@@ -88,10 +88,11 @@ class ServiciosRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('servicio.nombre')
                     ->wrap()
-                    ->lineClamp(2),
+                    ->lineClamp(3),
                 TextColumn::make('detalle')
                     ->wrap()
-                    ->lineClamp(3),
+                    ->lineClamp(3)
+                    ->placeholder('Sin detalles'),
                 TextColumn::make('precio')
                     ->prefix('S/ ')
                     ->alignRight(),

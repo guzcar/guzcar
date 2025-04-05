@@ -8,7 +8,8 @@
     <style>
         @page {
             size: A4;
-            margin: 80px 80px 0px 80px;
+            margin: 130px 80px 0px 80px;
+            /* Ajustado margen superior para el header */
         }
 
         body {
@@ -21,29 +22,29 @@
 
         header {
             position: fixed;
-            top: -55px;
+            top: -100px;
+            /* Ajustado para coincidir con el margen superior de @page */
             left: 0;
             right: 0;
-            height: 40px;
-            text-align: center;
+            height: 70px;
+            /* Aumentado para mejor espacio */
+            margin-bottom: 20px;
+            /* Espacio adicional después del header */
         }
 
         .header-logo {
-            position: absolute;
-            width: 60px;
+            width: 150px;
         }
 
         .header-title {
-            color: rgb(0, 80, 150);
-            font-size: 22px;
+            color: rgb(31, 62, 129);
             font-weight: bold;
-            margin-top: 8px;
-            padding-right: 70px;
         }
 
         footer {
             position: fixed;
-            bottom: 0;
+            bottom: 0px;
+            /* Ajustado para coincidir con el margen inferior */
             left: 0;
             right: 0;
             height: 50px;
@@ -51,18 +52,9 @@
             font-size: 11px;
         }
 
-        .header-line {
-            border: 2x solid rgb(180, 0, 0);
-        }
-
-        .footer-line {
-            border-top: 2px solid rgb(180, 0, 0);
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        .footer-text {
-            color: rgb(0, 80, 150);
+        /* Resto de tus estilos permanecen igual */
+        .border-top {
+            border-top: 1px solid black;
         }
 
         .watermark {
@@ -75,41 +67,87 @@
             z-index: -1;
         }
 
-        .content {
-            text-align: justify;
-            margin-bottom: 50px;
-        }
-
-        .table-info {
-            margin-left: auto;
-            margin-top: -32px;
-            border-collapse: collapse;
-            text-align: center;
-        }
-
-        .table-info th,
-        .table-info td {
-            padding: 1px 3px;
-            border: 1px solid #000;
-        }
-
-        .table-container {
+        .table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        .table-container th,
-        .table-container td {
-            padding: 1px 3px;
-            border: 1px solid #000;
+        .table th {
+            /* border-bottom: 1px solid black;
+            border-top: 1px solid black; */
+            color: white;
+            background-color: rgb(31, 62, 129);
         }
 
-        .table-container th {
-            background-color: rgb(180, 198, 231);
+        .table tr:nth-child(even) {
+            background-color: rgba(100, 100, 100, 0.25);
         }
 
-        .empty-case {
-            padding: 0.5rem !important;
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .content {
+            margin-top: 30px;
+            /* Espacio adicional después del header */
+            margin-bottom: 60px;
+            /* Espacio adicional antes del footer */
+        }
+
+        .m-0 {
+            margin: 0;
+        }
+
+        .mb-0 {
+            margin-bottom: 0;
+        }
+
+        .mt-0 {
+            margin-top: 0;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .w-150 {
+            width: 150px;
+        }
+
+        .w-200 {
+            width: 200px;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .table-simple {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .table-simple td {
+            padding: 1px 0;
+            vertical-align: bottom;
+        }
+
+        .table-header {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table-header td {
+            padding: 1px 0;
         }
     </style>
 
@@ -118,29 +156,54 @@
 
 <body>
 
-    <!-- HEADER -->
     <header>
-        <img src="{{ public_path('images/logo-kia.jpg') }}" class="header-logo">
-        <div class="header-title">AUTOMOTORES GUZCAR S.A.C.</div>
-        <table class="table-info">
-            <tr>
-                <th style="width: 130px;">{{ date('d / m / Y') }}</th>
-            </tr>
-            <tr>
-                <td>{{ $code ?? 'CODIGO' }}</td>
-            </tr>
+        <table class="table-header">
+            <tbody>
+                <tr style="height: 100%;">
+                    <td class="text-left" style="padding: 0px 5px 0px 0px; vertical-align: top;">
+                        <img src="{{ public_path('images/logo-guzcar.jpg') }}" class="header-logo">
+                    </td>
+                    <td class="text-left" style="vertical-align: middle;">
+                        <p class="header-title mt-0">AUTOMOTORES GUZCAR S.A.C.</p>
+                        <p class="m-0">Prolong. Leoncio Prado Nro. 1575 P.J. Miramar Alto</p>
+                        <p class="m-0">ENTEL. 998248543 - CHIMBOTE</p>
+                    </td>
+                    <td style="
+                        border: 1px solid lightgray;
+                        border-radius: 10px;
+                        width: 150px;
+                        text-align: center;
+                        padding: 5px 0;
+                        height: 100%;
+                        display: table-cell;
+                        vertical-align: middle;
+                        position: relative;
+                        background-color: ghostwhite;
+                    ">
+                        <div style="
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            width: calc(100% - 10px);
+                        ">
+                            <p class="bold mt-0">RUC: 20600613716</p>
+                            <p class="m-0">{{ $code ?? 'CODIGO' }}</p>
+                            <p class="m-0">{{ date('d/m/Y h:i:s') }}</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
         </table>
-        <hr class="header-line">
+        <div style="border-bottom: solid black 1px; padding-top: 10px;"></div>
     </header>
 
-    <!-- FOOTER -->
     <footer>
-        <div class="footer-line"></div>
-        <div class="footer-text">PROLG. LEONCIO PRADO 1575 - PJ. MIRAMAR ALTO</div>
-        <div class="footer-text">ENTEL. 998248543 - CHIMBOTE</div>
+        <div class="border-top" style="margin-bottom: 10px;"></div>
+        <div>Prolong. Leoncio Prado Nro. 1575 P.J. Miramar Alto</div>
+        <div>ENTEL. 998248543 - CHIMBOTE</div>
     </footer>
 
-    <!-- MARCA DE AGUA -->
     <img src="{{ public_path('images/logo-kia.jpg') }}" class="watermark">
 
     <div class="content">

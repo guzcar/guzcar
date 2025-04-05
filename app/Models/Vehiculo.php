@@ -18,6 +18,9 @@ class Vehiculo extends Model
         'marca',
         'modelo',
         'color',
+        'vin',
+        'motor',
+        'ano',
         'tipo_vehiculo_id',
     ];
 

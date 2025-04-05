@@ -16,6 +16,9 @@ return new class extends Migration {
             $table->string('marca');
             $table->string('modelo')->nullable();
             $table->string('color');
+            $table->string('vin')->nullable();
+            $table->string('motor')->nullable();
+            $table->unsignedSmallInteger('ano')->nullable();
             $table->foreignId('tipo_vehiculo_id')
                 ->constrained('tipo_vehiculos')
                 ->onDelete('restrict')

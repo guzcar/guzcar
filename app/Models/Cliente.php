@@ -14,7 +14,8 @@ class Cliente extends Model
     protected $fillable = [
         'identificador',
         'nombre',
-        'telefono'
+        'telefono',
+        'direccion',
     ];
 
     public function vehiculos(): BelongsToMany

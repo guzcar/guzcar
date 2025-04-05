@@ -99,6 +99,8 @@ class VentaResource extends Resource
                                         PhoneInput::make('telefono')
                                             ->defaultCountry('PE')
                                             ->initialCountry('pe'),
+                                        TextInput::make('direccion')
+                                            ->label('Dirección')
                                     ])
                                     ->editOptionForm([
                                         TextInput::make('identificador')
@@ -111,6 +113,8 @@ class VentaResource extends Resource
                                         PhoneInput::make('telefono')
                                             ->defaultCountry('PE')
                                             ->initialCountry('pe'),
+                                        TextInput::make('direccion')
+                                            ->label('Dirección')
                                     ]),
 
                                 Select::make('vehiculo_id')
@@ -134,7 +138,7 @@ class VentaResource extends Resource
                                             ->required(),
                                         TextInput::make('placa')
                                             ->unique(ignoreRecord: true)
-                                            ->maxLength(7)
+                                            ->maxLength(20)
                                             ->placeholder('ABC-123'),
                                         TextInput::make('marca')
                                             ->required()
@@ -145,6 +149,14 @@ class VentaResource extends Resource
                                         TextInput::make('color')
                                             ->required()
                                             ->maxLength(255),
+                                        TextInput::make('vin')
+                                            ->label('VIN / Chasis')
+                                            ->maxLength(255),
+                                        TextInput::make('motor')
+                                            ->maxLength(255),
+                                        TextInput::make('ano')
+                                            ->label('Año del modelo')
+                                            ->maxLength(255),
                                     ])
                                     ->editOptionForm([
                                         Select::make('tipo_vehiculo_id')
@@ -154,7 +166,7 @@ class VentaResource extends Resource
                                             ->required(),
                                         TextInput::make('placa')
                                             ->unique(ignoreRecord: true)
-                                            ->maxLength(7),
+                                            ->maxLength(20),
                                         TextInput::make('marca')
                                             ->required()
                                             ->maxLength(255),
@@ -162,6 +174,14 @@ class VentaResource extends Resource
                                             ->maxLength(255),
                                         TextInput::make('color')
                                             ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('vin')
+                                            ->label('VIN / Chasis')
+                                            ->maxLength(255),
+                                        TextInput::make('motor')
+                                            ->maxLength(255),
+                                        TextInput::make('ano')
+                                            ->label('Año del modelo')
                                             ->maxLength(255),
                                     ]),
                             ])->columnSpan(['xl' => 2, 'lg' => 2, 'md' => 2, 'sm' => 2]),
