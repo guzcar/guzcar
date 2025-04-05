@@ -37,7 +37,7 @@ class ViewEntrada extends ViewRecord
             // Action::make('Descargar')
             //     ->icon('heroicon-s-arrow-down-tray')
             //     ->url(
-            //         fn(Trabajo $trabajo): string => route('trabajo.pdf.report', ['trabajo' => $trabajo]),
+            //         fn(Trabajo $trabajo): string => route('trabajo.pdf.presupuesto', ['trabajo' => $trabajo]),
             //         shouldOpenInNewTab: true
             //     )
             //     ->color('gray'),

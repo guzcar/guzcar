@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('identificador', 12)->unique()->nullable();
             $table->string('nombre');
             $table->string('telefono')->nullable();
+            $table->string('direccion')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

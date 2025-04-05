@@ -60,7 +60,7 @@
 
     <h3 style="margin-top: 1rem;">ARTÍCULOS</h3>
 
-    <table class="table">
+    <table class="table-container">
         <thead>
             <tr>
                 <th style="width: 3rem;">N°</th>

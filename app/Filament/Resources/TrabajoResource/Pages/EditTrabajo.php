@@ -27,8 +27,8 @@ class EditTrabajo extends EditRecord
                 ->icon('heroicon-o-eye'),
             ActionGroup::make([
 
-                Action::make('Descargar proforma')
-                    ->icon('heroicon-s-document-text')
+                Action::make('Descargar presupuesto')
+                    ->icon('heroicon-s-document-currency-dollar')
                     ->form([
                         // Grid::make()
                         //     ->schema([
@@ -74,13 +74,20 @@ class EditTrabajo extends EditRecord
                             // 'articulos' => $data['articulos'] ?? true,
                         ];
 
-                        $url = route('trabajo.pdf.report', ['trabajo' => $trabajo] + $params);
+                        $url = route('trabajo.pdf.presupuesto', ['trabajo' => $trabajo] + $params);
                         $livewire->js("window.open('{$url}', '_blank');");
                     })
                     ->modalHeading('Configuración de Descarga')
                     ->modalButton('Descargar')
                     ->modalWidth('md')
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
+
+                Action::make('Descargar proforma')
+                    ->icon('heroicon-s-document-text')
+                    ->url(
+                        fn(Trabajo $trabajo): string => route('trabajo.pdf.proforma', ['trabajo' => $trabajo]),
+                        shouldOpenInNewTab: true
+                    ),
 
                 Action::make('Descargar evidencias')
                     ->icon('heroicon-s-photo')

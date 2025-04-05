@@ -194,30 +194,50 @@
 
     <h3></h3>
 
+    @if($descuentos->isNotEmpty())
+        <table class="table-container" style="margin-bottom: 10px;">
+            <thead>
+                <tr>
+                    <th colspan="3" style="text-align: left;">DESCUENTOS</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($descuentos as $descuento)
+                    <tr>
+                        <td style="width: 70%;">{{ $descuento->detalle }}</td>
+                        <td style="width: 15%; text-align: right;">-{{ $descuento->descuento }}%</td>
+                        <td style="width: 15%; text-align: right;">- S/
+                            {{ number_format($total * ($descuento->descuento / 100), 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+
     <table class="table-container">
         @if (request('igv'))
             <tr>
-                <td style="border: 0"></td>
-                <td style="border: 0; width: 95px;">Sub-Total:</td>
-                <td style="text-align: right;">S/ {{ number_format($total, 2, '.', '') }}</td>
-            </tr>
-            <tr>
-                <td style="border: 0"></td>
-                <td style="border: 0;">IGV ({{ request('igv_porcentaje')}}%):</td>
-                <td style="text-align: right;">S/ {{ number_format($total * request('igv_porcentaje') / 100, 2, '.', '') }}
+                <td style="width: 70%; border: none;">Sub-Total</td>
+                <td style="width: 30%; border: none; text-align: right;">S/ {{ number_format($total_con_descuentos, 2) }}
                 </td>
             </tr>
             <tr>
-                <td style="border: 0"></td>
-                <td style="border: 0;">Total:</td>
-                <th style="width: 100px; text-align: right;">
-                    S/ {{ number_format($total_con_igv = $total * (1 + request('igv_porcentaje') / 100), 2, '.', '') }}</th>
+                <td style="border: none;">IGV ({{ request('igv_porcentaje')}}%)</td>
+                <td style="border: none; text-align: right;">S/
+                    {{ number_format($total_con_descuentos * request('igv_porcentaje') / 100, 2) }}</td>
+            </tr>
+            <tr>
+                <td style="border-top: 1px solid #000;"><strong>TOTAL</strong></td>
+                <td style="border-top: 1px solid #000; text-align: right;">
+                    <strong>S/
+                        {{ number_format($total_con_igv = $total_con_descuentos * (1 + request('igv_porcentaje') / 100), 2) }}</strong>
+                </td>
             </tr>
         @else
             <tr>
-                <td style="border: 0"></td>
-                <td style="border: 0; width: 95px;">Total:</td>
-                <th style="width: 100px; text-align: right;">S/ {{ number_format($total_con_igv = $total, 2, '.', '') }}
+                <td style="width: 70%; border-top: 1px solid #000;"><strong>TOTAL</strong></td>
+                <th style="width: 30%; border-top: 1px solid #000; text-align: right;">
+                    <strong>S/ {{ number_format($total_con_igv = $total_con_descuentos, 2) }}</strong>
                 </th>
             </tr>
         @endif

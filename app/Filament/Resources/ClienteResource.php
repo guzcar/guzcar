@@ -56,7 +56,9 @@ class ClienteResource extends Resource
                     ->maxLength(255),
                 PhoneInput::make('telefono')
                     ->defaultCountry('PE')
-                    ->initialCountry('pe')
+                    ->initialCountry('pe'),
+                TextInput::make('direccion')
+                    ->label('Dirección')
             ]);
     }
 

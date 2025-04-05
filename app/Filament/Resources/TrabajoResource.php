@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TrabajoResource\Pages;
 use App\Filament\Resources\TrabajoResource\RelationManagers;
+use App\Filament\Resources\TrabajoResource\RelationManagers\DescuentosRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\EvidenciasRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\OtrosRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\PagosRelationManager;
@@ -13,6 +14,7 @@ use App\Models\Cliente;
 use App\Models\Servicio;
 use App\Models\Trabajo;
 use App\Models\User;
+use App\Models\Vehiculo;
 use App\Services\TrabajoService;
 use Carbon\Carbon;
 use DateTime;
@@ -23,6 +25,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -93,8 +96,34 @@ class TrabajoResource extends Resource
                                     ->unique(ignoreRecord: true)
                                     ->hiddenOn('create')
                                     ->prefixIcon('heroicon-s-key')
-                                    ->minLength(16)
-                                    ->maxLength(16),
+                                    ->maxLength(29),
+                                Select::make('cliente_id')
+                                    ->label('Cliente')
+                                    ->options(function (callable $get) {
+                                        $vehiculoId = $get('vehiculo_id');
+
+                                        if (!$vehiculoId) {
+                                            return Cliente::all()->mapWithKeys(function ($cliente) {
+                                                $label = $cliente->identificador
+                                                    ? "{$cliente->identificador} - {$cliente->nombre}"
+                                                    : $cliente->nombre;
+                                                return [$cliente->id => $label];
+                                            });
+                                        }
+
+                                        $vehiculo = Vehiculo::with('clientes')->find($vehiculoId);
+
+                                        return $vehiculo->clientes->mapWithKeys(function ($cliente) {
+                                            $label = $cliente->identificador
+                                                ? "{$cliente->identificador} - {$cliente->nombre}"
+                                                : $cliente->nombre;
+                                            return [$cliente->id => $label];
+                                        });
+                                    })
+                                    ->searchable()
+                                    ->searchPrompt('Buscar por nombre o identificador')
+                                    ->searchable()
+                                    ->hiddenOn('create'),
                                 Select::make('vehiculo_id')
                                     ->relationship('vehiculo')
                                     ->getOptionLabelFromRecordUsing(function ($record) {
@@ -132,7 +161,7 @@ class TrabajoResource extends Resource
                                             ->required(),
                                         TextInput::make('placa')
                                             ->unique(ignoreRecord: true)
-                                            ->maxLength(7)
+                                            ->maxLength(20)
                                             ->placeholder('ABC-123'),
                                         TextInput::make('marca')
                                             ->required()
@@ -142,6 +171,14 @@ class TrabajoResource extends Resource
                                             ->maxLength(255),
                                         TextInput::make('color')
                                             ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('vin')
+                                            ->label('VIN / Chasis')
+                                            ->maxLength(255),
+                                        TextInput::make('motor')
+                                            ->maxLength(255),
+                                        TextInput::make('ano')
+                                            ->label('Año del modelo')
                                             ->maxLength(255),
                                         Repeater::make('propietarios')
                                             ->relationship()
@@ -163,7 +200,9 @@ class TrabajoResource extends Resource
                                                             ->maxLength(255),
                                                         PhoneInput::make('telefono')
                                                             ->defaultCountry('PE')
-                                                            ->initialCountry('pe')
+                                                            ->initialCountry('pe'),
+                                                        TextInput::make('direccion')
+                                                            ->label('Dirección')
                                                     ])
                                                     ->createOptionUsing(function (array $data): int {
                                                         return Cliente::create($data)->getKey();
@@ -179,7 +218,9 @@ class TrabajoResource extends Resource
                                                             ->maxLength(255),
                                                         PhoneInput::make('telefono')
                                                             ->defaultCountry('PE')
-                                                            ->initialCountry('pe')
+                                                            ->initialCountry('pe'),
+                                                        TextInput::make('direccion')
+                                                            ->label('Dirección')
                                                     ])
                                                     ->getOptionLabelUsing(function ($value): ?string {
                                                         $cliente = Cliente::withTrashed()->find($value);
@@ -209,7 +250,7 @@ class TrabajoResource extends Resource
                                             ->required(),
                                         TextInput::make('placa')
                                             ->unique(ignoreRecord: true)
-                                            ->maxLength(7),
+                                            ->maxLength(20),
                                         TextInput::make('marca')
                                             ->required()
                                             ->maxLength(255),
@@ -217,6 +258,14 @@ class TrabajoResource extends Resource
                                             ->maxLength(255),
                                         TextInput::make('color')
                                             ->required()
+                                            ->maxLength(255),
+                                        TextInput::make('vin')
+                                            ->label('VIN / Chasis')
+                                            ->maxLength(255),
+                                        TextInput::make('motor')
+                                            ->maxLength(255),
+                                        TextInput::make('ano')
+                                            ->label('Año del modelo')
                                             ->maxLength(255),
                                         Repeater::make('propietarios')
                                             ->relationship()
@@ -238,7 +287,9 @@ class TrabajoResource extends Resource
                                                             ->maxLength(255),
                                                         PhoneInput::make('telefono')
                                                             ->defaultCountry('PE')
-                                                            ->initialCountry('pe')
+                                                            ->initialCountry('pe'),
+                                                        TextInput::make('direccion')
+                                                            ->label('Dirección')
                                                     ])
                                                     ->createOptionUsing(function (array $data): int {
                                                         return Cliente::create($data)->getKey();
@@ -254,7 +305,9 @@ class TrabajoResource extends Resource
                                                             ->maxLength(255),
                                                         PhoneInput::make('telefono')
                                                             ->defaultCountry('PE')
-                                                            ->initialCountry('pe')
+                                                            ->initialCountry('pe'),
+                                                        TextInput::make('direccion')
+                                                            ->label('Dirección')
                                                     ])
                                                     ->getOptionLabelUsing(function ($value): ?string {
                                                         $cliente = Cliente::withTrashed()->find($value);
@@ -263,6 +316,46 @@ class TrabajoResource extends Resource
                                                     ->required()
                                             )
                                             ->defaultItems(0)
+                                    ]),
+                                Select::make('conductor_id')
+                                    ->hiddenOn('create')
+                                    ->label('Conductor')
+                                    ->relationship('conductor', 'nombre')
+                                    ->searchable()
+                                    ->preload()
+                                    ->getOptionLabelFromRecordUsing(
+                                        fn(Cliente $record) =>
+                                        $record->identificador
+                                        ? "{$record->identificador} - {$record->nombre}"
+                                        : $record->nombre
+                                    )
+                                    ->createOptionForm([
+                                        TextInput::make('identificador')
+                                            ->label('RUC / DNI')
+                                            ->unique(table: 'clientes', ignoreRecord: true)
+                                            ->maxLength(12),
+                                        TextInput::make('nombre')
+                                            ->required()
+                                            ->maxLength(255),
+                                        PhoneInput::make('telefono')
+                                            ->defaultCountry('PE')
+                                            ->initialCountry('pe'),
+                                        TextInput::make('direccion')
+                                            ->label('Dirección')
+                                    ])
+                                    ->editOptionForm([
+                                        TextInput::make('identificador')
+                                            ->label('RUC / DNI')
+                                            ->unique(table: 'clientes', ignoreRecord: true)
+                                            ->maxLength(12),
+                                        TextInput::make('nombre')
+                                            ->required()
+                                            ->maxLength(255),
+                                        PhoneInput::make('telefono')
+                                            ->defaultCountry('PE')
+                                            ->initialCountry('pe'),
+                                        TextInput::make('direccion')
+                                            ->label('Dirección')
                                     ]),
                                 Select::make('taller_id')
                                     ->relationship('taller', 'nombre')
@@ -291,6 +384,9 @@ class TrabajoResource extends Resource
                                     ->required(),
                                 DatePicker::make('fecha_salida')
                                     ->hiddenOn('create'),
+                                TextInput::make('kilometraje')
+                                    ->numeric()
+                                    ->maxValue(42949672.95),
                                 Textarea::make('descripcion_servicio')
                                     ->required()
                                     ->columnSpanFull(),
@@ -365,6 +461,28 @@ class TrabajoResource extends Resource
                                             ->itemLabel(fn(array $state): ?string => $state['tecnico_id'] ? User::withTrashed()->find($state['tecnico_id'])->name : null)
                                     ])
                                     ->heading('Técnicos')
+                                    ->hiddenOn('create'),
+                                Section::make()
+                                    ->schema([
+                                        TextInput::make('garantia')
+                                            ->label('Garantía'),
+                                        RichEditor::make('observaciones')
+                                            ->label('Observaciones')
+                                            ->toolbarButtons([
+                                                'blockquote',
+                                                'bold',
+                                                'bulletList',
+                                                'heading',
+                                                'italic',
+                                                'link',
+                                                'orderedList',
+                                                'redo',
+                                                'strike',
+                                                'table',
+                                                'undo',
+                                            ]),
+                                    ])
+                                    ->heading('Detalles')
                                     ->hiddenOn('create'),
                                 Section::make()
                                     ->schema([
@@ -476,8 +594,12 @@ class TrabajoResource extends Resource
                     ->prefix('S/ ')
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
                     ->toggleable(isToggledHiddenByDefault: false),
-                // TextColumn::make('importe_2')
-                //     ->getStateUsing(function),
+                TextColumn::make('importe_2')
+                    ->getStateUsing(fn($record) => $record->importe())
+                    ->alignRight()
+                    ->prefix('S/ ')
+                    ->formatStateUsing(fn($state): string => number_format($state, 2, '.', ','))
+                    ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
                 TextColumn::make('a_cuenta')
                     ->alignRight()
                     ->prefix('S/ ')
@@ -598,8 +720,8 @@ class TrabajoResource extends Resource
 
                 ActionGroup::make([
 
-                    Action::make('Descargar proforma')
-                        ->icon('heroicon-s-document-text')
+                    Action::make('Descargar presupuesto')
+                        ->icon('heroicon-s-document-currency-dollar')
                         ->form([
                             // Grid::make()
                             //     ->schema([
@@ -645,13 +767,20 @@ class TrabajoResource extends Resource
                                 // 'articulos' => $data['articulos'] ?? true,
                             ];
 
-                            $url = route('trabajo.pdf.report', ['trabajo' => $trabajo] + $params);
+                            $url = route('trabajo.pdf.presupuesto', ['trabajo' => $trabajo] + $params);
                             $livewire->js("window.open('{$url}', '_blank');");
                         })
                         ->modalHeading('Configuración de Descarga')
                         ->modalButton('Descargar')
                         ->modalWidth('md')
                         ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
+
+                    Action::make('Descargar proforma')
+                        ->icon('heroicon-s-document-text')
+                        ->url(
+                            fn(Trabajo $trabajo): string => route('trabajo.pdf.proforma', ['trabajo' => $trabajo]),
+                            shouldOpenInNewTab: true
+                        ),
 
                     Action::make('Descargar evidencias')
                         ->icon('heroicon-s-photo')
@@ -716,6 +845,7 @@ class TrabajoResource extends Resource
             OtrosRelationManager::class,
             EvidenciasRelationManager::class,
             PagosRelationManager::class,
+            DescuentosRelationManager::class,
         ];
     }
 

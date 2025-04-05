@@ -15,19 +15,43 @@ class Trabajo extends Model
     protected $fillable = [
         'control',
         'codigo',
+        'cliente_id',
         'vehiculo_id',
+        'conductor_id',
         'taller_id',
         'fecha_ingreso',
         'fecha_salida',
+        'kilometraje',
         'descripcion_servicio',
         'desembolso',
-        'disponible'
+        'disponible',
+        'garantia',
+        'observaciones',
     ];
 
     protected $casts = [
         'fecha_ingreso' => 'date',
         'fecha_salida' => 'date',
     ];
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class, 'cliente_id');
+    }
+
+    public function firstCliente()
+    {
+        if ($this->cliente_id) {
+            return $this->cliente;
+        }
+
+        return $this->vehiculo?->clientes?->first();
+    }
+
+    public function conductor()
+    {
+        return $this->belongsTo(Cliente::class, 'conductor_id');
+    }
 
     public function taller()
     {
@@ -94,24 +118,32 @@ class Trabajo extends Model
 
     public function importe(): float
     {
-        $total = 0;
+        // 1. Sumar todos los servicios (precio x cantidad)
+        $totalServicios = $this->servicios->sum(
+            fn($servicio) => $servicio->precio * $servicio->cantidad
+        );
 
-        // Sumar servicios (precio * cantidad)
-        $total += $this->servicios->sum(function ($servicio) {
-            return $servicio->precio * $servicio->cantidad;
-        });
+        // 2. Sumar artículos con presupuesto activo (precio x cantidad)
+        $totalArticulos = $this->trabajoArticulos->where('presupuesto', true)->sum(
+            fn($articulo) => $articulo->precio * $articulo->cantidad
+        );
 
-        // Sumar artículos con presupuesto=true (precio * cantidad)
-        $total += $this->trabajoArticulos->where('presupuesto', true)->sum(function ($articulo) {
-            return $articulo->precio * $articulo->cantidad;
-        });
+        // 3. Sumar otros conceptos (precio x cantidad)
+        $totalOtros = $this->otros->sum(
+            fn($otro) => $otro->precio * $otro->cantidad
+        );
 
-        // Sumar otros conceptos (precio * cantidad)
-        $total += $this->otros->sum(function ($otro) {
-            return $otro->precio * $otro->cantidad;
-        });
+        // 4. Calcular subtotal antes de descuentos
+        $subtotal = $totalServicios + $totalArticulos + $totalOtros;
 
-        return (float) $total;
+        // 5. Aplicar descuentos generales si existen (suma de porcentajes)
+        if ($this->descuentos->isNotEmpty()) {
+            $porcentajeDescuento = $this->descuentos->sum('descuento');
+            $subtotal *= (1 - ($porcentajeDescuento / 100));
+        }
+
+        // 6. Retornar el importe final (nunca negativo)
+        return $subtotal;
     }
 
     /**
