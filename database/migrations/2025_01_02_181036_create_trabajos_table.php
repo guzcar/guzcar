@@ -33,7 +33,9 @@ return new class extends Migration {
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
             $table->date('fecha_ingreso');
+            $table->time('hora_ingreso');
             $table->date('fecha_salida')->nullable();
+            $table->time('hora_salida')->nullable();
             $table->decimal('kilometraje', 10, 2)->nullable();
             $table->text('descripcion_servicio');
             $table->decimal('importe')->default(0);
