@@ -30,6 +30,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -379,11 +380,28 @@ class TrabajoResource extends Resource
                                 //         ->required()
                                 //         ->maxLength(255),
                                 // ]),
-                                DatePicker::make('fecha_ingreso')
-                                    ->default(now())
-                                    ->required(),
-                                DatePicker::make('fecha_salida')
-                                    ->hiddenOn('create'),
+                                Grid::make()
+                                    ->schema([
+                                        DatePicker::make('fecha_ingreso')
+                                            ->default(now())
+                                            ->required()
+                                            ->native(false)
+                                            ->displayFormat('d/m/Y'),
+                                        TimePicker::make('hora_ingreso')
+                                            ->default(now())
+                                            ->required()
+                                    ])
+                                    ->columns(['default' => 2]),
+                                Grid::make()
+                                    ->schema([
+                                        DatePicker::make('fecha_salida')
+                                            ->native(false)
+                                            ->displayFormat('d/m/Y')
+                                            ->hiddenOn('create'),
+                                        TimePicker::make('hora_salida')
+                                            ->hiddenOn('create')
+                                    ])
+                                    ->columns(['default' => 2]),
                                 TextInput::make('kilometraje')
                                     ->numeric()
                                     ->maxValue(42949672.95),
@@ -683,6 +701,7 @@ class TrabajoResource extends Resource
 
                         $record->update([
                             'fecha_salida' => now(),
+                            'hora_salida' => now()
                         ]);
 
                         TrabajoService::actualizarTrabajoPorId($record);
@@ -706,6 +725,7 @@ class TrabajoResource extends Resource
                     ->action(function (Trabajo $record) {
                         $record->update([
                             'fecha_salida' => null,
+                            'hora_salida' => null,
                             'desembolso' => null
                         ]);
 

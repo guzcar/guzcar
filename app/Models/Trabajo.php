@@ -20,7 +20,9 @@ class Trabajo extends Model
         'conductor_id',
         'taller_id',
         'fecha_ingreso',
+        'hora_ingreso',
         'fecha_salida',
+        'hora_salida',
         'kilometraje',
         'descripcion_servicio',
         'desembolso',
@@ -31,7 +33,9 @@ class Trabajo extends Model
 
     protected $casts = [
         'fecha_ingreso' => 'date',
+        'hora_ingreso' => 'datetime',
         'fecha_salida' => 'date',
+        'hora_salida' => 'datetime',
     ];
 
     public function cliente()

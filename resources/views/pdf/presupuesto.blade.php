@@ -20,7 +20,7 @@
         </tbody>
     </table>
 
-    <h3>VEHÍCULO</h3>
+    <h3>DATOS DE LA UNIDAD</h3>
 
     <table class="table-simple">
         <tbody>

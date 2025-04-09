@@ -54,11 +54,13 @@
                 </p>
                 <p class="text-gray-800 dark:text-gray-300">
                     <span class="font-medium text-gray-900 dark:text-gray-300">Fecha Ingreso:</span>
-                    {{ $trabajo->fecha_ingreso }}
+                    {{ $trabajo->fecha_ingreso->format('d/m/y') }}
+                    {{ $trabajo->hora_ingreso->isoFormat('h:mm A') }}
                 </p>
                 <p class="text-gray-800 dark:text-gray-300">
                     <span class="font-medium text-gray-900 dark:text-gray-300">Fecha Salida:</span>
-                    {{ $trabajo->fecha_salida ?? 'Pendiente' }}
+                    {{ $trabajo->fecha_salida?->format('d/m/y') }}
+                    {{ $trabajo->hora_salida?->isoFormat('h:mm A') }}
                 </p>
                 <div>
                     <p class="font-medium text-gray-800 dark:text-gray-300">Descripción del Servicio:</p>
@@ -200,7 +202,7 @@
     </section>
     --}}
 
-    <h2 class="text-xl font-bold">Evidencias Asociadas</h2>
+    <h2 class="text-xl font-bold">Evidencias</h2>
 
     @if ($evidencias->isNotEmpty())
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -208,7 +210,7 @@
                 <x-filament::card>
                     @if ($evidencia->tipo === 'imagen')
                         <a href="{{ Storage::url($evidencia->evidencia_url) }}" data-fancybox="gallery"
-                            data-caption="Actualizado el: {{ $evidencia->updated_at->format('d/m/Y H:i') }}">
+                            data-caption="Cargado el {{ $evidencia->created_at->isoFormat('D [de] MMMM [de] YYYY [a las] h:mm A') }}">
                             <img src="{{ Storage::url($evidencia->evidencia_url) }}" alt="Evidencia"
                                 class="w-full h-48 object-cover rounded-lg transition-transform transform hover:scale-105">
                         </a>
@@ -227,6 +229,15 @@
                                     clip-rule="evenodd" />
                             </svg>
                             <span style="margin-left: 5px">{{ $evidencia->user->name }}</span>
+                        </p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-5 h-5 text-gray-500">
+                                <path fill-rule="evenodd"
+                                    d="M6 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6Zm12 2H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1ZM8 8V7h2v1H8Zm6 0V7h2v1h-2ZM7 11h10v2H7v-2Zm0 4h10v2H7v-2Z"
+                                    clip-rule="evenodd"/>
+                            </svg>  
+                            <span style="margin-left: 5px">{{ $evidencia->created_at->format('d/m/Y') }} ({{ $evidencia->created_at->diffForHumans() }})</span>
                         </p>
                         <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">{{ $evidencia->observacion }}</p>
                     </div>
