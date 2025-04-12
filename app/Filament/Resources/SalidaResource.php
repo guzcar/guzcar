@@ -506,15 +506,17 @@ class SalidaResource extends Resource
                         ->sortable()
                         ->placeholder('Sin trabajo'),
                     TextColumn::make('trabajo.fecha_ingreso')
+                        ->date('d/m/Y')
                         ->label('Fecha ingreso')
                         ->sortable()
                         ->placeholder('Sin trabajo')
-                        ->toggleable(isToggledHiddenByDefault: true),
+                        ->toggleable(isToggledHiddenByDefault: false),
                     TextColumn::make('trabajo.fecha_salida')
+                        ->date('d/m/Y')
                         ->label('Fecha salida')
                         ->sortable()
                         ->placeholder('Sin trabajo')
-                        ->toggleable(isToggledHiddenByDefault: true),
+                        ->toggleable(isToggledHiddenByDefault: false),
                     TextColumn::make('trabajo.vehiculo.placa')
                         ->label('Placa')
                         ->placeholder('Sin Vehiculo')
