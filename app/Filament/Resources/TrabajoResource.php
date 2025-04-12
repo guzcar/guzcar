@@ -612,12 +612,12 @@ class TrabajoResource extends Resource
                     ->prefix('S/ ')
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
                     ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('importe_2')
-                    ->getStateUsing(fn($record) => $record->importe())
-                    ->alignRight()
-                    ->prefix('S/ ')
-                    ->formatStateUsing(fn($state): string => number_format($state, 2, '.', ','))
-                    ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
+                // TextColumn::make('importe_2')
+                //     ->getStateUsing(fn($record) => $record->importe())
+                //     ->alignRight()
+                //     ->prefix('S/ ')
+                //     ->formatStateUsing(fn($state): string => number_format($state, 2, '.', ','))
+                //     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
                 TextColumn::make('a_cuenta')
                     ->alignRight()
                     ->prefix('S/ ')
