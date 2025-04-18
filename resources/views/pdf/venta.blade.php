@@ -7,7 +7,7 @@
     <table style="width: 100%; border-collapse: collapse;">
         <tr>
             <td style="vertical-align: top; padding-right: 0.5rem">
-                <table class="table-container">
+                <table class="table">
                     <tbody>
                         <tr>
                             <th style="width: 5rem; text-align: left;">RUC / DNI</th>
@@ -25,7 +25,7 @@
                 </table>
             </td>
             <td style="width: 32%; vertical-align: top">
-                <table class="table-container">
+                <table class="table">
                     <tbody>
                         <tr>
                             <th style="text-align: left;">Fecha</th>
@@ -46,7 +46,7 @@
         <table style="width: 50%; border-collapse: collapse;">
             <tr>
                 <td style="vertical-align: top; padding-right: 0.5rem">
-                    <table class="table-container">
+                    <table class="table">
                         <tbody>
                             <tr>
                                 <th style="text-align: left; width: 5rem">Placa</th>
@@ -69,7 +69,7 @@
 
     <h3>ARTÍCULOS</h3>
 
-    <table class="table-container">
+    <table class="table">
         <thead>
             <tr>
                 <th>Artículo</th>
@@ -134,7 +134,7 @@
 
     <h3></h3>
 
-    <table class="table-container">
+    <table class="table">
         @if (request('igv'))
             <tr>
                 <td style="border: 0"></td>

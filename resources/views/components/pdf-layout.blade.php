@@ -77,6 +77,7 @@
             border-top: 1px solid black; */
             color: white;
             background-color: rgb(31, 62, 129);
+            border: solid white 1px;
         }
 
         .table tr:nth-child(even) {
@@ -130,12 +131,12 @@
             font-weight: bold;
         }
 
-        .table-simple {
+        .table-void {
             border-collapse: collapse;
             width: 100%;
         }
 
-        .table-simple td {
+        .table-void td {
             padding: 1px 0;
             vertical-align: bottom;
         }
@@ -148,6 +149,25 @@
 
         .table-header td {
             padding: 1px 0;
+        }
+
+        .table-simple {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-simple th {
+            color: white;
+            background-color: #424242;
+            border: 1px solid white;
+        }
+
+        .table-simple td {
+            border: 1px solid white;
+        }
+
+        .table-simple tr:nth-child(even) {
+            background-color: rgba(100, 100, 100, 0.25);
         }
     </style>
 

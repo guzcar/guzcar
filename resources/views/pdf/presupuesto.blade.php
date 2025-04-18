@@ -1,6 +1,6 @@
 <x-pdf-layout title="Presupuesto {{ $trabajo->codigo }}" code="{{ $trabajo->codigo }}">
 
-    <table class="table-simple">
+    <table class="table-void">
         <tbody>
             <tr>
                 <td style="width: 14%;">DNI / RUC:</td>
@@ -22,7 +22,7 @@
 
     <h3>DATOS DE LA UNIDAD</h3>
 
-    <table class="table-simple">
+    <table class="table-void">
         <tbody>
             <tr>
                 <td style="width: 14%;">PLACA:</td>
@@ -126,7 +126,7 @@
                                             $articuloData->presentacion->nombre ?? null,
                                             $articuloData->medida ?? null,
                                             $articuloData->unidad->nombre ?? null,
-                                            $articuloData->color ?? null
+                                            /*$articuloData->color ?? null*/
                                         ];
                                         echo implode(' ', array_filter($labelParts));
                                     @endphp
@@ -257,20 +257,93 @@
         $palabras = strtoupper($numberTransformer->toWords($entero)) . " CON $decimal/100 SOLES";
     @endphp
 
-    <p>Son: <span class="bold">{{ $palabras }}</span></p>
+    <div style="border-bottom: solid gray 1px; border-top: solid gray 1px; margin-top: 1rem;">
+        <p>Son: <span class="bold">{{ $palabras }}</span></p>
+    </div>
 
     <!-- <div style="border-top: dashed black 1px;"></div> -->
 
-    <p class="mb-0">Tiempo de ejecución: <span class="bold">{{ $tiempo }}</span></p>
+    <!-- <table style="border-collapse: collapse; width: 100%;">
+        <tbody>
+            <tr>
+                <td style="padding: 0; margin: 0; border: none; vertical-align: top;">
+                    <p style="margin-bottom: 0px;"><b>CUENTA BCP</b></p>
+                    <ul style="padding-left: 0; list-style-position: inside; margin-top: 0px;">
+                        <li>N° CTA: 3104600455054</li>
+                        <li>CCI: 00231000460045505410</li>
+                    </ul>
+                </td>
+                <td style="padding: 0; margin: 0; border: none; vertical-align: top;">
+                    <p style="margin-bottom: 0px;"><b>CUENTA BBVA</b></p>
+                    <ul style="padding-left: 0; list-style-position: inside; margin-top: 0px;">
+                        <li>N° CTA: 001102950100124365</li>
+                        <li>CCI: 0011029500010012436536</li>
+                    </ul>
+                </td>
+                <td style="padding: 0; margin: 0; border: none; vertical-align: top;">
+                    <p style="margin-bottom: 0px;"><b>BANCO DE LA NACION</b></p>
+                    <ul style="padding-left: 0; list-style-position: inside; margin-top: 0px;">
+                        <li>CTA. detracciones: 007850151</li>
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table> -->
 
-    @if ($trabajo->garantia)
-        <p class="mt-0">Garantía: <span class="bold">{{ $trabajo?->garantia ?? '' }}</span></p>
-    @endif
+    <table style="border-collapse: collapse; width: 100%; margin-top: 1rem;">
+        <tbody>
+            <tr>
+                <td style="padding: 0; margin: 0; border: none; vertical-align: top; width: 45%; padding-right: 1rem;">
+                    <p class="mt-0 mb-0">Tiempo de ejecución: <span class="bold">{{ $tiempo }}</span></p>
 
-    @if ($trabajo->observaciones)
-        <!-- <div style="border-top: dashed black 1px;"></div> -->
-        <p class="mb-0">Observaciones:</p>
-        <p class="mt-0">{!! $trabajo->observaciones !!}</p>
-    @endif
+                    @if ($trabajo->garantia)
+                        <p class="mt-0">Garantía: <span class="bold">{{ $trabajo?->garantia ?? '' }}</span></p>
+                    @endif
+
+                    @if ($trabajo->observaciones)
+                        <!-- <div style="border-top: dashed black 1px;"></div> -->
+                        <p class="mb-0">Observaciones:</p>
+                        <p class="mt-0">{!! $trabajo->observaciones !!}</p>
+                    @endif
+                </td>
+                <td style="padding: 0; margin: 0; border: none; vertical-align: top;">
+                    <table class="table-simple">
+                        <thead>
+                            <tr>
+                                <th style="width: 4rem;">Entidad</th>
+                                <th>Tipo de Cuenta</th>
+                                <th>Número de Cuenta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="2"><b>BCP</b></t>
+                                <td style="text-align: center;">CTE</td>
+                                <td>3104600455054</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">CCI</td>
+                                <td>00231000460045505410</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2"><b>BBVA</b></t>
+                                <td style="text-align: center;">CTE</td>
+                                <td>001102950100124365</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">CCI</td>
+                                <td>0011029500010012436536</td>
+                            </tr>
+                            <tr>
+                                <td><b>Banco de la Nación</b></t>
+                                <td style="text-align: center;">Detracciones</td>
+                                <td>007850151</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
 </x-pdf-layout>
