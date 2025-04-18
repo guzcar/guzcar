@@ -15,7 +15,7 @@
     <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-6 col-lg-5">
+                <div class="col-md-8 col-lg-6 col-xl-5">
                     <div class="card shadow rounded-lg">
                         <div class="card-header text-center py-4">
                             <h5 class="font-weight-light mb-0">Automotores <b>GUZCAR</b></h5>

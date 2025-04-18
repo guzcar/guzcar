@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TrabajoResource\RelationManagers;
 use App\Models\Servicio;
 use App\Models\TrabajoServicio;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -18,6 +19,7 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
@@ -31,28 +33,61 @@ class ServiciosRelationManager extends RelationManager
         return $form
             ->schema([
                 Select::make('servicio_id')
-                    ->relationship('servicio', 'nombre')
+                    ->relationship(
+                        name: 'servicio',
+                        titleAttribute: 'nombre',
+                        modifyQueryUsing: fn(Builder $query) => $query->with('tipoVehiculo')
+                    )
+                    ->getOptionLabelFromRecordUsing(function (Servicio $record) {
+                        return $record->tipoVehiculo
+                            ? "{$record->tipoVehiculo->nombre} - {$record->nombre}"
+                            : $record->nombre;
+                    })
                     ->createOptionForm([
-                        TextInput::make('nombre')
+                        Grid::make()
+                            ->schema([
+                                Select::make('tipo_vehiculo_id')
+                                    ->label('Tipo de Vehículo')
+                                    ->relationship('tipoVehiculo', 'nombre')
+                                    ->searchable()
+                                    ->preload()
+                                    ->columnSpan(1),
+                                TextInput::make('costo')
+                                    ->numeric()
+                                    ->required()
+                                    ->prefix('S/ ')
+                                    ->maxValue(42949672.95)
+                                    ->columnSpan(1),
+                            ])
+                            ->columns(2),
+                        Textarea::make('nombre')
                             ->unique(ignoreRecord: true)
                             ->required()
-                            ->maxLength(255),
-                        TextInput::make('costo')
-                            ->numeric()
-                            ->required()
-                            ->prefix('S/ ')
-                            ->maxValue(42949672.95),
+                            ->maxLength(255)
+                            ->columnSpanFull(),
                     ])
                     ->editOptionForm([
-                        TextInput::make('nombre')
+                        Grid::make()
+                            ->schema([
+                                Select::make('tipo_vehiculo_id')
+                                    ->label('Tipo de Vehículo')
+                                    ->relationship('tipoVehiculo', 'nombre')
+                                    ->searchable()
+                                    ->preload()
+                                    ->columnSpan(1),
+                                TextInput::make('costo')
+                                    ->numeric()
+                                    ->required()
+                                    ->prefix('S/ ')
+                                    ->maxValue(42949672.95)
+                                    ->columnSpan(1),
+                            ])
+                            ->columns(2),
+                        Textarea::make('nombre')
                             ->unique(ignoreRecord: true)
                             ->required()
-                            ->maxLength(255),
-                        TextInput::make('costo')
-                            ->numeric()
-                            ->required()
-                            ->prefix('S/ ')
-                            ->maxValue(42949672.95),
+                            ->maxLength(255)
+                            ->columnSpanFull(),
                     ])
                     ->searchable()
                     ->preload()
@@ -103,7 +138,7 @@ class ServiciosRelationManager extends RelationManager
                     ->prefix('S/ ')
                     ->alignRight()
                     ->state(function (TrabajoServicio $record): string {
-                        return number_format($record->precio * $record->cantidad, 2,'.','');
+                        return number_format($record->precio * $record->cantidad, 2, '.', '');
                     })
             ])
             ->filters([

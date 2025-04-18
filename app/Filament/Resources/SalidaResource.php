@@ -23,6 +23,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -37,6 +38,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
@@ -295,22 +297,56 @@ class SalidaResource extends Resource
                                         Select::make('trabajo_id')
                                             ->label('Trabajo en vehículo')
                                             ->prefixIcon('heroicon-s-truck')
-                                            ->options(function () {
-                                                // $fechaActual = now()->format('Y-m-d');
-                                                return Trabajo::with(['vehiculo'])
-                                                    // ->where(function ($query) use ($fechaActual) {
-                                                    //     $query->whereNull('fecha_salida')
-                                                    //         ->orWhereDate('fecha_salida', '>=', $fechaActual);
-                                                    // })
+                                            ->options(function (Get $get) {
+                                                $fechaActual = now()->format('Y-m-d');
+                                                $trabajoId = $get('trabajo_id');
+
+                                                return Trabajo::with(['vehiculo', 'vehiculo.tipoVehiculo'])
+                                                    ->where(function ($query) use ($fechaActual, $trabajoId) {
+                                                        if ($trabajoId) {
+                                                            $query->where('id', $trabajoId);
+                                                        }
+
+                                                        $query->orWhere(function ($subQuery) use ($fechaActual) {
+                                                            $subQuery->where('disponible', true)
+                                                                ->orWhereNull('fecha_salida')
+                                                                ->orWhereDate('fecha_salida', '>=', $fechaActual);
+                                                        });
+                                                    })
                                                     ->orderBy('created_at', 'desc')
                                                     ->get()
                                                     ->mapWithKeys(function ($trabajo) {
-                                                    $label = "{$trabajo->vehiculo->placa} {$trabajo->vehiculo->tipoVehiculo->nombre} {$trabajo->vehiculo->marca} {$trabajo->vehiculo->modelo} {$trabajo->vehiculo->color} ({$trabajo->codigo})";
-                                                    return [$trabajo->id => $label];
-                                                });
+                                                        // Solución segura para combinar fecha (date) + hora (time)
+                                                        $fechaHoraIngreso = Carbon::createFromFormat(
+                                                            'Y-m-d H:i:s',
+                                                            $trabajo->fecha_ingreso->format('Y-m-d') . ' ' . $trabajo->hora_ingreso->format('H:i:s')
+                                                        );
+                                                        
+                                                        // Formateo de fecha (opcional: puedes usar ->format() si prefieres)
+                                                        $formatoFecha = $fechaHoraIngreso->isoFormat('D [de] MMMM [de] YYYY');
+                                                        $textoTiempo = $fechaHoraIngreso->locale('es')->diffForHumans();
+                                                        
+                                                        // Construcción del label seguro con valores nulos
+                                                        $partesVehiculo = array_filter([
+                                                            $trabajo->vehiculo->placa,
+                                                            $trabajo->vehiculo->tipoVehiculo->nombre,
+                                                            $trabajo->vehiculo->marca,
+                                                            $trabajo->vehiculo->modelo,
+                                                            $trabajo->vehiculo->color
+                                                        ], 'strlen');
+                                                        
+                                                        $label = sprintf(
+                                                            "%s\nIngreso: %s (%s)",
+                                                            implode(' ', $partesVehiculo),
+                                                            $formatoFecha,
+                                                            $textoTiempo
+                                                        );
+                                                    
+                                                        return [$trabajo->id => $label];
+                                                    });
                                             })
                                             ->searchable()
-                                            ->preload(),
+                                            ->preload()
                                     ]),
                                 Section::make()
                                     ->schema([
@@ -509,13 +545,16 @@ class SalidaResource extends Resource
                         ->date('d/m/Y')
                         ->label('Fecha ingreso')
                         ->sortable()
-                        ->placeholder('Sin trabajo')
+                        ->placeholder('Sin ingreso')
                         ->toggleable(isToggledHiddenByDefault: false),
                     TextColumn::make('trabajo.fecha_salida')
-                        ->date('d/m/Y')
+                        ->state(function ($record) {
+                            return $record->trabajo->fecha_salida
+                                ? Carbon::parse($record->fecha_salida)->format('d/m/Y')
+                                : $record->trabajo->taller->nombre;
+                        })
                         ->label('Fecha salida')
-                        ->sortable()
-                        ->placeholder('Sin trabajo')
+                        ->placeholder('Sin salida')
                         ->toggleable(isToggledHiddenByDefault: false),
                     TextColumn::make('trabajo.vehiculo.placa')
                         ->label('Placa')

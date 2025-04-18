@@ -6,6 +6,7 @@ use App\Filament\Resources\ServicioResource\Pages;
 use App\Filament\Resources\ServicioResource\RelationManagers;
 use App\Models\Servicio;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -41,16 +42,21 @@ class ServicioResource extends Resource
     {
         return $form
             ->schema([
-                Textarea::make('nombre')
-                    ->unique(ignoreRecord: true)
-                    ->required()
-                    ->maxLength(255)
-                    ->columnSpanFull(),
+                Select::make('tipo_vehiculo_id')
+                    ->label('Tipo de Vehículo')
+                    ->relationship('tipoVehiculo', 'nombre')
+                    ->searchable()
+                    ->preload(),
                 TextInput::make('costo')
                     ->numeric()
                     ->required()
                     ->prefix('S/ ')
                     ->maxValue(42949672.95),
+                Textarea::make('nombre')
+                    ->unique(ignoreRecord: true)
+                    ->required()
+                    ->maxLength(255)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -65,8 +71,14 @@ class ServicioResource extends Resource
                     ->searchable()
                     ->wrap()
                     ->lineClamp(2),
+                TextColumn::make('tipoVehiculo.nombre')
+                    ->label('Tipo de Vehículo')
+                    ->placeholder('Sin especificación')
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('costo')
-                    ->prefix('S/ '),
+                    ->prefix('S/ ')
+                    ->alignEnd(),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')

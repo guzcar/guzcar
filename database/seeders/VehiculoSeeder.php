@@ -42,14 +42,14 @@ class VehiculoSeeder extends Seeder
         $faker = Faker::create();  // Inicializamos Faker
 
         // Crear 1000 vehículos con Faker
-        for ($i = 0; $i < 1000; $i++) {
-            Vehiculo::create([
-                'placa' => strtoupper($faker->regexify('[A-Z]{3}-[0-9]{3}')),  // Genera una placa aleatoria (ej. "ABC-123")
-                'marca' => $faker->company,  // Genera una marca aleatoria (ej. "Toyota")
-                'modelo' => $faker->word,  // Genera un modelo aleatorio (ej. "Hilux")
-                'color' => $faker->safeColorName,  // Genera un color aleatorio
-                'tipo_vehiculo_id' => $faker->numberBetween(1, 5),  // Asume que tienes 5 tipos de vehículos (puedes ajustar según tu caso)
-            ]);
-        }
+        // for ($i = 0; $i < 1000; $i++) {
+        //     Vehiculo::create([
+        //         'placa' => strtoupper($faker->regexify('[A-Z]{3}-[0-9]{3}')),  // Genera una placa aleatoria (ej. "ABC-123")
+        //         'marca' => $faker->company,  // Genera una marca aleatoria (ej. "Toyota")
+        //         'modelo' => $faker->word,  // Genera un modelo aleatorio (ej. "Hilux")
+        //         'color' => $faker->safeColorName,  // Genera un color aleatorio
+        //         'tipo_vehiculo_id' => $faker->numberBetween(1, 5),  // Asume que tienes 5 tipos de vehículos (puedes ajustar según tu caso)
+        //     ]);
+        // }
     }
 }

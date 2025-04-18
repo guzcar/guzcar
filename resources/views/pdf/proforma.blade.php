@@ -1,6 +1,6 @@
 <x-pdf-layout title="Proforma {{ $trabajo->codigo }}" code="{{ $trabajo->codigo }}">
 
-    <table class="table-simple">
+    <table class="table-void">
         <tbody>
             <tr>
                 <td style="width: 14%;">DNI / RUC:</td>
@@ -21,7 +21,7 @@
 
     <h3>DATOS DE LA UNIDAD</h3>
 
-    <table class="table-simple">
+    <table class="table-void">
         <tbody>
             <tr>
                 <td style="width: 14%;">PLACA:</td>
@@ -111,7 +111,7 @@
                                     $articuloData->presentacion->nombre ?? null,
                                     $articuloData->medida ?? null,
                                     $articuloData->unidad->nombre ?? null,
-                                    $articuloData->color ?? null
+                                    /*$articuloData->color ?? null*/
                                 ];
                                 echo implode(' ', array_filter($labelParts));
                             @endphp
