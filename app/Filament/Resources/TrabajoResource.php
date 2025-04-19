@@ -607,6 +607,7 @@ class TrabajoResource extends Resource
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('importe')
+                    ->sortable()
                     ->alignRight()
                     ->label('Importe total')
                     ->prefix('S/ ')
@@ -619,6 +620,7 @@ class TrabajoResource extends Resource
                 //     ->formatStateUsing(fn($state): string => number_format($state, 2, '.', ','))
                 //     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
                 TextColumn::make('a_cuenta')
+                    ->sortable()
                     ->alignRight()
                     ->prefix('S/ ')
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))

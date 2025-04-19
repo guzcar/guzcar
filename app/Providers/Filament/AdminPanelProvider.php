@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Services\CustomBreezyCore;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Enums\ThemeMode;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -57,7 +58,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
+                \App\Filament\Widgets\AccountWidget::class,
+                \App\Filament\Widgets\ImportesSummary::class,
             ])
             ->middleware([
                 EncryptCookies::class,

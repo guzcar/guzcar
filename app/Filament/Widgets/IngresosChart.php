@@ -1,0 +1,147 @@
+<?php
+
+namespace App\Filament\Widgets;
+
+use App\Models\Trabajo;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+use Filament\Widgets\ChartWidget;
+
+class IngresosChart extends ChartWidget
+{
+    protected static ?string $heading = 'Recepción de Vehículos';
+    protected static ?int $sort = 3;
+
+    protected $listeners = [
+        'updateDateFilter' => 'updateFilteredData',
+        'clearDateFilter' => 'clearFilters'
+    ];
+
+    public ?array $filters = [];
+    public bool $hasFilters = false;
+
+    protected function getData(): array
+    {
+        $meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+        $startDate = $this->hasFilters
+            ? Carbon::parse($this->filters['startDate'])
+            : now()->startOfWeek();
+
+        $endDate = $this->hasFilters
+            ? Carbon::parse($this->filters['endDate'])
+            : now()->endOfDay();
+
+        // Determinar la granularidad del gráfico
+        $diffInDays = $startDate->diffInDays($endDate);
+
+        if ($diffInDays <= 21) { // Hasta 5 semanas (mostrar por día)
+            $period = CarbonPeriod::create($startDate, $endDate);
+            $format = 'd';
+            $groupBy = 'day';
+            $xAxisFormat = 'd';
+        } elseif ($diffInDays <= 45) { // Hasta 6 meses (mostrar por semana)
+            $period = CarbonPeriod::create($startDate, '1 week', $endDate);
+            $format = 'W';
+            $groupBy = 'week';
+            $xAxisFormat = 'W';
+        } elseif ($diffInDays <= 550) { // Hasta 2 años (mostrar por mes)
+            $period = CarbonPeriod::create($startDate, '1 month', $endDate);
+            $groupBy = 'month';
+            $xAxisFormat = 'M';
+        } else { // Más de 2 años (mostrar por año)
+            $period = CarbonPeriod::create($startDate, '1 year', $endDate);
+            $groupBy = 'year';
+            $xAxisFormat = 'Y';
+        }
+
+        $labels = [];
+        $data = [];
+
+        foreach ($period as $date) {
+            // Formatear según el tipo de agrupación
+            if ($groupBy === 'week') {
+                $labels[] = "Sem {$date->weekOfYear}";
+            } elseif ($groupBy === 'month') {
+                $mesNumero = $date->format('n') - 1;
+                $labels[] = $meses[$mesNumero] . ' ' . $date->format('y');
+            } elseif ($groupBy === 'year') {
+                $labels[] = $date->format('Y');
+            } else {
+                $labels[] = $date->format($format) . ' ' . $meses[$date->format('n') - 1];
+            }
+
+            $query = Trabajo::query()
+                ->whereDate('fecha_ingreso', '>=', $groupBy === 'week' ? $date->startOfWeek() : $date->startOf($groupBy))
+                ->whereDate('fecha_ingreso', '<=', $groupBy === 'week' ? $date->endOfWeek() : $date->endOf($groupBy));
+
+            $data[] = $query->count();
+        }
+
+        return [
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Vehículos recibidos',
+                    'data' => $data,
+                    'backgroundColor' => '#2563eb',
+                    'borderColor' => '#2563eb',
+                    'fill' => false,
+                    'tension' => 0.1,
+                ],
+            ],
+            'options' => [
+                'scales' => [
+                    'x' => [
+                        'ticks' => [
+                            'maxRotation' => 45,
+                            'minRotation' => 45,
+                            'autoSkip' => true,
+                            'maxTicksLimit' => 12
+                        ]
+                    ]
+                ],
+                'plugins' => [
+                    'tooltip' => [
+                        'callbacks' => [
+                            'title' => function ($context) use ($groupBy, $meses) {
+                                $label = $context[0]->label;
+                                if ($groupBy === 'week') {
+                                    return "Semana {$label}";
+                                } elseif ($groupBy === 'month') {
+                                    $parts = explode(' ', $label);
+                                    return "{$parts[0]} {$parts[1]}";
+                                }
+                                return $label;
+                            }
+                        ]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    protected function getType(): string
+    {
+        return 'bar';
+    }
+
+    public function getDescription(): ?string
+    {
+        return 'Cantidad de vehículos que ingresaron al taller para ser atendidos.';
+    }
+
+    public function updateFilteredData(array $filters): void
+    {
+        $this->filters = $filters;
+        $this->hasFilters = true;
+        $this->dispatch('updateChartData');
+    }
+
+    public function clearFilters(): void
+    {
+        $this->filters = [];
+        $this->hasFilters = false;
+        $this->dispatch('updateChartData');
+    }
+}
