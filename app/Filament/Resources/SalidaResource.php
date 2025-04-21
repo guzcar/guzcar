@@ -321,11 +321,11 @@ class SalidaResource extends Resource
                                                             'Y-m-d H:i:s',
                                                             $trabajo->fecha_ingreso->format('Y-m-d') . ' ' . $trabajo->hora_ingreso->format('H:i:s')
                                                         );
-                                                        
+
                                                         // Formateo de fecha (opcional: puedes usar ->format() si prefieres)
                                                         $formatoFecha = $fechaHoraIngreso->isoFormat('D [de] MMMM [de] YYYY');
                                                         $textoTiempo = $fechaHoraIngreso->locale('es')->diffForHumans();
-                                                        
+
                                                         // Construcción del label seguro con valores nulos
                                                         $partesVehiculo = array_filter([
                                                             $trabajo->vehiculo->placa,
@@ -334,14 +334,14 @@ class SalidaResource extends Resource
                                                             $trabajo->vehiculo->modelo,
                                                             $trabajo->vehiculo->color
                                                         ], 'strlen');
-                                                        
+
                                                         $label = sprintf(
                                                             "%s\nIngreso: %s (%s)",
                                                             implode(' ', $partesVehiculo),
                                                             $formatoFecha,
                                                             $textoTiempo
                                                         );
-                                                    
+
                                                         return [$trabajo->id => $label];
                                                     });
                                             })
@@ -549,9 +549,12 @@ class SalidaResource extends Resource
                         ->toggleable(isToggledHiddenByDefault: false),
                     TextColumn::make('trabajo.fecha_salida')
                         ->state(function ($record) {
-                            return $record->trabajo->fecha_salida
-                                ? Carbon::parse($record->fecha_salida)->format('d/m/Y')
-                                : $record->trabajo->taller->nombre;
+                            if ($record->trabajo) {
+                                return $record->trabajo->fecha_salida
+                                    ? Carbon::parse($record->trabajo->fecha_salida)->format('d/m/Y')
+                                    : ($record->trabajo->taller ? $record->trabajo->taller->nombre : 'Sin taller');
+                            }
+                            return 'Sin trabajo asociado';
                         })
                         ->label('Fecha salida')
                         ->placeholder('Sin salida')
