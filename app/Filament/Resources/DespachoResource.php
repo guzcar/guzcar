@@ -17,6 +17,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -28,6 +29,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
@@ -90,25 +92,52 @@ class DespachoResource extends Resource
                                 Select::make('trabajo_id')
                                     ->label('Trabajo en vehículo')
                                     ->prefixIcon('heroicon-s-truck')
-                                    ->options(function () {
-                                        // Obtener la fecha actual
-                                        // $fechaActual = now()->format('Y-m-d'); // Formatear para comparar solo la fecha
-                            
-                                        return Trabajo::with(['vehiculo'])
-                                            // ->where(function ($query) use ($fechaActual) {
-                                            //     $query->whereNull('fecha_salida') // Filtra por trabajos sin fecha_salida
-                                            //         ->orWhereDate('fecha_salida', '>=', $fechaActual); // Filtra por fecha_salida igual a la fecha actual
-                                            // })
+                                    ->options(function (Get $get) {
+                                        $fechaActual = now()->format('Y-m-d');
+                                        $trabajoId = $get('trabajo_id');
+
+                                        return Trabajo::with(['vehiculo', 'vehiculo.tipoVehiculo'])
+                                            ->where(function ($query) use ($fechaActual, $trabajoId) {
+                                                if ($trabajoId) {
+                                                    $query->where('id', $trabajoId);
+                                                }
+
+                                                $query->orWhere(function ($subQuery) use ($fechaActual) {
+                                                    $subQuery->where('disponible', true)
+                                                        ->orWhereNull('fecha_salida')
+                                                        ->orWhereDate('fecha_salida', '>=', $fechaActual);
+                                                });
+                                            })
                                             ->orderBy('created_at', 'desc')
                                             ->get()
                                             ->mapWithKeys(function ($trabajo) {
-                                                $codigo = $trabajo->codigo;
-                                                $placa = $trabajo->vehiculo->placa;
-                                                $tipo = $trabajo->vehiculo->tipoVehiculo->nombre;
-                                                $marca = $trabajo->vehiculo->marca;
-                                                $modelo = $trabajo->vehiculo->modelo;
-                                                $color = $trabajo->vehiculo->color;
-                                                $label = "{$placa} {$tipo} {$marca} {$modelo} {$color} ({$codigo})";
+                                                // Solución segura para combinar fecha (date) + hora (time)
+                                                $fechaHoraIngreso = Carbon::createFromFormat(
+                                                    'Y-m-d H:i:s',
+                                                    $trabajo->fecha_ingreso->format('Y-m-d') . ' ' . $trabajo->hora_ingreso->format('H:i:s')
+                                                );
+
+                                                // Formateo de fecha
+                                                $formatoFecha = $fechaHoraIngreso->isoFormat('D [de] MMMM [de] YYYY');
+                                                $textoTiempo = $fechaHoraIngreso->locale('es')->diffForHumans();
+
+                                                // Construcción del label seguro con valores nulos
+                                                $partesVehiculo = array_filter([
+                                                    $trabajo->vehiculo->placa,
+                                                    $trabajo->vehiculo->tipoVehiculo->nombre,
+                                                    $trabajo->vehiculo->marca,
+                                                    $trabajo->vehiculo->modelo,
+                                                    $trabajo->vehiculo->color,
+                                                    // "({$trabajo->codigo})" // Agregar el código como en tu versión original
+                                                ], 'strlen');
+
+                                                $label = sprintf(
+                                                    "%s\nIngreso: %s (%s)",
+                                                    implode(' ', $partesVehiculo),
+                                                    $formatoFecha,
+                                                    $textoTiempo
+                                                );
+
                                                 return [$trabajo->id => $label];
                                             });
                                     })

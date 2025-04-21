@@ -35,17 +35,17 @@ class SalidasChart extends ChartWidget
         // Determinar la granularidad del gráfico
         $diffInDays = $startDate->diffInDays($endDate);
 
-        if ($diffInDays <= 35) { // Hasta 5 semanas (mostrar por día)
+        if ($diffInDays <= 21) { // Hasta 5 semanas (mostrar por día)
             $period = CarbonPeriod::create($startDate, $endDate);
             $format = 'd';
             $groupBy = 'day';
             $xAxisFormat = 'd';
-        } elseif ($diffInDays <= 180) { // Hasta 6 meses (mostrar por semana)
+        } elseif ($diffInDays <= 45) { // Hasta 6 meses (mostrar por semana)
             $period = CarbonPeriod::create($startDate, '1 week', $endDate);
             $format = 'W';
             $groupBy = 'week';
             $xAxisFormat = 'W';
-        } elseif ($diffInDays <= 730) { // Hasta 2 años (mostrar por mes)
+        } elseif ($diffInDays <= 550) { // Hasta 2 años (mostrar por mes)
             $period = CarbonPeriod::create($startDate, '1 month', $endDate);
             $groupBy = 'month';
             $xAxisFormat = 'M';
