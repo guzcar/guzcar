@@ -3,8 +3,10 @@
 use App\Http\Controllers\ArticuloController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\Pdf\DespachoController as PdfDespachoController;
 use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
 use App\Http\Controllers\Pdf\VentaController as PdfVentaController;
@@ -83,6 +85,6 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     // Editar perfil
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::post('/profile/edit', [UserController::class, 'update'])->name('user.update');
-    Route::post('/profile/add-avatar', [UserController::class,'addAvatar'])->name('user.add-avatar');
+    Route::post('/profile/add-avatar', [UserController::class, 'addAvatar'])->name('user.add-avatar');
     Route::post('/profile/remove-avatar', [UserController::class, 'removeAvatar'])->name('user.remove-avatar');
 });

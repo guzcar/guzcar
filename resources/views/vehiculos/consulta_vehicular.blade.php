@@ -20,13 +20,13 @@
             <li class="list-group-item py-3">
                 <div class="d-flex">
                     <span class="fw-bold" style="min-width: 100px;">Marca</span>
-                    <span>{{ $vehiculo->marca }}</span>
+                    <span>{{ $vehiculo->marca?->nombre }}</span>
                 </div>
             </li>
             <li class="list-group-item py-3">
                 <div class="d-flex">
                     <span class="fw-bold" style="min-width: 100px;">Modelo</span>
-                    <span>{{ $vehiculo->modelo }}</span>
+                    <span>{{ $vehiculo->modelo?->nombre }}</span>
                 </div>
             </li>
             <li class="list-group-item py-3">

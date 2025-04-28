@@ -70,11 +70,11 @@
                     </p>
                     <p class="text-gray-800 dark:text-gray-300">
                         <span class="font-medium text-gray-900 dark:text-gray-300">Marca:</span>
-                        {{ $evidencia->trabajo->vehiculo->marca }}
+                        {{ $evidencia->trabajo->vehiculo->marca?->nombre }}
                     </p>
                     <p class="text-gray-800 dark:text-gray-300">
                         <span class="font-medium text-gray-900 dark:text-gray-300">Modelo:</span>
-                        {{ $evidencia->trabajo->vehiculo->modelo }}
+                        {{ $evidencia->trabajo->vehiculo->modelo?->nombre }}
                     </p>
                     <p class="text-gray-800 dark:text-gray-300">
                         <span class="font-medium text-gray-900 dark:text-gray-300">Color:</span>

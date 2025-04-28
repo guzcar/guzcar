@@ -28,11 +28,11 @@
                             </tr>
                             <tr>
                                 <th style="text-align: left;">Marca</th>
-                                <td>{{ $despacho->trabajo->vehiculo->marca }}</td>
+                                <td>{{ $despacho->trabajo->vehiculo->marca?->nombre }}</td>
                             </tr>
                             <tr>
                                 <th style="text-align: left;">Modelo</th>
-                                <td>{{ $despacho->trabajo->vehiculo->modelo }}</td>
+                                <td>{{ $despacho->trabajo->vehiculo->modelo?->nombre }}</td>
                             </tr>
                         </tbody>
                     </table>

@@ -25,9 +25,9 @@
                                         <li class="list-group-item px-2 py-2" style="background-color: transparent">
                                             {{ $trabajo->vehiculo->tipoVehiculo->nombre }}</li>
                                         <li class="list-group-item px-2 py-2" style="background-color: transparent">
-                                            {{ $trabajo->vehiculo->marca }}</li>
+                                            {{ $trabajo->vehiculo->marca?->nombre }}</li>
                                         <li class="list-group-item px-2 py-2" style="background-color: transparent">
-                                            {{ $trabajo->vehiculo->modelo }}</li>
+                                            {{ $trabajo->vehiculo->modelo?->nombre }}</li>
                                         <li class="list-group-item px-2 py-2" style="background-color: transparent">
                                             {{ $trabajo->vehiculo->color }}</li>
                                     </ul>

@@ -83,12 +83,14 @@ class EvidenciaResource extends Resource
                         ->placeholder('Sin Placa')
                         ->sortable()
                         ->searchable(isIndividual: true),
-                    TextColumn::make('trabajo.vehiculo.marca')
+                    TextColumn::make('trabajo.vehiculo.marca.nombre')
                         ->label('Marca')
+                        ->placeholder('Sin Marca')
                         ->sortable()
                         ->searchable(isIndividual: true),
-                    TextColumn::make('trabajo.vehiculo.modelo')
+                    TextColumn::make('trabajo.vehiculo.modelo.nombre')
                         ->label('Modelo')
+                        ->placeholder('Sin Modelo')
                         ->sortable()
                         ->searchable(isIndividual: true)
                         ->toggleable(isToggledHiddenByDefault: true),

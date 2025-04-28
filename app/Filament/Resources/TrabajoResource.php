@@ -15,6 +15,8 @@ use App\Models\Servicio;
 use App\Models\Trabajo;
 use App\Models\User;
 use App\Models\Vehiculo;
+use App\Models\VehiculoMarca;
+use App\Models\VehiculoModelo;
 use App\Services\TrabajoService;
 use Carbon\Carbon;
 use DateTime;
@@ -33,6 +35,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\ActionSize;
@@ -130,8 +134,8 @@ class TrabajoResource extends Resource
                                     ->getOptionLabelFromRecordUsing(function ($record) {
                                         $placa = $record->placa ?? '';
                                         $tipoVehiculo = $record->tipoVehiculo->nombre;
-                                        $marca = $record->marca;
-                                        $modelo = $record->modelo;
+                                        $marca = $record->marca?->nombre;
+                                        $modelo = $record->modelo?->nombre;
                                         $color = $record->color;
                                         if (!empty($placa)) {
                                             return "{$placa} {$tipoVehiculo} {$marca} {$modelo} {$color}";
@@ -164,12 +168,63 @@ class TrabajoResource extends Resource
                                             ->unique(ignoreRecord: true)
                                             ->maxLength(20)
                                             ->placeholder('ABC-123'),
-                                        TextInput::make('marca')
-                                            ->required()
-                                            ->maxLength(255),
-                                        TextInput::make('modelo')
-                                            ->required()
-                                            ->maxLength(255),
+
+                                        Select::make('marca_id')
+                                            ->label('Marca')
+                                            ->relationship('marca', 'nombre')
+                                            ->searchable()
+                                            ->preload()
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre de la Marca')
+                                                    ->required()
+                                                    ->unique(VehiculoMarca::class, 'nombre'),
+                                            ])
+                                            ->createOptionUsing(function (array $data) {
+                                                return VehiculoMarca::create($data)->getKey();
+                                            })
+                                            ->editOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre de la Marca')
+                                                    ->required()
+                                                    ->unique(VehiculoMarca::class, 'nombre', ignoreRecord: true),
+                                            ])
+                                            ->afterStateUpdated(function (Set $set) {
+                                                $set('modelo_id', null);
+                                            })
+                                            ->reactive()
+                                            ->nullable(),
+
+                                        Select::make('modelo_id')
+                                            ->label('Modelo')
+                                            ->relationship('modelo', 'nombre')
+                                            ->searchable()
+                                            ->preload()
+                                            ->disabled(fn(Get $get) => blank($get('marca_id')))
+                                            ->options(fn(Get $get) => VehiculoModelo::query()
+                                                ->when($get('marca_id'), fn($query, $marcaId) => $query->where('marca_id', $marcaId))
+                                                ->pluck('nombre', 'id'))
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre del Modelo')
+                                                    ->required()
+                                                    ->unique(VehiculoModelo::class, 'nombre'),
+                                            ])
+                                            ->createOptionUsing(function (array $data, Get $get) {
+                                                return VehiculoModelo::create([
+                                                    'nombre' => $data['nombre'],
+                                                    'marca_id' => $get('marca_id'),
+                                                ])->getKey();
+                                            })
+                                            ->editOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre del Modelo')
+                                                    ->required()
+                                                    ->unique(VehiculoModelo::class, 'nombre', ignoreRecord: true),
+                                            ])
+                                            ->reactive()
+                                            ->nullable(),
+
                                         TextInput::make('color')
                                             ->required()
                                             ->maxLength(255),
@@ -251,12 +306,65 @@ class TrabajoResource extends Resource
                                             ->required(),
                                         TextInput::make('placa')
                                             ->unique(ignoreRecord: true)
-                                            ->maxLength(20),
-                                        TextInput::make('marca')
-                                            ->required()
-                                            ->maxLength(255),
-                                        TextInput::make('modelo')
-                                            ->maxLength(255),
+                                            ->maxLength(20)
+                                            ->placeholder('ABC-123'),
+
+                                        Select::make('marca_id')
+                                            ->label('Marca')
+                                            ->relationship('marca', 'nombre')
+                                            ->searchable()
+                                            ->preload()
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre de la Marca')
+                                                    ->required()
+                                                    ->unique(VehiculoMarca::class, 'nombre'),
+                                            ])
+                                            ->createOptionUsing(function (array $data) {
+                                                return VehiculoMarca::create($data)->getKey();
+                                            })
+                                            ->editOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre de la Marca')
+                                                    ->required()
+                                                    ->unique(VehiculoMarca::class, 'nombre', ignoreRecord: true),
+                                            ])
+                                            ->afterStateUpdated(function (Set $set) {
+                                                $set('modelo_id', null);
+                                            })
+                                            ->reactive()
+                                            ->nullable(),
+
+                                        Select::make('modelo_id')
+                                            ->label('Modelo')
+                                            ->relationship('modelo', 'nombre')
+                                            ->searchable()
+                                            ->preload()
+                                            ->disabled(fn(Get $get) => blank($get('marca_id')))
+                                            ->options(fn(Get $get) => VehiculoModelo::query()
+                                                ->when($get('marca_id'), fn($query, $marcaId) => $query->where('marca_id', $marcaId))
+                                                ->pluck('nombre', 'id'))
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre del Modelo')
+                                                    ->required()
+                                                    ->unique(VehiculoModelo::class, 'nombre'),
+                                            ])
+                                            ->createOptionUsing(function (array $data, Get $get) {
+                                                return VehiculoModelo::create([
+                                                    'nombre' => $data['nombre'],
+                                                    'marca_id' => $get('marca_id'),
+                                                ])->getKey();
+                                            })
+                                            ->editOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre del Modelo')
+                                                    ->required()
+                                                    ->unique(VehiculoModelo::class, 'nombre', ignoreRecord: true),
+                                            ])
+                                            ->reactive()
+                                            ->nullable(),
+
                                         TextInput::make('color')
                                             ->required()
                                             ->maxLength(255),
@@ -533,7 +641,7 @@ class TrabajoResource extends Resource
                     ->label('Código')
                     ->sortable()
                     ->searchable(isIndividual: true)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('fecha_ingreso')
                     ->date('d/m/Y')
                     ->sortable(),
@@ -542,7 +650,7 @@ class TrabajoResource extends Resource
                     ->hidden(fn() => !auth()->user()->can('update_trabajo')),
                 TextColumn::make('vehiculo.placa')
                     ->label('Placa')
-                    ->placeholder('SIN PLACA')
+                    ->placeholder('Sin Placa')
                     ->sortable()
                     ->searchable(isIndividual: true)
                     ->badge()
@@ -554,12 +662,13 @@ class TrabajoResource extends Resource
                     ->sortable()
                     ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('vehiculo.marca')
+                TextColumn::make('vehiculo.marca.nombre')
+                    ->placeholder('Sin Marca')
                     ->label('Marca')
                     ->sortable()
                     ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('vehiculo.modelo')
+                TextColumn::make('vehiculo.modelo.nombre')
                     ->placeholder('Sin Modelo')
                     ->label('Modelo')
                     ->wrap()
@@ -577,12 +686,12 @@ class TrabajoResource extends Resource
                     ->searchable(isIndividual: true)
                     ->badge()
                     ->wrap()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('descripcion_servicio')
                     ->searchable(isIndividual: true)
                     ->wrap()
                     ->lineClamp(2)
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('usuarios.name')
                     ->placeholder('Sin Técnicos')
                     ->label('Técnicos')

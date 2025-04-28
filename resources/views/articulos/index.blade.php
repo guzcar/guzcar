@@ -134,8 +134,8 @@
                                         @if($articulo->trabajo)
                                             {{ $articulo->trabajo->vehiculo->placa }} -
                                             {{ $articulo->trabajo->vehiculo->tipoVehiculo->nombre }}
-                                            {{ $articulo->trabajo->vehiculo->marca }}
-                                            {{ $articulo->trabajo->vehiculo->modelo }}
+                                            {{ $articulo->trabajo->vehiculo->marca?->nombre }}
+                                            {{ $articulo->trabajo->vehiculo->modelo?->nombre }}
                                             {{ $articulo->trabajo->vehiculo->color }}
                                         @else
                                             <span class="text-secondary">Taller</span>

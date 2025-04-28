@@ -330,8 +330,8 @@ class SalidaResource extends Resource
                                                         $partesVehiculo = array_filter([
                                                             $trabajo->vehiculo->placa,
                                                             $trabajo->vehiculo->tipoVehiculo->nombre,
-                                                            $trabajo->vehiculo->marca,
-                                                            $trabajo->vehiculo->modelo,
+                                                            $trabajo->vehiculo->marca?->nombre,
+                                                            $trabajo->vehiculo->modelo?->nombre,
                                                             $trabajo->vehiculo->color
                                                         ], 'strlen');
 
@@ -554,7 +554,7 @@ class SalidaResource extends Resource
                                     ? Carbon::parse($record->trabajo->fecha_salida)->format('d/m/Y')
                                     : ($record->trabajo->taller ? $record->trabajo->taller->nombre : 'Sin taller');
                             }
-                            return 'Sin trabajo asociado';
+                            return null;
                         })
                         ->label('Fecha salida')
                         ->placeholder('Sin salida')
@@ -567,9 +567,13 @@ class SalidaResource extends Resource
                         ->label('Tipo')
                         ->placeholder('Sin Vehiculo')
                         ->searchable(isIndividual: true),
-                    TextColumn::make('trabajo.vehiculo.marca')
+                    TextColumn::make('trabajo.vehiculo.marca.nombre')
                         ->label('Marca')
-                        ->placeholder('Sin Vehiculo')
+                        ->placeholder('Sin Marca')
+                        ->searchable(isIndividual: true),
+                    TextColumn::make('trabajo.vehiculo.modelo.nombre')
+                        ->label('Modelo')
+                        ->placeholder('Sin Modelo')
                         ->searchable(isIndividual: true),
                     TextColumn::make('trabajo.vehiculo.color')
                         ->label('Color')

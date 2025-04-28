@@ -15,6 +15,16 @@ return new class extends Migration {
             $table->string('placa', 7)->unique()->nullable();
             $table->string('marca');
             $table->string('modelo')->nullable();
+            $table->foreignId('marca_id')
+                ->nullable()
+                ->constrained('vehiculo_marcas')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+            $table->foreignId('modelo_id')
+                ->nullable()
+                ->constrained('vehiculo_modelos')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
             $table->string('color');
             $table->string('vin')->nullable();
             $table->string('motor')->nullable();

@@ -125,8 +125,8 @@ class DespachoResource extends Resource
                                                 $partesVehiculo = array_filter([
                                                     $trabajo->vehiculo->placa,
                                                     $trabajo->vehiculo->tipoVehiculo->nombre,
-                                                    $trabajo->vehiculo->marca,
-                                                    $trabajo->vehiculo->modelo,
+                                                    $trabajo->vehiculo->marca?->nombre,
+                                                    $trabajo->vehiculo->modelo?->nombre,
                                                     $trabajo->vehiculo->color,
                                                     // "({$trabajo->codigo})" // Agregar el código como en tu versión original
                                                 ], 'strlen');

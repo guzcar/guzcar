@@ -6,6 +6,8 @@ use App\Filament\Resources\VentaResource\Pages;
 use App\Filament\Resources\VentaResource\RelationManagers;
 use App\Filament\Resources\VentaResource\RelationManagers\VentaArticuloRelationManager;
 use App\Models\Vehiculo;
+use App\Models\VehiculoMarca;
+use App\Models\VehiculoModelo;
 use App\Models\Venta;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
@@ -17,6 +19,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -124,9 +128,9 @@ class VentaResource extends Resource
                                     ->getOptionLabelFromRecordUsing(function ($record) {
                                         $placa = $record->placa ?? '';
                                         $tipoVehiculo = $record->tipoVehiculo->nombre;
-                                        $marca = $record->marca;
-                                        $modelo = $record->modelo;
-                                        return "{$placa} - {$tipoVehiculo} - {$marca} {$modelo}";
+                                        $marca = $record->marca?->nombre;
+                                        $modelo = $record->modelo?->nombre;
+                                        return "{$placa} {$tipoVehiculo} {$marca} {$modelo}";
                                     })
                                     ->searchable()
                                     ->preload()
@@ -140,12 +144,63 @@ class VentaResource extends Resource
                                             ->unique(ignoreRecord: true)
                                             ->maxLength(20)
                                             ->placeholder('ABC-123'),
-                                        TextInput::make('marca')
-                                            ->required()
-                                            ->maxLength(255),
-                                        TextInput::make('modelo')
-                                            ->required()
-                                            ->maxLength(255),
+
+                                        Select::make('marca_id')
+                                            ->label('Marca')
+                                            ->relationship('marca', 'nombre')
+                                            ->searchable()
+                                            ->preload()
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre de la Marca')
+                                                    ->required()
+                                                    ->unique(VehiculoMarca::class, 'nombre'),
+                                            ])
+                                            ->createOptionUsing(function (array $data) {
+                                                return VehiculoMarca::create($data)->getKey();
+                                            })
+                                            ->editOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre de la Marca')
+                                                    ->required()
+                                                    ->unique(VehiculoMarca::class, 'nombre', ignoreRecord: true),
+                                            ])
+                                            ->afterStateUpdated(function (Set $set) {
+                                                $set('modelo_id', null);
+                                            })
+                                            ->reactive()
+                                            ->nullable(),
+
+                                        Select::make('modelo_id')
+                                            ->label('Modelo')
+                                            ->relationship('modelo', 'nombre')
+                                            ->searchable()
+                                            ->preload()
+                                            ->disabled(fn(Get $get) => blank($get('marca_id')))
+                                            ->options(fn(Get $get) => VehiculoModelo::query()
+                                                ->when($get('marca_id'), fn($query, $marcaId) => $query->where('marca_id', $marcaId))
+                                                ->pluck('nombre', 'id'))
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre del Modelo')
+                                                    ->required()
+                                                    ->unique(VehiculoModelo::class, 'nombre'),
+                                            ])
+                                            ->createOptionUsing(function (array $data, Get $get) {
+                                                return VehiculoModelo::create([
+                                                    'nombre' => $data['nombre'],
+                                                    'marca_id' => $get('marca_id'),
+                                                ])->getKey();
+                                            })
+                                            ->editOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre del Modelo')
+                                                    ->required()
+                                                    ->unique(VehiculoModelo::class, 'nombre', ignoreRecord: true),
+                                            ])
+                                            ->reactive()
+                                            ->nullable(),
+
                                         TextInput::make('color')
                                             ->required()
                                             ->maxLength(255),
@@ -167,11 +222,63 @@ class VentaResource extends Resource
                                         TextInput::make('placa')
                                             ->unique(ignoreRecord: true)
                                             ->maxLength(20),
-                                        TextInput::make('marca')
-                                            ->required()
-                                            ->maxLength(255),
-                                        TextInput::make('modelo')
-                                            ->maxLength(255),
+
+                                        Select::make('marca_id')
+                                            ->label('Marca')
+                                            ->relationship('marca', 'nombre')
+                                            ->searchable()
+                                            ->preload()
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre de la Marca')
+                                                    ->required()
+                                                    ->unique(VehiculoMarca::class, 'nombre'),
+                                            ])
+                                            ->createOptionUsing(function (array $data) {
+                                                return VehiculoMarca::create($data)->getKey();
+                                            })
+                                            ->editOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre de la Marca')
+                                                    ->required()
+                                                    ->unique(VehiculoMarca::class, 'nombre', ignoreRecord: true),
+                                            ])
+                                            ->afterStateUpdated(function (Set $set) {
+                                                $set('modelo_id', null);
+                                            })
+                                            ->reactive()
+                                            ->nullable(),
+
+                                        Select::make('modelo_id')
+                                            ->label('Modelo')
+                                            ->relationship('modelo', 'nombre')
+                                            ->searchable()
+                                            ->preload()
+                                            ->disabled(fn(Get $get) => blank($get('marca_id')))
+                                            ->options(fn(Get $get) => VehiculoModelo::query()
+                                                ->when($get('marca_id'), fn($query, $marcaId) => $query->where('marca_id', $marcaId))
+                                                ->pluck('nombre', 'id'))
+                                            ->createOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre del Modelo')
+                                                    ->required()
+                                                    ->unique(VehiculoModelo::class, 'nombre'),
+                                            ])
+                                            ->createOptionUsing(function (array $data, Get $get) {
+                                                return VehiculoModelo::create([
+                                                    'nombre' => $data['nombre'],
+                                                    'marca_id' => $get('marca_id'),
+                                                ])->getKey();
+                                            })
+                                            ->editOptionForm([
+                                                Forms\Components\TextInput::make('nombre')
+                                                    ->label('Nombre del Modelo')
+                                                    ->required()
+                                                    ->unique(VehiculoModelo::class, 'nombre', ignoreRecord: true),
+                                            ])
+                                            ->reactive()
+                                            ->nullable(),
+
                                         TextInput::make('color')
                                             ->required()
                                             ->maxLength(255),
@@ -217,25 +324,25 @@ class VentaResource extends Resource
                 ColumnGroup::make('Vehículo', [
                     TextColumn::make('vehiculo.placa')
                         ->label('Placa')
-                        ->placeholder('Sin placa')
+                        ->placeholder('Sin Placa')
                         ->searchable(isIndividual: true)
                         ->sortable()
                         ->toggleable(isToggledHiddenByDefault: false),
                     TextColumn::make('vehiculo.tipoVehiculo.nombre')
                         ->label('Tipo')
-                        ->placeholder('Sin placa')
+                        ->placeholder('Sin Vehiculo')
                         ->searchable(isIndividual: true)
                         ->sortable()
                         ->toggleable(isToggledHiddenByDefault: true),
-                    TextColumn::make('vehiculo.marca')
-                        ->label('marca')
-                        ->placeholder('Sin placa')
+                    TextColumn::make('vehiculo.marca.nombre')
+                        ->label('Marca')
+                        ->placeholder('Sin Marca')
                         ->searchable(isIndividual: true)
                         ->sortable()
                         ->toggleable(isToggledHiddenByDefault: true),
-                    TextColumn::make('vehiculo.modelo')
-                        ->label('modelo')
-                        ->placeholder('Sin placa')
+                    TextColumn::make('vehiculo.modelo.nombre')
+                        ->label('Modelo')
+                        ->placeholder('Sin Modelo')
                         ->searchable(isIndividual: true)
                         ->sortable()
                         ->toggleable(isToggledHiddenByDefault: true),

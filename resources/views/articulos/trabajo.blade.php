@@ -51,13 +51,13 @@
         <li class="list-group-item">
             <div class="d-flex">
                 <span class="fw-bold" style="min-width: 100px;">Marca</span>
-                <span>{{ $trabajo->vehiculo->marca }}</span>
+                <span>{{ $trabajo->vehiculo->marca?->nombre }}</span>
             </div>
         </li>
         <li class="list-group-item">
             <div class="d-flex">
                 <span class="fw-bold" style="min-width: 100px;">Modelo</span>
-                <span>{{ $trabajo->vehiculo->modelo }}</span>
+                <span>{{ $trabajo->vehiculo->modelo?->nombre }}</span>
             </div>
         </li>
         <li class="list-group-item">

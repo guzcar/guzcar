@@ -37,13 +37,13 @@
             </tr>
             <tr>
                 <td>MARCA:</td>
-                <td style="border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->marca ?? '' }}</td>
+                <td style="border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->marca?->nombre ?? '' }}</td>
                 <td style="padding-left: 1rem;">AÑO:</td>
                 <td style="border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->ano ?? '' }}</td>
             </tr>
             <tr>
                 <td>MODELO:</td>
-                <td style="border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->modelo ?? '' }}</td>
+                <td style="border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->modelo?->nombre ?? '' }}</td>
                 <td style="padding-left: 1rem;">KILOMETRAJE:</td>
                 <td style="border-bottom: dotted black 1px;">{{ $trabajo?->kilometraje ?? '' }}</td>
             </tr>

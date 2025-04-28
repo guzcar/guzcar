@@ -20,11 +20,11 @@
                         </tr>
                         <tr>
                             <td>Marca</td>
-                            <td>{{ $vehiculo->marca }}</td>
+                            <td>{{ $vehiculo->marca?->nombre }}</td>
                         </tr>
                         <tr>
                             <td>Modelo</td>
-                            <td>{{ $vehiculo->modelo }}</td>
+                            <td>{{ $vehiculo->modelo?->nombre }}</td>
                         </tr>
                     </tbody>
                 </table>
