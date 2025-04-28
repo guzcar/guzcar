@@ -31,7 +31,19 @@ class ModelosRelationManager extends RelationManager
             ->recordTitleAttribute('nombre')
             ->columns([
                 Tables\Columns\TextColumn::make('nombre'),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Fecha de creación')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Fecha de edición')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
+
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])
