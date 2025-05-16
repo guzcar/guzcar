@@ -65,6 +65,7 @@ class ClienteResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->searchOnBlur(true)
             ->columns([
                 TextColumn::make('identificador')
                     ->label('RUC / DNI')

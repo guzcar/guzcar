@@ -51,6 +51,7 @@ class ArticuloPresentacionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->searchOnBlur(true)
             ->columns([
                 TextColumn::make('nombre')
                     ->searchable()

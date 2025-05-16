@@ -55,6 +55,7 @@ class EvidenciaResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->searchOnBlur(true)
             ->columns([
                 ColumnGroup::make('Trabajo', [
                     TextColumn::make('trabajo.codigo')
