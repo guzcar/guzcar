@@ -1,7 +1,5 @@
 <x-pdf-layout title="Proforma {{ $trabajo->codigo }}" code="{{ $trabajo->codigo }}">
 
-    <h3>CLIENTE</h3>
-
     <table class="table-void">
         <tbody>
             <tr>

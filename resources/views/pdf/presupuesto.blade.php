@@ -1,5 +1,7 @@
 <x-pdf-layout title="Presupuesto {{ $trabajo->codigo }}" code="{{ $trabajo->codigo }}">
 
+    <h3 class="mt-0">CLIENTE</h3>
+
     <table class="table-void">
         <tbody>
             <tr>
@@ -47,6 +49,13 @@
                 <td style="border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->modelo?->nombre ?? '' }}</td>
                 <td style="padding-left: 1rem;">KILOMETRAJE:</td>
                 <td style="border-bottom: dotted black 1px;">{{ $trabajo?->kilometraje ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>COLOR:</td>
+                <td style="border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->color ?? '' }}</td>
+                <td style="padding-left: 1rem;">F. ENTREGA:</td>
+                <td style="border-bottom: dotted black 1px;">
+                    {{ optional($trabajo?->fecha_salida)->format('d/m/Y') ?? '' }}</td>
             </tr>
             @if ($trabajo->conductor)
                 <tr>
@@ -112,34 +121,34 @@
         <tbody>
             @php $counter = 1; @endphp
             @if($articulosAgrupados->isNotEmpty())
-                    @foreach($articulosAgrupados as $articulo)
-                            <tr>
-                                <td class="text-center">{{ $counter++ }}</td>
-                                <td>
-                                    @php
-                                        $articuloData = $articulo['articulo'];
-                                        $labelParts = [
-                                            $articuloData->categoria->nombre ?? null,
-                                            $articuloData->marca->nombre ?? null,
-                                            $articuloData->subCategoria->nombre ?? null,
-                                            $articuloData->especificacion ?? null,
-                                            $articuloData->presentacion->nombre ?? null,
-                                            $articuloData->medida ?? null,
-                                            $articuloData->unidad->nombre ?? null,
-                                            /*$articuloData->color ?? null*/
-                                        ];
-                                        echo implode(' ', array_filter($labelParts));
-                                    @endphp
-                                </td>
-                                <td class="text-center">
-                                    {{ \App\Services\FractionService::decimalToFraction($articulo['cantidad']) }}
-                                </td>
-                                <td class="text-right">S/ {{ $articulo['precio'] }}</td>
-                                <td class="text-right">S/
-                                    {{ number_format($articulo['cantidad'] * $articulo['precio'], 2) }}
-                                </td>
-                            </tr>
-                    @endforeach
+                @foreach($articulosAgrupados as $articulo)
+                    <tr>
+                        <td class="text-center">{{ $counter++ }}</td>
+                        <td>
+                            @php
+                                $articuloData = $articulo['articulo'];
+                                $labelParts = [
+                                    $articuloData->categoria->nombre ?? null,
+                                    $articuloData->marca->nombre ?? null,
+                                    $articuloData->subCategoria->nombre ?? null,
+                                    $articuloData->especificacion ?? null,
+                                    $articuloData->presentacion->nombre ?? null,
+                                    $articuloData->medida ?? null,
+                                    $articuloData->unidad->nombre ?? null,
+                                    /*$articuloData->color ?? null*/
+                                ];
+                                echo implode(' ', array_filter($labelParts));
+                            @endphp
+                        </td>
+                        <td class="text-center">
+                            {{ \App\Services\FractionService::decimalToFraction($articulo['cantidad']) }}
+                        </td>
+                        <td class="text-right">S/ {{ $articulo['precio'] }}</td>
+                        <td class="text-right">S/
+                            {{ number_format($articulo['cantidad'] * $articulo['precio'], 2) }}
+                        </td>
+                    </tr>
+                @endforeach
             @endif
 
             @forelse($trabajo->otros as $trabajoOtro)
@@ -175,57 +184,50 @@
     <table style="border-collapse: collapse; width: 100%;">
         <tbody>
             <tr>
-                <td style="padding: 0; margin: 0; border: none; width: 180px; vertical-align: top;">
-                    @if($descuentos->isNotEmpty())
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 80px;">Descuento</th>
-                                    <th style="width: 100px;">Monto</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($descuentos as $descuento)
-                                    <tr>
-                                        <td class="text-center">{{ $descuento->descuento }}%</td>
-                                        <td class="text-right">S/ {{ number_format($total * ($descuento->descuento / 100), 2) }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td class="border-top"></td>
-                                    <td class="text-right border-top bold">S/ {{ number_format($total_descuentos, 2) }}</td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                <!-- Columna izquierda: Tiempo, Garantía, Observaciones -->
+                <td style="width: 65%; vertical-align: top; padding-right: 1rem;">
+                    <p class="mt-0 mb-0">Tiempo de ejecución: <span class="bold">{{ $tiempo }}</span></p>
+
+                    @if ($trabajo->garantia)
+                        <p class="mt-0 mb-0">Tiempo de garantía: <span class="bold">{{ $trabajo->garantia }}</span></p>
+                    @endif
+
+                    @if ($trabajo->observaciones)
+                        <p class="mb-0">Observaciones:</p>
+                        <p class="mt-0">{!! $trabajo->observaciones !!}</p>
                     @endif
                 </td>
-                <td></td>
-                <td style="width: 200px; vertical-align: top;">
+
+                <!-- Columna derecha: Resumen de montos -->
+                <td style="width: 35%; vertical-align: top;">
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Resumen</th>
-                                <th>Monto</th>
+                                <th>RESUMEN</th>
+                                <th>MONTO</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Sub-Total</td>
-                                <td class="text-right">S/ {{ number_format($total, 2) }}</td>
+                                <td>SUBTOTAL</td>
+                                <td style="width: 100px" class="text-right">S/ {{ number_format($total, 2) }}</td>
                             </tr>
+
+                            @foreach($descuentos as $descuento)
+                                <tr>
+                                    <td>DESC. {{ $descuento->descuento }}%</td>
+                                    <td class="text-right">S/ {{ number_format($total * ($descuento->descuento / 100), 2) }}
+                                    </td>
+                                </tr>
+                            @endforeach
+
                             @if($descuentos->isNotEmpty())
                                 <tr>
-                                    <td>Descuento</td>
-                                    <td class="text-right">S/ {{ number_format($total_descuentos, 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Sub-Total c/Desc</td>
+                                    <td>TOTAL C/DESC</td>
                                     <td class="text-right">S/ {{ number_format($total_con_descuentos, 2) }}</td>
                                 </tr>
                             @endif
+
                             @if (request('igv'))
                                 <tr>
                                     <td>IGV ({{ request('igv_porcentaje')}}%)</td>
@@ -237,8 +239,9 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td class="border-top"></td>
-                                <td class="text-right bold border-top">S/
+                                <td class="border-top bold"></td>
+                                <td class="text-right border-top bold">
+                                    S/
                                     {{ number_format($total_con_igv = $total_con_descuentos * (1 + (request('igv') ? request('igv_porcentaje') / 100 : 0)), 2) }}
                                 </td>
                             </tr>
@@ -249,6 +252,7 @@
         </tbody>
     </table>
 
+    <!-- Texto en palabras -->
     @php
         $numberToWords = new NumberToWords\NumberToWords();
         $numberTransformer = $numberToWords->getNumberTransformer('es');
@@ -257,93 +261,9 @@
         $palabras = strtoupper($numberTransformer->toWords($entero)) . " CON $decimal/100 SOLES";
     @endphp
 
-    <div style="border-bottom: solid gray 1px; border-top: solid gray 1px; margin-top: 1rem;">
-        <p>Son: <span class="bold">{{ $palabras }}</span></p>
+    <div style="border-top: solid gray 1px; border-bottom: solid gray 1px; margin-top: 1rem;">
+        <p class="bold">SON: {{ $palabras }}</p>
     </div>
 
-    <!-- <div style="border-top: dashed black 1px;"></div> -->
-
-    <!-- <table style="border-collapse: collapse; width: 100%;">
-        <tbody>
-            <tr>
-                <td style="padding: 0; margin: 0; border: none; vertical-align: top;">
-                    <p style="margin-bottom: 0px;"><b>CUENTA BCP</b></p>
-                    <ul style="padding-left: 0; list-style-position: inside; margin-top: 0px;">
-                        <li>N° CTA: 3104600455054</li>
-                        <li>CCI: 00231000460045505410</li>
-                    </ul>
-                </td>
-                <td style="padding: 0; margin: 0; border: none; vertical-align: top;">
-                    <p style="margin-bottom: 0px;"><b>CUENTA BBVA</b></p>
-                    <ul style="padding-left: 0; list-style-position: inside; margin-top: 0px;">
-                        <li>N° CTA: 001102950100124365</li>
-                        <li>CCI: 0011029500010012436536</li>
-                    </ul>
-                </td>
-                <td style="padding: 0; margin: 0; border: none; vertical-align: top;">
-                    <p style="margin-bottom: 0px;"><b>BANCO DE LA NACION</b></p>
-                    <ul style="padding-left: 0; list-style-position: inside; margin-top: 0px;">
-                        <li>CTA. detracciones: 007850151</li>
-                    </ul>
-                </td>
-            </tr>
-        </tbody>
-    </table> -->
-
-    <table style="border-collapse: collapse; width: 100%; margin-top: 1rem;">
-        <tbody>
-            <tr>
-                <td style="padding: 0; margin: 0; border: none; vertical-align: top; width: 45%; padding-right: 1rem;">
-                    <p class="mt-0 mb-0">Tiempo de ejecución: <span class="bold">{{ $tiempo }}</span></p>
-
-                    @if ($trabajo->garantia)
-                        <p class="mt-0">Garantía: <span class="bold">{{ $trabajo?->garantia ?? '' }}</span></p>
-                    @endif
-
-                    @if ($trabajo->observaciones)
-                        <!-- <div style="border-top: dashed black 1px;"></div> -->
-                        <p class="mb-0">Observaciones:</p>
-                        <p class="mt-0">{!! $trabajo->observaciones !!}</p>
-                    @endif
-                </td>
-                <td style="padding: 0; margin: 0; border: none; vertical-align: top;">
-                    <table class="table-simple">
-                        <thead>
-                            <tr>
-                                <th style="width: 4rem;">Entidad</th>
-                                <th>Tipo de Cuenta</th>
-                                <th>Número de Cuenta</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td rowspan="2"><b>BCP</b></t>
-                                <td style="text-align: center;">CTE</td>
-                                <td>3104600455054</td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: center;">CCI</td>
-                                <td>00231000460045505410</td>
-                            </tr>
-                            <tr>
-                                <td rowspan="2"><b>BBVA</b></t>
-                                <td style="text-align: center;">CTE</td>
-                                <td>001102950100124365</td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: center;">CCI</td>
-                                <td>0011029500010012436536</td>
-                            </tr>
-                            <tr>
-                                <td><b>Banco de la Nación</b></t>
-                                <td style="text-align: center;">Detracciones</td>
-                                <td>007850151</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </td>
-            </tr>
-        </tbody>
-    </table>
 
 </x-pdf-layout>

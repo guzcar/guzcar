@@ -223,8 +223,8 @@
 
     <footer>
         <div class="border-top" style="margin-bottom: 10px;"></div>
-        <div>GRACIAS POR SU PREFERENCIA</div>
-        <div>AUTOMOTORES GUZCAR S.A.C.</div>
+        <div>Prolong. Leoncio Prado Nro. 1575 P.J. Miramar Alto</div>
+        <div>ENTEL. 998248543 - CHIMBOTE</div>
     </footer>
 
     <img src="{{ public_path('images/logo-kia.jpg') }}" class="watermark">
