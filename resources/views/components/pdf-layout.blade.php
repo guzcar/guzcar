@@ -191,7 +191,6 @@
                         <p class="m-0" style="text-transform: lowercase;">automotoresguzcar1@hotmail.com</p>
                     </td>
                     <td style="
-                        border: 1px solid rgb(31, 62, 129);
                         border-radius: 10px;
                         width: 150px;
                         text-align: center;
@@ -200,7 +199,7 @@
                         display: table-cell;
                         vertical-align: middle;
                         position: relative;
-                        background-color:rgb(196, 226, 236);
+                        background-color:rgb(31, 62, 129);
                     ">
                         <div style="
                             position: absolute;
@@ -208,6 +207,7 @@
                             left: 50%;
                             transform: translate(-50%, -50%);
                             width: calc(100% - 10px);
+                            color: white;
                         ">
                             <p class="bold mt-0">RUC: 20600613716</p>
                             <p class="m-0">PROFORMA</p>
