@@ -64,11 +64,25 @@
                                             </div>
                                             <div class="d-flex mb-2">
                                                 <span class="fw-bold" style="min-width: 100px;">F. Salida</span>
-                                                <span>{{ $trabajo?->fecha_salida?->format('d/m/Y') }}</span>
+                                                @if($trabajo?->fecha_salida)
+                                                    <span>{{ $trabajo->fecha_salida->format('d/m/Y') }}</span>
+                                                @else
+                                                    <span class="text-muted">EN TALLER</span>
+                                                @endif
                                             </div>
-                                            <div class="d-flex">
+                                            <div class="d-flex mb-2">
                                                 <span class="fw-bold" style="min-width: 100px;">Descripción</span>
                                                 <span>{{ $trabajo->descripcion_servicio ?? 'Sin descripción' }}</span>
+                                            </div>
+                                            <div class="d-flex">
+                                                <span class="fw-bold" style="min-width: 100px;">Técnicos</span>
+                                                <span>
+                                                    @forelse($trabajo->usuarios as $tecnico)
+                                                        {{ $tecnico->name }}{{ !$loop->last ? ',' : '' }}
+                                                    @empty
+                                                        <span class="text-muted">Sin técnicos</span>
+                                                    @endforelse
+                                                </span>
                                             </div>
                                         </td>
                                     </tr>

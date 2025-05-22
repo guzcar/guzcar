@@ -23,6 +23,7 @@ class VehiculoController extends Controller
 
         $trabajos = $vehiculo
             ? $vehiculo->trabajos()
+                ->with(['usuarios'])
                 ->orderByDesc('fecha_ingreso')
                 ->get()
             : collect();
