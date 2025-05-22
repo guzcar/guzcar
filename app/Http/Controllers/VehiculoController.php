@@ -18,9 +18,16 @@ class VehiculoController extends Controller
     {
         // Obtener la placa desde la URL (query parameter)
         $placa = $request->query('placa');
-        $vehiculo = Vehiculo::where('placa', $placa)->first();
+        $vehiculo = Vehiculo::where('placa', $placa)
+            ->first();
 
-        return view('vehiculos.consulta_vehicular', compact('placa', 'vehiculo'));
+        $trabajos = $vehiculo
+            ? $vehiculo->trabajos()
+                ->orderByDesc('fecha_ingreso')
+                ->get()
+            : collect();
+
+        return view('vehiculos.consulta_vehicular', compact('placa', 'vehiculo', 'trabajos'));
     }
 
     public function articulosUtilizados($id)

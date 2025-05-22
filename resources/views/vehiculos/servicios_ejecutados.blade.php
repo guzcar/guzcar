@@ -1,5 +1,14 @@
 <x-layout>
-    <h1 class="mb-3">Servicios Ejecutados</h1>
+<div style="max-width: 750px;" class="mx-auto">
+
+    <h1>{{ $vehiculo->placa  }}</h1>
+    <h4 class="fw-normal mb-3">
+        {{ $vehiculo->tipoVehiculo?->nombre }}
+        {{ $vehiculo->marca?->nombre }}
+        {{ $vehiculo->modelo?->nombre }}
+        {{ $vehiculo?->color }}
+    </h4>
+
     <a href="{{ url()->previous() }}" class="btn btn-light border mb-3">Volver</a>
 
     <p>Esta es la lista de todos los servicios que se ejecutaron en este vehículo.</p>
@@ -55,4 +64,6 @@
         });
     </script>
     @endpush
+
+</div>
 </x-layout>
