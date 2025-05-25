@@ -637,6 +637,7 @@ class TrabajoResource extends Resource
     {
         return $table
             ->searchOnBlur(true)
+            ->paginated([5, 10, 25, 50, 100])
             ->columns([
                 TextColumn::make('codigo')
                     ->label('Código')
@@ -800,6 +801,16 @@ class TrabajoResource extends Resource
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
                 DateRangeFilter::make('fecha_ingreso'),
                 DateRangeFilter::make('fecha_salida'),
+                TernaryFilter::make('aplazados')
+                    ->label('Trabajos aplazados')
+                    ->placeholder('Todos')
+                    ->trueLabel('Solo aplazados')
+                    ->falseLabel('Excluir aplazados')
+                    ->queries(
+                        true: fn($query) => $query->where('disponible', true),
+                        false: fn($query) => $query->where('disponible', false),
+                        blank: fn($query) => $query, // Mostrar todos (opción por defecto)
+                    ),
                 TrashedFilter::make(),
             ])
             ->actions([
@@ -946,20 +957,41 @@ class TrabajoResource extends Resource
                 // ]),
             ])
             ->headerActions([
-                Action::make('reiniciarControl')
-                    ->label('Reiniciar Control')
-                    ->requiresConfirmation()
-                    ->modalHeading('Reiniciar Control')
-                    ->modalDescription('¿Estás segura/o de que deseas reiniciar el control de todos los registros? Esta acción no se puede deshacer.')
-                    ->action(function () {
-                        DB::table('trabajos')->update(['control' => false]);
-                        Notification::make()
-                            ->title('Control reiniciado')
-                            ->body('Todos los registros han sido actualizados correctamente.')
-                            ->success()
-                            ->send();
-                    })
-                    ->color('danger'),
+                ActionGroup::make([
+                    Action::make('reiniciarControl')
+                        ->label('Reiniciar Control')
+                        ->requiresConfirmation()
+                        ->modalHeading('Reiniciar Control')
+                        ->modalDescription('¿Estás segura/o de que deseas reiniciar el control de todos los registros? Esta acción no se puede deshacer.')
+                        ->action(function () {
+                            DB::table('trabajos')->update(['control' => false]);
+                            Notification::make()
+                                ->title('Control reiniciado')
+                                ->body('Todos los registros han sido actualizados correctamente.')
+                                ->success()
+                                ->send();
+                        })
+                        ->color('danger')
+                        ->icon('heroicon-o-arrow-path'),
+
+                    Action::make('cerrarAplazados')
+                        ->label('Cerrar aplazados')
+                        ->requiresConfirmation()
+                        ->modalHeading('Cerrar trabajos aplazados')
+                        ->modalDescription('¿Estás seguro/a de que deseas cerrar todos los trabajos marcados como aplazados?.')
+                        ->action(function () {
+                            DB::table('trabajos')->update(['disponible' => false]);
+                            Notification::make()
+                                ->title('Aplazados cerrados')
+                                ->body('Todos los trabajos aplazados han sido actualizados correctamente.')
+                                ->success()
+                                ->send();
+                        })
+                        ->color('warning')
+                        ->icon('heroicon-o-clock')
+                ])
+                    ->button()
+                    ->color('gray'),
             ])
             ->recordClasses(fn(Trabajo $record) => match ($record->desembolso) {
                 'A CUENTA' => 'desembolso-a-cuenta',

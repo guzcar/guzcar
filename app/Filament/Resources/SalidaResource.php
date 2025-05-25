@@ -398,6 +398,7 @@ class SalidaResource extends Resource
     {
         return $table
             ->searchOnBlur(true)
+            ->paginated([5, 10, 25, 50])
             ->columns([
                 ColumnGroup::make('Resposables', [
                     TextColumn::make('fecha')

@@ -210,7 +210,7 @@
                             color: white;
                         ">
                             <p class="bold mt-0">RUC: 20600613716</p>
-                            <p class="m-0">PROFORMA</p>
+                            <p class="m-0">{{ $tipoReporte ?? 'REPORTE' }}</p>
                             <p class="m-0">N° {{ $code ?? 'CODIGO' }}</p>
                             <!-- <p class="m-0">{{ date('d/m/Y h:i:s') }}</p> -->
                         </div>

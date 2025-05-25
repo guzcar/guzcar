@@ -1,4 +1,4 @@
-<x-pdf-layout title="Despacho {{ $despacho->codigo }}" code="{{ $despacho->codigo }}">
+<x-pdf-layout title="Despacho {{ $despacho->codigo }}" code="{{ $despacho->codigo }}" tipoReporte="DESPACHO">
 
     <h3>DESPACHO</h3>
 

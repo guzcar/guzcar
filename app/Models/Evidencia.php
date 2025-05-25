@@ -15,7 +15,9 @@ class Evidencia extends Model
         'user_id',
         'evidencia_url',
         'tipo',
-        'observacion'
+        'observacion',
+        'sort',
+        'mostrar',
     ];
 
     public function trabajo()

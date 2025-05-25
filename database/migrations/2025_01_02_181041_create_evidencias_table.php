@@ -23,6 +23,8 @@ return new class extends Migration {
             $table->string('evidencia_url');
             $table->enum('tipo', ['imagen', 'video'])->default('video');
             $table->text('observacion')->nullable();
+            $table->unsignedBigInteger('sort')->default(0);
+            $table->boolean('mostrar')->default(true);
             $table->timestamps();
         });
 

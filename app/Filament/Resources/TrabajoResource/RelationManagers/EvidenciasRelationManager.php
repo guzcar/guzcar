@@ -13,10 +13,13 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EvidenciasRelationManager extends RelationManager
@@ -30,11 +33,12 @@ class EvidenciasRelationManager extends RelationManager
                 Grid::make()
                     ->schema([
                         FileUpload::make('evidencia_url')
+                            ->imageEditor()
                             ->label('Evidencias')
                             ->directory('evidencia')
                             ->required()
-                            ->multiple()
-                            ->reorderable()
+                            ->multiple(fn (string $operation): bool => $operation === 'create')
+                            ->reorderable(fn (string $operation): bool => $operation === 'create')
                             ->appendFiles()
                             ->panelLayout('grid')
                             ->columnSpan(1)
@@ -116,9 +120,10 @@ class EvidenciasRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->reorderable('sort')
             ->columns([
                 ImageColumn::make('evidencia_url')
-                    ->size(40)
+                    ->size(100)
                     ->label('Evidencia')
                     ->getStateUsing(function (Evidencia $record): string {
                         if ($record->tipo === 'imagen') {
@@ -128,6 +133,12 @@ class EvidenciasRelationManager extends RelationManager
                     })
                     ->alignCenter()
                     ->verticallyAlignCenter(),
+                TextColumn::make('mostrar')
+                    ->label('Mostrar')
+                    ->formatStateUsing(fn($state) => $state ? 'Si' : 'No')
+                    ->badge()
+                    ->color(fn($state) => $state ? 'success' : 'danger')
+                    ->alignCenter(),
                 TextColumn::make('user.name')
                     ->label('Subido por'),
                 TextColumn::make('observacion')
@@ -146,7 +157,8 @@ class EvidenciasRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('created_at', 'desc')
+            ->paginatedWhileReordering()
+            ->defaultSort('sort', 'asc')
             ->filters([
                 //
             ])
@@ -184,8 +196,28 @@ class EvidenciasRelationManager extends RelationManager
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
+                BulkActionGroup::make([
+                    BulkAction::make('marcarComoSi')
+                        ->label('Incluir en el Informe')
+                        ->action(function (Collection $records) {
+                            $records->each(function ($record) {
+                                $record->mostrar = true; // Cambiar a "SI"
+                                $record->save();
+                            });
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                    BulkAction::make('marcarComoNo')
+                        ->label('Excluir del Informe')
+                        ->action(function (Collection $records) {
+                            $records->each(function ($record) {
+                                $record->mostrar = false; // Cambiar a "NO"
+                                $record->save();
+                            });
+                        })
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ]);
     }

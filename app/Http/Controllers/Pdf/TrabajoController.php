@@ -187,7 +187,10 @@ class TrabajoController extends Controller
     public function evidencia($id)
     {
         $trabajo = Trabajo::find($id);
-        $evidencias = $trabajo->evidencias;
+        $evidencias = $trabajo->evidencias()
+            ->where('mostrar', true)
+            ->orderBy('sort')
+            ->get();
 
         // return view('pdf.evidencia', compact('trabajo', 'evidencias'));
 
