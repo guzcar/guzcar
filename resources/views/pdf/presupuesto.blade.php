@@ -242,6 +242,8 @@
                                 <td class="border-top bold">
                                     @if (!request('igv'))
                                         No incluye IGV
+                                    @else
+                                        Total
                                     @endif
                                 </td>
                                 <td class="text-right border-top bold">
