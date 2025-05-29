@@ -71,11 +71,11 @@
     <table class="table">
         <thead>
             <tr>
-                <th style="width: 40px">N°</th>
+                <th style="width: 30px">N°</th>
                 <th>Descripción</th>
-                <th style="width: 80px">Cantidad</th>
-                <th style="width: 100px">Costo</th>
-                <th style="width: 100px">Sub-Total</th>
+                <th style="width: 60px">Cant.</th>
+                <th style="width: 80px">Costo</th>
+                <th style="width: 80px">Sub-Total</th>
             </tr>
         </thead>
         <tbody>
@@ -111,11 +111,11 @@
     <table class="table">
         <thead>
             <tr>
-                <th style="width: 40px">N°</th>
+                <th style="width: 30px">N°</th>
                 <th>Descripción</th>
-                <th style="width: 80px">Cantidad</th>
-                <th style="width: 100px">Costo</th>
-                <th style="width: 100px">Sub-Total</th>
+                <th style="width: 60px">Cant.</th>
+                <th style="width: 80px">Costo</th>
+                <th style="width: 80px">Sub-Total</th>
             </tr>
         </thead>
         <tbody>
@@ -203,7 +203,7 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>RESUMEN</th>
+                                <th>DESCRIPCIÓN</th>
                                 <th>MONTO</th>
                             </tr>
                         </thead>
@@ -239,7 +239,11 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td class="border-top bold"></td>
+                                <td class="border-top bold">
+                                    @if (!request('igv'))
+                                        No incluye IGV
+                                    @endif
+                                </td>
                                 <td class="text-right border-top bold">
                                     S/
                                     {{ number_format($total_con_igv = $total_con_descuentos * (1 + (request('igv') ? request('igv_porcentaje') / 100 : 0)), 2) }}

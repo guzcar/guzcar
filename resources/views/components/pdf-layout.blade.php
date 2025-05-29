@@ -8,13 +8,13 @@
     <style>
         @page {
             size: A4;
-            margin: 130px 80px 0px 80px;
+            margin: 110px 80px -20px 80px;
             /* Ajustado margen superior para el header */
         }
 
         body {
             font-family: Arial, sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             margin: 0;
             padding: 0;
@@ -23,18 +23,18 @@
 
         header {
             position: fixed;
-            top: -100px;
+            top: -95px;
             /* Ajustado para coincidir con el margen superior de @page */
             left: 0;
             right: 0;
-            height: 70px;
+            height: 60px;
             /* Aumentado para mejor espacio */
             margin-bottom: 20px;
             /* Espacio adicional después del header */
         }
 
         .header-logo {
-            width: 150px;
+            width: 130px;
         }
 
         .header-title {
@@ -48,7 +48,7 @@
             /* Ajustado para coincidir con el margen inferior */
             left: 0;
             right: 0;
-            height: 50px;
+            height: 55px;
             text-align: center;
             font-size: 11px;
         }
@@ -98,9 +98,9 @@
         }
 
         .content {
-            margin-top: 30px;
+            /* margin-top: 10px; */
             /* Espacio adicional después del header */
-            margin-bottom: 60px;
+            margin-bottom: 50px;
             /* Espacio adicional antes del footer */
         }
 
@@ -181,14 +181,14 @@
         <table class="table-header">
             <tbody>
                 <tr style="height: 100%;">
-                    <td class="text-left" style="padding: 0px 5px 0px 0px; vertical-align: top;">
+                    <td class="text-left" style="padding: 0px 0px 0px 0px; vertical-align: top;">
                         <img src="{{ public_path('images/logo-guzcar.jpg') }}" class="header-logo">
                     </td>
-                    <td class="text-left" style="vertical-align: middle;">
+                    <td class="text-center" style="vertical-align: middle; padding-right: 1rem;">
                         <!-- <p class="header-title mt-0">AUTOMOTORES GUZCAR S.A.C.</p> -->
-                        <p class="mt-0">Prolog. Leoncio Prado N° 1575 - CHIMBOTE</p>
                         <p class="m-0">TELF: 919294602 - 998248543</p>
                         <p class="m-0" style="text-transform: lowercase;">automotoresguzcar1@hotmail.com</p>
+                        <p class="mb-0">Prolog. Leoncio Prado N° 1575 - CHIMBOTE</p>
                     </td>
                     <td style="
                         border-radius: 10px;
@@ -224,7 +224,7 @@
     <footer>
         <div class="border-top" style="margin-bottom: 10px;"></div>
         <div>GRACIAS POR SU PREFERENCIA</div>
-        <div>AUTOMOTORES GUZCAR S.A.C.</div>
+        <!-- <div>AUTOMOTORES GUZCAR S.A.C.</div> -->
     </footer>
 
     <img src="{{ public_path('images/logo-kia.jpg') }}" class="watermark">

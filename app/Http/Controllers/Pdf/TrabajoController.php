@@ -169,6 +169,14 @@ class TrabajoController extends Controller
             ];
         });
 
+        // return view('pdf.proforma', compact(
+        //     'trabajo',
+        //     'vehiculo',
+        //     'tiempo',
+        //     'articulosAgrupados',
+        //     'clientePrincipal'
+        // ));
+
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('pdf.proforma', compact(
             'trabajo',
