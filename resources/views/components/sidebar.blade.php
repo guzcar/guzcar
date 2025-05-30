@@ -23,6 +23,12 @@
                 <div class="sb-nav-link-icon"><i class="fa-solid fa-magnifying-glass fa-fw me-2"></i></div>
                 Consulta vehicular
             </a>
+
+            <!-- <div class="sb-sidenav-menu-heading">HERRAMIENTAS</div>
+            <a class="nav-link {{ request()->routeIs('asistencia.*') ? 'active bg-light' : '' }}" href="{{ route('asistencia.index') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-fingerprint me-2"></i></div>
+                Asistencia
+            </a> -->
         </div>
     </div>
     <div class="sb-sidenav-footer">

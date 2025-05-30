@@ -101,4 +101,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         return $this->belongsToMany(Trabajo::class, 'trabajo_tecnicos', 'tecnico_id', 'trabajo_id')
             ->withPivot(['finalizado', 'created_at']);
     }
+
+    public function asistencias()
+    {
+        return $this->hasMany(Asistencia::class);
+    }
 }

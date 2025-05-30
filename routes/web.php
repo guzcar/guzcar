@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ArticuloController;
+use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\ChatController;
@@ -87,4 +88,7 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     Route::post('/profile/edit', [UserController::class, 'update'])->name('user.update');
     Route::post('/profile/add-avatar', [UserController::class, 'addAvatar'])->name('user.add-avatar');
     Route::post('/profile/remove-avatar', [UserController::class, 'removeAvatar'])->name('user.remove-avatar');
+
+    Route::get('/asistencia', [AsistenciaController::class, 'index'])->name('asistencia.index');
+    Route::post('/asistencia', [AsistenciaController::class, 'registrar'])->name('asistencia.registrar');
 });
