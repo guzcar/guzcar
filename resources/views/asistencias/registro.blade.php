@@ -24,7 +24,7 @@
             }
 
             .animated-alert {
-                animation: fadeInUp 0.5s ease;
+                animation: fadeInUp 0.75s ease;
             }
         </style>
     @endpush
@@ -34,7 +34,7 @@
             function mostrarAlerta(mensaje, tipo = 'primary') {
                 const alertContainer = document.getElementById('alert-container');
                 alertContainer.innerHTML = `
-                    <div style="max-width: 250px;" class="alert mx-auto alert-${tipo} alert-dismissible fade show shadow-sm rounded-pill animated-alert" role="alert">
+                    <div style="max-width: 250px;" class="alert mx-auto alert-${tipo} alert-dismissible fade show shadow-sm animated-alert" role="alert">
                         ${mensaje}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>

@@ -66,7 +66,7 @@ class AsistenciaResource extends Resource
                     ->label('Fecha de registro'),
             ])
             ->actions([
-                DeleteAction::make()
+                // DeleteAction::make()
                 // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

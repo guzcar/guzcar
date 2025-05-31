@@ -83,6 +83,11 @@ class Trabajo extends Model
             ->withTrashed();
     }
 
+    public function detalles()
+    {
+        return $this->hasMany(TrabajoDetalle::class);
+    }
+
     public function servicios(): HasMany
     {
         return $this->hasMany(TrabajoServicio::class, 'trabajo_id');
