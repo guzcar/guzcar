@@ -24,7 +24,9 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EvidenciasRelationManager extends RelationManager
 {
-    protected static string $relationship = 'evidencias';
+    protected static string $relationship = 'evidencias_2';
+
+    protected static ?string $title = 'Evidencias';
 
     public function form(Form $form): Form
     {
@@ -37,8 +39,8 @@ class EvidenciasRelationManager extends RelationManager
                             ->label('Evidencias')
                             ->directory('evidencia')
                             ->required()
-                            ->multiple(fn (string $operation): bool => $operation === 'create')
-                            ->reorderable(fn (string $operation): bool => $operation === 'create')
+                            ->multiple(fn(string $operation): bool => $operation === 'create')
+                            ->reorderable(fn(string $operation): bool => $operation === 'create')
                             ->appendFiles()
                             ->panelLayout('grid')
                             ->columnSpan(1)

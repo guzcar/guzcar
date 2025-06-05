@@ -72,6 +72,11 @@ class Trabajo extends Model
         return $this->hasMany(Evidencia::class);
     }
 
+    public function evidencias_2(): HasMany
+    {
+        return $this->hasMany(Evidencia::class)->orderBy('mostrar', 'desc');
+    }
+
     public function tecnicos()
     {
         return $this->hasMany(TrabajoTecnico::class, 'trabajo_id');

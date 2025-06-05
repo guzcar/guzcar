@@ -63,6 +63,9 @@ class TrabajoArticulosRelationManager extends RelationManager
                         return $this->buildArticuloLabel($articulo);
                     })
                     ->wrap(),
+                TextColumn::make('tecnico.name'),
+                TextColumn::make('responsable.name')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('presupuesto')
                     ->label('Presupuesto')
                     ->formatStateUsing(fn($state) => $state ? 'Incluido' : 'Excluido')
@@ -86,6 +89,11 @@ class TrabajoArticulosRelationManager extends RelationManager
                     ->state(function (TrabajoArticulo $record): string {
                         return number_format($record->precio * $record->cantidad, 2, '.', '');
                     }),
+                TextColumn::make('created_at')
+                    ->label('Fecha')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
