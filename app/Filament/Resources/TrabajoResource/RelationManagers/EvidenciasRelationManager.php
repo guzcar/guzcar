@@ -125,7 +125,7 @@ class EvidenciasRelationManager extends RelationManager
             ->reorderable('sort')
             ->columns([
                 ImageColumn::make('evidencia_url')
-                    ->size(100)
+                    ->size(150)
                     ->label('Evidencia')
                     ->getStateUsing(function (Evidencia $record): string {
                         if ($record->tipo === 'imagen') {

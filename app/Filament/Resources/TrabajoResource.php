@@ -58,6 +58,7 @@ use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\Layout\Panel;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -718,6 +719,14 @@ class TrabajoResource extends Resource
                     ])
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
                     ->toggleable(isToggledHiddenByDefault: false),
+                ToggleColumn::make('presupuesto_enviado')
+                    ->alignCenter()
+                    ->label('Presupuesto')
+                    ->onIcon('heroicon-s-envelope')
+                    ->offIcon('heroicon-s-envelope-open')
+                    ->onColor('success')
+                    ->toggleable(true)
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('importe')
                     ->sortable()
                     ->alignRight()
@@ -800,6 +809,16 @@ class TrabajoResource extends Resource
                     ])
                     ->placeholder('Todos')
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
+                TernaryFilter::make('presupuestos')
+                    ->label('Estado de presupuesto')
+                    ->placeholder('Todos')
+                    ->trueLabel('Enviados')
+                    ->falseLabel('Por enviar')
+                    ->queries(
+                        true: fn($query) => $query->where('presupuesto_enviado', true),
+                        false: fn($query) => $query->where('presupuesto_enviado', false),
+                        blank: fn($query) => $query, // Mostrar todos (opción por defecto)
+                    ),
                 DateRangeFilter::make('fecha_ingreso'),
                 DateRangeFilter::make('fecha_salida'),
                 TernaryFilter::make('aplazados')

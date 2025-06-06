@@ -26,6 +26,7 @@ class Trabajo extends Model
         'kilometraje',
         'descripcion_servicio',
         'desembolso',
+        'presupuesto_enviado',
         'disponible',
         'garantia',
         'observaciones',

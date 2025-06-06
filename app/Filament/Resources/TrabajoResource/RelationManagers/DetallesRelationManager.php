@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TrabajoResource\RelationManagers;
 
 use Filament\Forms;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -20,26 +21,41 @@ class DetallesRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\Textarea::make('descripcion')
+                RichEditor::make('descripcion')
                     ->columnSpanFull()
-                    ->required()
-                    ->maxLength(255),
+                    ->toolbarButtons([
+                        'blockquote',
+                        'bold',
+                        'bulletList',
+                        'heading',
+                        'italic',
+                        'link',
+                        'orderedList',
+                        'redo',
+                        'strike',
+                        'table',
+                        'undo',
+                    ])
+                    ->extraInputAttributes(['style' => 'min-height: 60vh; max-height: 100vh; overflow-y: auto;'])
+                    ->required(),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('descripcion')
+            // ->recordTitleAttribute('descripcion')
+            ->defaultSort('created_at', 'desc')
             ->columns([
-                TextColumn::make('descripcion'),
-                TextColumn::make('updated_at')
-                    ->label('Fecha de edición')
+                TextColumn::make('descripcion')
+                    ->html(),
+                TextColumn::make('created_at')
+                    ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')
-                    ->label('Fecha de eliminación')
+                TextColumn::make('updated_at')
+                    ->label('Fecha de edición')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -48,10 +64,30 @@ class DetallesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->modalWidth('screen')
+                    ->modalCloseButton(false)
+                    ->closeModalByClickingAway(false)
+                    ->modalActions([
+                        // Tables\Actions\Action::make('cancel')
+                        //     ->label('Cancelar')
+                        //     ->color('gray')
+                        //     ->requiresConfirmation()
+                        //     ->modalHeading('¿Seguro que quieres cancelar?')
+                        //     ->modalSubheading('Los cambios se perderán.')
+                        //     ->modalButton('Sí, cancelar')
+                        //     ->action(function ($livewire, $arguments) {
+                        //         $livewire->dispatch('close-modal'); // este no cierra en v3
+                        //     }),
+                        Tables\Actions\Action::make('create')
+                            ->label('Guardar')
+                            ->submit('create'),
+                    ])
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->modalWidth('screen')
+                    ->closeModalByClickingAway(false),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

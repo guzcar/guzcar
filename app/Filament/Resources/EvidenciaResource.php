@@ -18,6 +18,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class EvidenciaResource extends Resource
@@ -109,7 +110,7 @@ class EvidenciaResource extends Resource
                 ]),
                 ColumnGroup::make('Evidencia', [
                     ImageColumn::make('evidencia_url')
-                        ->size(40)
+                        ->size(150)
                         ->label('Archivo')
                         ->getStateUsing(function (Evidencia $record): string {
                             if ($record->tipo === 'imagen') {
@@ -141,7 +142,8 @@ class EvidenciaResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
-                //
+                DateRangeFilter::make('created_at')
+                    ->label('Fecha de subida'),
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
