@@ -129,7 +129,39 @@ class TrabajoResource extends Resource
                                     })
                                     ->searchable()
                                     ->searchPrompt('Buscar por nombre o identificador')
-                                    ->searchable()
+                                    ->createOptionForm([
+                                        TextInput::make('identificador')
+                                            ->label('RUC / DNI')
+                                            ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
+                                            ->maxLength(12),
+                                        TextInput::make('nombre')
+                                            ->required()
+                                            ->maxLength(255),
+                                        PhoneInput::make('telefono')
+                                            ->defaultCountry('PE')
+                                            ->initialCountry('pe'),
+                                        TextInput::make('direccion')
+                                            ->label('Dirección')
+                                    ])
+                                    ->createOptionUsing(function (array $data, callable $get) {
+                                        $cliente = Cliente::create($data);
+
+                                        $vehiculoId = $get('vehiculo_id');
+                                        if ($vehiculoId) {
+                                            $vehiculo = Vehiculo::find($vehiculoId);
+                                            if ($vehiculo) {
+                                                // Asocia el cliente con el vehículo
+                                                $vehiculo->clientes()->attach($cliente->id);
+                                            }
+                                        }
+
+                                        return $cliente->id;
+                                    })
+                                    ->getOptionLabelFromRecordUsing(function (Cliente $record) {
+                                        return $record->identificador
+                                            ? "{$record->identificador} - {$record->nombre}"
+                                            : $record->nombre;
+                                    })
                                     ->hiddenOn('create'),
                                 Select::make('vehiculo_id')
                                     ->relationship('vehiculo')

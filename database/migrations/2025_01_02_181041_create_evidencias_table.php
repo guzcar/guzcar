@@ -33,7 +33,7 @@ return new class extends Migration {
             BEFORE INSERT ON evidencias
             FOR EACH ROW
             BEGIN
-                IF LOWER(SUBSTRING_INDEX(NEW.evidencia_url, '.', -1)) IN ('jpg', 'jpeg', 'png', 'gif', 'jfif') THEN
+                IF LOWER(SUBSTRING_INDEX(NEW.evidencia_url, '.', -1)) IN ('jpg', 'jpeg', 'png', 'gif', 'jfif', 'webp', 'bmp') THEN
                     SET NEW.tipo = 'imagen';
                 ELSEIF LOWER(SUBSTRING_INDEX(NEW.evidencia_url, '.', -1)) IN ('mp4', 'webm', 'ogg') THEN
                     SET NEW.tipo = 'video';
@@ -48,7 +48,7 @@ return new class extends Migration {
             BEFORE UPDATE ON evidencias
             FOR EACH ROW
             BEGIN
-                IF LOWER(SUBSTRING_INDEX(NEW.evidencia_url, '.', -1)) IN ('jpg', 'jpeg', 'png', 'gif', 'jfif') THEN
+                IF LOWER(SUBSTRING_INDEX(NEW.evidencia_url, '.', -1)) IN ('jpg', 'jpeg', 'png', 'gif', 'jfif', 'webp', 'bmp') THEN
                     SET NEW.tipo = 'imagen';
                 ELSEIF LOWER(SUBSTRING_INDEX(NEW.evidencia_url, '.', -1)) IN ('mp4', 'webm', 'ogg') THEN
                     SET NEW.tipo = 'video';
