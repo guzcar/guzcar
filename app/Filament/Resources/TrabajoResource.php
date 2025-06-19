@@ -106,29 +106,27 @@ class TrabajoResource extends Resource
                                     ->maxLength(29),
                                 Select::make('cliente_id')
                                     ->label('Cliente')
-                                    ->options(function (callable $get) {
-                                        $vehiculoId = $get('vehiculo_id');
-
-                                        if (!$vehiculoId) {
-                                            return Cliente::all()->mapWithKeys(function ($cliente) {
+                                    ->searchable()
+                                    ->searchPrompt('Buscar por nombre, RUC o DNI')
+                                    ->getSearchResultsUsing(function (string $search) {
+                                        return Cliente::query()
+                                            ->where('nombre', 'like', "%{$search}%")
+                                            ->orWhere('identificador', 'like', "%{$search}%")
+                                            ->limit(50)
+                                            ->get()
+                                            ->mapWithKeys(function ($cliente) {
                                                 $label = $cliente->identificador
                                                     ? "{$cliente->identificador} - {$cliente->nombre}"
                                                     : $cliente->nombre;
                                                 return [$cliente->id => $label];
                                             });
-                                        }
-
-                                        $vehiculo = Vehiculo::with('clientes')->find($vehiculoId);
-
-                                        return $vehiculo->clientes->mapWithKeys(function ($cliente) {
-                                            $label = $cliente->identificador
-                                                ? "{$cliente->identificador} - {$cliente->nombre}"
-                                                : $cliente->nombre;
-                                            return [$cliente->id => $label];
-                                        });
                                     })
-                                    ->searchable()
-                                    ->searchPrompt('Buscar por nombre o identificador')
+                                    ->getOptionLabelUsing(function ($value) {
+                                        $cliente = Cliente::find($value);
+                                        return $cliente->identificador
+                                            ? "{$cliente->identificador} - {$cliente->nombre}"
+                                            : $cliente->nombre;
+                                    })
                                     ->createOptionForm([
                                         TextInput::make('identificador')
                                             ->label('RUC / DNI')
@@ -143,24 +141,8 @@ class TrabajoResource extends Resource
                                         TextInput::make('direccion')
                                             ->label('Dirección')
                                     ])
-                                    ->createOptionUsing(function (array $data, callable $get) {
-                                        $cliente = Cliente::create($data);
-
-                                        $vehiculoId = $get('vehiculo_id');
-                                        if ($vehiculoId) {
-                                            $vehiculo = Vehiculo::find($vehiculoId);
-                                            if ($vehiculo) {
-                                                // Asocia el cliente con el vehículo
-                                                $vehiculo->clientes()->attach($cliente->id);
-                                            }
-                                        }
-
-                                        return $cliente->id;
-                                    })
-                                    ->getOptionLabelFromRecordUsing(function (Cliente $record) {
-                                        return $record->identificador
-                                            ? "{$record->identificador} - {$record->nombre}"
-                                            : $record->nombre;
+                                    ->createOptionUsing(function (array $data) {
+                                        return Cliente::create($data)->id;
                                     })
                                     ->hiddenOn('create'),
                                 Select::make('vehiculo_id')
@@ -803,7 +785,7 @@ class TrabajoResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('created_at', 'desc')
+            ->defaultSort('fecha_ingreso', 'desc')
             ->recordUrl(function (Trabajo $record): ?string {
                 if (auth()->user()->can('update_trabajo')) {
                     return static::getUrl('edit', ['record' => $record]);
