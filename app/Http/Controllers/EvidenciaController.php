@@ -53,7 +53,7 @@ class EvidenciaController extends Controller
         }
 
         $request->validate([
-            'evidencias' => 'required|array|max:5',
+            'evidencias' => 'required|array|max:15',
             'evidencias.*' => 'file|mimes:jpg,jpeg,png,mp4,mov',
             'observacion' => 'nullable|string',
         ]);
@@ -65,9 +65,9 @@ class EvidenciaController extends Controller
             $path = $file->store('evidencia', 'public');
 
             // Optimizar imágenes con GD
-            if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
-                $this->optimizeImage(Storage::disk('public')->path($path), $file->getMimeType());
-            }
+            // if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
+            //     $this->optimizeImage(Storage::disk('public')->path($path), $file->getMimeType());
+            // }
 
             Evidencia::create([
                 'trabajo_id' => $trabajo->id,

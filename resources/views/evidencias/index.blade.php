@@ -85,15 +85,13 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-warning btn-editar" 
-                                        data-id="{{ $evidencia->id }}" 
+                                    <button type="button" class="btn btn-warning btn-editar" data-id="{{ $evidencia->id }}"
                                         data-observacion="{{ $evidencia->observacion }}"
                                         data-url="{{ route('gestion.evidencias.update', [$trabajo, $evidencia]) }}"
                                         style="width: 60px; height: 60px;">
                                         <i class="fa-solid fa-pen"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-eliminar" 
-                                        data-id="{{ $evidencia->id }}" 
+                                    <button type="button" class="btn btn-danger btn-eliminar" data-id="{{ $evidencia->id }}"
                                         data-url="{{ route('gestion.evidencias.destroy', [$trabajo, $evidencia]) }}"
                                         style="width: 60px; height: 60px;">
                                         <i class="fa-solid fa-trash"></i>
@@ -122,7 +120,8 @@
     </div>
 
     {{-- Modal para crear nueva evidencia --}}
-    <div class="modal fade" id="nuevaEvidencia" tabindex="-1" aria-labelledby="nuevaEvidenciaLabel" aria-hidden="true">
+    <div class="modal fade" id="nuevaEvidencia" tabindex="-1" aria-labelledby="nuevaEvidenciaLabel" aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form action="{{ route('gestion.evidencias.store', $trabajo) }}" method="POST"
@@ -136,7 +135,7 @@
                         <div class="mb-3">
                             <label for="evidencias" class="form-label">
                                 Subir Evidencias
-                                <span class="text-muted">(Máximo 5)</span>
+                                <span class="text-muted">(Máximo 15)</span>
                             </label>
                             <input type="file" name="evidencias[]" class="form-control" id="evidencias" multiple
                                 required>
@@ -146,9 +145,11 @@
                             <textarea name="observacion" class="form-control" id="observacion" rows="5"
                                 placeholder="Escribe tu observación aquí"></textarea>
                         </div>
+                        <div id="error-container"></div>
+
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                        <!-- <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button> -->
                         <button type="submit" class="btn btn-primary">Subir Evidencias</button>
                     </div>
                 </form>
@@ -157,7 +158,8 @@
     </div>
 
     {{-- Modal para editar evidencia --}}
-    <div class="modal fade" id="editarEvidenciaModal" tabindex="-1" aria-labelledby="editarEvidenciaModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editarEvidenciaModal" tabindex="-1" aria-labelledby="editarEvidenciaModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="editarEvidenciaForm" method="POST">
@@ -170,7 +172,8 @@
                     <div class="modal-body">
                         <div>
                             <label for="observacionEditar" class="form-label">Observación</label>
-                            <textarea name="observacion" class="form-control" id="observacionEditar" rows="3"></textarea>
+                            <textarea name="observacion" class="form-control" id="observacionEditar"
+                                rows="3"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -183,7 +186,8 @@
     </div>
 
     {{-- Modal para eliminar evidencia --}}
-    <div class="modal fade" id="eliminarEvidenciaModal" tabindex="-1" aria-labelledby="eliminarEvidenciaModalLabel" aria-hidden="true">
+    <div class="modal fade" id="eliminarEvidenciaModal" tabindex="-1" aria-labelledby="eliminarEvidenciaModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="eliminarEvidenciaForm" method="POST">
@@ -208,18 +212,227 @@
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Manejar el foco al cerrar los modales
+                // 1. Función para comprimir imágenes manteniendo formatos válidos
+                async function compressImage(file) {
+                    try {
+                        // Formatos aceptados por el servidor
+                        const validFormats = {
+                            'image/jpeg': 'jpg',
+                            'image/jpg': 'jpg',
+                            'image/png': 'png',
+                            'image/webp': 'webp', // Aunque no esté en la validación, lo convertiremos a jpg
+                            'video/mp4': 'mp4',
+                            'video/quicktime': 'mov'
+                        };
+
+                        // Si no es un formato comprimible, devolver original
+                        if (!validFormats[file.type]) {
+                            console.log(`Archivo ${file.name} no requiere compresión. Tipo: ${file.type}`);
+                            return file;
+                        }
+
+                        // Si es video, devolver original
+                        if (file.type.startsWith('video/')) {
+                            console.log(`Video ${file.name} no se comprime. Tipo: ${file.type}`);
+                            return file;
+                        }
+
+                        return await new Promise((resolve) => {
+                            const reader = new FileReader();
+
+                            reader.onerror = () => {
+                                console.error('Error al leer el archivo:', file.name);
+                                resolve(file);
+                            };
+
+                            reader.onload = function (event) {
+                                const img = new Image();
+
+                                img.onerror = () => {
+                                    console.error('Error al cargar la imagen:', file.name);
+                                    resolve(file);
+                                };
+
+                                img.onload = function () {
+                                    try {
+                                        const canvas = document.createElement('canvas');
+                                        const ctx = canvas.getContext('2d');
+                                        const MAX_DIMENSION = 1200;
+                                        const QUALITY = 0.6;
+
+                                        let width = img.width;
+                                        let height = img.height;
+
+                                        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                                            const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+                                            width = Math.floor(width * ratio);
+                                            height = Math.floor(height * ratio);
+                                        }
+
+                                        canvas.width = width;
+                                        canvas.height = height;
+                                        ctx.imageSmoothingQuality = 'high';
+                                        ctx.drawImage(img, 0, 0, width, height);
+
+                                        // Convertir siempre a jpeg para cumplir con la validación del servidor
+                                        const mimeType = 'image/jpeg';
+                                        const newFileName = file.name.replace(/\.[^/.]+$/, '') + '.jpg';
+
+                                        canvas.toBlob(
+                                            (blob) => {
+                                                if (!blob) {
+                                                    console.error('No se pudo generar blob para:', file.name);
+                                                    resolve(file);
+                                                    return;
+                                                }
+
+                                                const compressedFile = new File([blob], newFileName, {
+                                                    type: mimeType,
+                                                    lastModified: Date.now()
+                                                });
+
+                                                console.log(`Compresión: ${file.name} - Original: ${(file.size / 1024).toFixed(2)}KB | Comprimido: ${(blob.size / 1024).toFixed(2)}KB`);
+                                                resolve(compressedFile);
+                                            },
+                                            mimeType,
+                                            QUALITY
+                                        );
+                                    } catch (error) {
+                                        console.error('Error en compresión:', error);
+                                        resolve(file);
+                                    }
+                                };
+
+                                img.src = event.target.result;
+                            };
+
+                            reader.readAsDataURL(file);
+                        });
+                    } catch (error) {
+                        console.error('Error general en compressImage:', error);
+                        return file;
+                    }
+                }
+
+                // 2. Interceptar envío del formulario - VERSIÓN CORREGIDA
+                const form = document.querySelector('#nuevaEvidencia form');
+                if (form) {
+                    form.addEventListener('submit', async function (e) {
+                        e.preventDefault();
+
+                        const fileInput = document.getElementById('evidencias');
+                        const submitButton = this.querySelector('button[type="submit"]');
+                        const originalButtonText = submitButton.innerHTML;
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ||
+                            document.querySelector('input[name="_token"]')?.value ||
+                            '';
+
+                        try {
+                            submitButton.disabled = true;
+                            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando archivos...';
+
+                            const formData = new FormData();
+
+                            // Copiar todos los campos excepto archivos
+                            for (const [key, value] of new FormData(this)) {
+                                if (key !== 'evidencias[]') {
+                                    formData.append(key, value);
+                                }
+                            }
+
+                            // Procesar archivos
+                            const files = Array.from(fileInput.files);
+                            console.log(`Procesando ${files.length} archivos...`);
+
+                            const processedFiles = await Promise.all(
+                                files.map(async (file) => {
+                                    try {
+                                        return await compressImage(file);
+                                    } catch (error) {
+                                        console.error('Error procesando archivo:', file.name, error);
+                                        return file;
+                                    }
+                                })
+                            );
+
+                            // Verificar que todos los archivos sean válidos
+                            const validExtensions = ['.jpg', '.jpeg', '.png', '.mp4', '.mov'];
+                            processedFiles.forEach(file => {
+                                const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+                                if (!validExtensions.includes(fileExt)) {
+                                    console.error(`Archivo con extensión no permitida: ${file.name}`);
+                                    throw new Error(`El archivo ${file.name} no tiene un formato permitido (jpg, jpeg, png, mp4, mov)`);
+                                }
+                                formData.append('evidencias[]', file, file.name);
+                            });
+
+                            // Configurar headers
+                            const headers = {
+                                'Accept': 'application/json'
+                            };
+
+                            if (csrfToken) {
+                                headers['X-CSRF-TOKEN'] = csrfToken;
+                            }
+
+                            // Enviar al servidor
+                            const response = await fetch(this.action, {
+                                method: 'POST',
+                                body: formData,
+                                headers: headers
+                            });
+
+                            if (!response.ok) {
+                                const errorData = await response.json().catch(() => ({}));
+                                throw new Error(errorData.message || 'Error en el servidor');
+                            }
+
+                            window.location.reload();
+
+                        } catch (error) {
+                            console.error('Error en el envío:', error);
+
+                            let errorMessage = 'Error al procesar los archivos';
+                            if (error.message.includes('NetworkError')) {
+                                errorMessage = 'Error de conexión. Verifica tu red.';
+                            } else if (error.message) {
+                                errorMessage = error.message;
+                            }
+
+                            // Mostrar error en un div específico (por ejemplo, con id "error-container")
+                            const errorContainer = document.getElementById('error-container'); // Reemplaza con tu ID real
+
+                            // Limpiar errores previos
+                            const existingAlert = errorContainer.querySelector('.alert');
+                            if (existingAlert) existingAlert.remove();
+
+                            // Crear nuevo mensaje de error
+                            const alertDiv = document.createElement('div');
+                            alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3 mb-0';
+                            alertDiv.innerHTML = `
+                                    <strong>Error:</strong> ${errorMessage}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                `;
+
+                            // Agregar el mensaje al contenedor específico
+                            errorContainer.appendChild(alertDiv);
+
+                        } finally {
+                            submitButton.disabled = false;
+                            submitButton.innerHTML = originalButtonText;
+                        }
+                    });
+                }
+
+                // Resto del código para modales...
                 const modals = document.querySelectorAll('.modal');
                 modals.forEach(modal => {
                     modal.addEventListener('hidden.bs.modal', function () {
                         const triggerButton = document.querySelector(`[data-bs-target="#${modal.id}"]`);
-                        if (triggerButton) {
-                            triggerButton.focus(); // Devuelve el foco al botón que abrió el modal
-                        }
+                        if (triggerButton) triggerButton.focus();
                     });
                 });
 
-                // Manejar la edición de evidencias
                 document.querySelectorAll('.btn-editar').forEach(button => {
                     button.addEventListener('click', function () {
                         const id = this.getAttribute('data-id');
@@ -234,7 +447,6 @@
                     });
                 });
 
-                // Manejar la eliminación de evidencias
                 document.querySelectorAll('.btn-eliminar').forEach(button => {
                     button.addEventListener('click', function () {
                         const url = this.getAttribute('data-url');
