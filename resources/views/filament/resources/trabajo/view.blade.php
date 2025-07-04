@@ -1,90 +1,128 @@
 <x-filament::page>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <x-filament::card>
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white pb-4">
+        {{-- Información del Vehículo --}}
+        <x-filament::section>
+            <x-slot name="heading">
                 Vehículo
-            </h2>
-            <div class="space-y-4">
-                <p class="text-gray-800 dark:text-gray-300">
-                    <span class="font-medium text-gray-900 dark:text-gray-300">Placa:</span>
-                    {{ $trabajo->vehiculo->placa ?? 'SIN PLACA' }}
-                </p>
-                <p class="text-gray-800 dark:text-gray-300">
-                    <span class="font-medium text-gray-900 dark:text-gray-300">Marca:</span>
-                    {{ $trabajo->vehiculo->marca?->nombre }}
-                </p>
-                <p class="text-gray-800 dark:text-gray-300">
-                    <span class="font-medium text-gray-900 dark:text-gray-300">Modelo:</span>
-                    {{ $trabajo->vehiculo->modelo?->nombre }}
-                </p>
-                <p class="text-gray-800 dark:text-gray-300">
-                    <span class="font-medium text-gray-900 dark:text-gray-300">Color:</span>
-                    {{ $trabajo->vehiculo->color }}
-                </p>
-                <p class="text-gray-800 dark:text-gray-300">
-                    <span class="font-medium text-gray-900 dark:text-gray-300">Tipo:</span>
-                    {{ $trabajo->vehiculo->tipoVehiculo->nombre }}
-                </p>
-                <div>
-                    <p class="font-medium text-gray-800 dark:text-gray-300">Propietarios:</p>
-                    <ul class="list-disc list-inside mt-2">
-                        @forelse($trabajo->vehiculo->clientes as $cliente)
-                            <li class="text-gray-800 dark:text-gray-300">{{ $cliente->nombre }}</li>
-                        @empty
-                            <p class="text-gray-500 dark:text-gray-400">No hay propietarios asignados.</p>
-                        @endforelse
-                    </ul>
-                </div>
-            </div>
-        </x-filament::card>
+            </x-slot>
 
-        <x-filament::card>
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white pb-4">
+            <div class="overflow-x-auto">
+                <table
+                    class="w-full table-auto text-left border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <tbody>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300 w-40" style="width: 120px;">Placa</th>
+                            <td class="px-4 py-2 text-gray-900 dark:text-white">
+                                {{ $trabajo->vehiculo->placa ?? 'SIN PLACA' }}</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Marca</th>
+                            <td class="px-4 py-2">{{ $trabajo->vehiculo->marca?->nombre }}</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Modelo</th>
+                            <td class="px-4 py-2">{{ $trabajo->vehiculo->modelo?->nombre }}</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Color</th>
+                            <td class="px-4 py-2">{{ $trabajo->vehiculo->color }}</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Tipo</th>
+                            <td class="px-4 py-2">{{ $trabajo->vehiculo->tipoVehiculo->nombre }}</td>
+                        </tr>
+                        <tr>
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300 align-top">Propietarios
+                            </th>
+                            <td class="px-4 py-2">
+                                <ul class="list-disc list-inside space-y-1">
+                                    @forelse($trabajo->vehiculo->clientes as $cliente)
+                                        <li>{{ $cliente->nombre }}</li>
+                                    @empty
+                                        <span class="text-gray-500 dark:text-gray-400">No hay propietarios asignados.</span>
+                                    @endforelse
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </x-filament::section>
+
+        {{-- Información del Trabajo --}}
+        <x-filament::section>
+            <x-slot name="heading">
                 Trabajo
-            </h2>
-            <div class="space-y-4">
-                <p class="text-gray-800 dark:text-gray-300">
-                    <span class="font-medium text-gray-900 dark:text-gray-300">Código:</span>
-                    {{ $trabajo->codigo }}
-                </p>
-                <p class="text-gray-800 dark:text-gray-300">
-                    <span class="font-medium text-gray-900 dark:text-gray-300">Taller:</span>
-                    {{ $trabajo->taller->nombre ?? 'N/A' }}
-                </p>
-                <p class="text-gray-800 dark:text-gray-300">
-                    <span class="font-medium text-gray-900 dark:text-gray-300">Fecha Ingreso:</span>
-                    {{ $trabajo->fecha_ingreso->format('d/m/y') }}
-                    {{ $trabajo->hora_ingreso->isoFormat('h:mm A') }}
-                </p>
-                <p class="text-gray-800 dark:text-gray-300">
-                    <span class="font-medium text-gray-900 dark:text-gray-300">Fecha Salida:</span>
-                    {{ $trabajo->fecha_salida?->format('d/m/y') }}
-                    {{ $trabajo->hora_salida?->isoFormat('h:mm A') }}
-                </p>
-                <div>
-                    <p class="font-medium text-gray-800 dark:text-gray-300">Descripción del Servicio:</p>
-                    <p class="text-gray-800 dark:text-gray-300 mt-1">{{ $trabajo->descripcion_servicio }}</p>
-                </div>
-            </div>
-        </x-filament::card>
+            </x-slot>
 
-        <x-filament::card>
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white pb-4">
+            <div class="overflow-x-auto">
+                <table
+                    class="w-full table-auto text-left border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <tbody>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300 w-40" style="width: 120px;">Código</th>
+                            <td class="px-4 py-2">{{ $trabajo->codigo }}</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Taller</th>
+                            <td class="px-4 py-2">{{ $trabajo->taller->nombre ?? 'N/A' }}</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Ingreso</th>
+                            <td class="px-4 py-2">
+                                {{ $trabajo->fecha_ingreso->format('d/m/y - h:m A') }}
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Salida</th>
+                            <td class="px-4 py-2">
+                                @if($trabajo->fecha_salida)
+                                    {{ $trabajo->fecha_salida->format('d/m/y - h:i A') }}
+                                @else
+                                    <span class="text-gray-400">Sin fecha de salida</span>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Kilometraje</th>
+                            <td class="px-4 py-2">
+                                @if(!empty($trabajo->kilometraje))
+                                    {{ $trabajo->kilometraje }}
+                                @else
+                                    <span class="text-gray-400">Sin kilometraje</span>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300 align-top">Descripción
+                            </th>
+                            <td class="px-4 py-2">{{ $trabajo->descripcion_servicio }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </x-filament::section>
+
+        {{-- Técnicos Asignados --}}
+        <x-filament::section>
+            <x-slot name="heading">
                 Técnicos Asignados
-            </h2>
-            <ul class="list-disc list-inside">
+            </x-slot>
+            <ul class="list-disc list-inside space-y-1">
                 @forelse($trabajo->usuarios as $usuario)
                     <li class="text-gray-800 dark:text-gray-300">{{ $usuario->name }}</li>
                 @empty
                     <p class="text-gray-500 dark:text-gray-400">No hay técnicos asignados.</p>
                 @endforelse
             </ul>
-        </x-filament::card>
-        <x-filament::card>
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white pb-4">
+        </x-filament::section>
+
+        @can('update_trabajo')
+        <x-filament::section>
+            <x-slot name="heading">
                 Archivos
-            </h2>
+            </x-slot>
             <ul class="list-disc list-inside">
                 @forelse ($trabajo->archivos as $archivo)
                 <li>
@@ -102,105 +140,33 @@
                     <p class="text-gray-500 dark:text-gray-400">No hay archivos.</p>
                 @endforelse
             </ul>
-        </x-filament::card>
+        </x-filament::section>
+        @endcan
     </div>
 
-    {{--
-    <h2 class="text-xl font-bold">Servicios ejecutados</h2>
+    <h2 class="text-xl font-bold">Detalles del trabajo</h2>
 
-    <section
-        class="fi-section rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10 overflow-hidden">
-        <div class="fi-section-content-ctn">
-            <div class="fi-section-content p-0">
-                <div class="overflow-x-auto">
-                    <table
-                        class="fi-ta-table w-full table-auto divide-y divide-gray-200 text-start dark:divide-white/5 rounded-lg">
-                        <thead class="divide-y divide-gray-200 dark:divide-white/5">
-                            <tr class="bg-gray-50 dark:bg-white/5">
-                                <th class="fi-ta-header-cell px-6 py-3.5 fi-table-header-cell-nombre">
-                                    <span
-                                        class="group flex w-full items-center gap-x-1 whitespace-nowrap justify-start">
-                                        <span
-                                            class="fi-ta-header-cell-label text-sm font-semibold text-gray-950 dark:text-white">
-                                            Servicios
-                                        </span>
-                                    </span>
-                                </th>
-                                <th class="fi-ta-header-cell px-6 py-3.5 fi-table-header-cell-costo">
-                                    <span
-                                        class="group flex w-full items-center gap-x-1 whitespace-nowrap justify-start">
-                                        <span
-                                            class="fi-ta-header-cell-label text-sm font-semibold text-gray-950 dark:text-white">
-                                            Costo
-                                        </span>
-                                    </span>
-                                </th>
-                                <th class="fi-ta-header-cell px-6 py-3.5 fi-table-header-cell-costo">
-                                    <span
-                                        class="group flex w-full items-center gap-x-1 whitespace-nowrap justify-start">
-                                        <span
-                                            class="fi-ta-header-cell-label text-sm font-semibold text-gray-950 dark:text-white">
-                                            Cantidad
-                                        </span>
-                                    </span>
-                                </th>
-                                <th class="fi-ta-header-cell px-6 py-3.5 fi-table-header-cell-costo">
-                                    <span
-                                        class="group flex w-full items-center gap-x-1 whitespace-nowrap justify-start">
-                                        <span
-                                            class="fi-ta-header-cell-label text-sm font-semibold text-gray-950 dark:text-white">
-                                            Sub-Total
-                                        </span>
-                                    </span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 whitespace-nowrap dark:divide-white/5">
-                            @forelse($trabajo->servicios as $trabajoServicio)
-                                <tr class="fi-ta-row hover:bg-gray-50 dark:hover:bg-white/5 transition duration-75">
-                                    <td class="fi-ta-cell px-6 py-4 text-gray-700 dark:text-gray-300 truncate max-w-xs">
-                                        {{ $trabajoServicio->servicio->nombre }}
-                                    </td>
-                                    <td class="fi-ta-cell px-6 py-4 text-gray-700 dark:text-gray-300 truncate max-w-xs">
-                                        S/ {{ $trabajoServicio->precio }}
-                                    </td>
-                                    <td class="fi-ta-cell px-6 py-4 text-gray-700 dark:text-gray-300 truncate max-w-xs">
-                                        {{ $trabajoServicio->cantidad }}
-                                    </td>
-                                    <td class="fi-ta-cell px-6 py-4 text-gray-700 dark:text-gray-300 truncate max-w-xs">
-                                        S/ {{ number_format($trabajoServicio->cantidad * $trabajoServicio->precio, 2, '.', '') }}
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="text-center px-3 py-6 break-words">
-                                        <div
-                                            class="fi-ta-empty-state-content mx-auto grid max-w-lg justify-items-center text-center">
-                                            <div
-                                                class="fi-ta-empty-state-icon-ctn mb-4 rounded-full bg-gray-100 p-3 dark:bg-gray-500/20">
-                                                <svg class="fi-ta-empty-state-icon h-6 w-6 text-gray-500 dark:text-gray-400"
-                                                    xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                    aria-hidden="true" data-slot="icon">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M6 18 18 6M6 6l12 12"></path>
-                                                </svg>
-                                            </div>
-                                            <h4
-                                                class="fi-ta-empty-state-heading text-base font-semibold leading-6 text-gray-950 dark:text-white">
-                                                No se encontraron servicios
-                                            </h4>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+    @forelse($trabajo->detalles as $detalle)
+        <x-filament::section>
+            {!! $detalle->descripcion !!}
+        </x-filament::section>
+    @empty
+        <x-filament::card>
+            <div class="fi-ta-empty-state-content mx-auto grid max-w-lg justify-items-center text-center">
+                <div class="fi-ta-empty-state-icon-ctn mb-4 rounded-full bg-gray-100 p-3 dark:bg-gray-500/20">
+                    <svg class="fi-ta-empty-state-icon h-6 w-6 text-gray-500 dark:text-gray-400"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" aria-hidden="true" data-slot="icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                    </svg>
                 </div>
+                <h4 class="fi-ta-empty-state-heading text-base font-semibold leading-6 text-gray-950 dark:text-white">
+                    No se encontraron detalles
+                </h4>
             </div>
-        </div>
-    </section>
-    --}}
+        </x-filament::card>
+
+    @endforelse
 
     <h2 class="text-xl font-bold">Evidencias</h2>
 
@@ -216,8 +182,7 @@
                         </a>
                     @elseif ($evidencia->tipo === 'video')
                         <video controls="controls" preload="auto" class="w-full h-48 rounded-lg" name="media"
-                            src="{{ Storage::url($evidencia->evidencia_url) }}"
-                            type="video/mp4">
+                            src="{{ Storage::url($evidencia->evidencia_url) }}" type="video/mp4">
                         </video>
                     @endif
                     <div class="pt-4">
@@ -235,11 +200,13 @@
                                 class="w-5 h-5 text-gray-500">
                                 <path fill-rule="evenodd"
                                     d="M6 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6Zm12 2H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1ZM8 8V7h2v1H8Zm6 0V7h2v1h-2ZM7 11h10v2H7v-2Zm0 4h10v2H7v-2Z"
-                                    clip-rule="evenodd"/>
-                            </svg>  
-                            <span style="margin-left: 5px">{{ $evidencia->created_at->format('d/m/Y') }} ({{ $evidencia->created_at->diffForHumans() }})</span>
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span style="margin-left: 5px">{{ $evidencia->created_at->format('d/m/Y') }}
+                                ({{ $evidencia->created_at->diffForHumans() }})</span>
                         </p>
-                        <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">{{ $evidencia->observacion }}</p>
+                        <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                            {{ $evidencia->observacion ?? 'Sin observaciones' }}</p>
                     </div>
                 </x-filament::card>
             @endforeach
@@ -260,6 +227,8 @@
             </div>
         </x-filament::card>
     @endif
+
+    {{ $evidencias->links() }}
 
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>

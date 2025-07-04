@@ -17,12 +17,15 @@ class ViewTrabajo extends ViewRecord
         $trabajo = $this->record;
 
         $trabajo->load([
-            'servicios'
+            // 'servicios',
+            'detalles'
         ]);
 
         return [
             'trabajo' => $trabajo,
-            'evidencias' => $trabajo->evidencias, // Obtén todas las evidencias asociadas
+            'evidencias' => $trabajo->evidencias()
+                ->orderBy('created_at', 'desc')
+                ->simplePaginate(12),
         ];
     }
 

@@ -317,10 +317,7 @@ class SalidaResource extends Resource
                                                     ->get()
                                                     ->mapWithKeys(function ($trabajo) {
                                                         // Solución segura para combinar fecha (date) + hora (time)
-                                                        $fechaHoraIngreso = Carbon::createFromFormat(
-                                                            'Y-m-d H:i:s',
-                                                            $trabajo->fecha_ingreso->format('Y-m-d') . ' ' . $trabajo->hora_ingreso->format('H:i:s')
-                                                        );
+                                                        $fechaHoraIngreso = $trabajo->fecha_ingreso;
 
                                                         // Formateo de fecha (opcional: puedes usar ->format() si prefieres)
                                                         $formatoFecha = $fechaHoraIngreso->isoFormat('D [de] MMMM [de] YYYY');

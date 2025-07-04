@@ -24,6 +24,7 @@ use DateTime;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
@@ -504,28 +505,11 @@ class TrabajoResource extends Resource
                                 //         ->required()
                                 //         ->maxLength(255),
                                 // ]),
-                                Grid::make()
-                                    ->schema([
-                                        DatePicker::make('fecha_ingreso')
-                                            ->default(now())
-                                            ->required()
-                                            ->native(false)
-                                            ->displayFormat('d/m/Y'),
-                                        TimePicker::make('hora_ingreso')
-                                            ->default(now())
-                                            ->required()
-                                    ])
-                                    ->columns(['default' => 2]),
-                                Grid::make()
-                                    ->schema([
-                                        DatePicker::make('fecha_salida')
-                                            ->native(false)
-                                            ->displayFormat('d/m/Y')
-                                            ->hiddenOn('create'),
-                                        TimePicker::make('hora_salida')
-                                            ->hiddenOn('create')
-                                    ])
-                                    ->columns(['default' => 2]),
+                                DateTimePicker::make('fecha_ingreso')
+                                    ->default(now())
+                                    ->required(),
+                                DateTimePicker::make('fecha_salida')
+                                    ->hiddenOn('create'),
                                 TextInput::make('kilometraje')
                                     ->numeric()
                                     ->maxValue(42949672.95),
@@ -663,6 +647,11 @@ class TrabajoResource extends Resource
                 TextColumn::make('fecha_ingreso')
                     ->date('d/m/Y')
                     ->sortable(),
+                TextColumn::make('hora_ingreso')
+                    ->getStateUsing(function ($record) {
+                        return $record->fecha_ingreso->format('h:i:s A');
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 CheckboxColumn::make('control')
                     ->alignCenter()
                     ->hidden(fn() => !auth()->user()->can('update_trabajo')),
@@ -724,6 +713,15 @@ class TrabajoResource extends Resource
                             ? Carbon::parse($record->fecha_salida)->format('d/m/Y')
                             : $record->taller->nombre;
                     }),
+                TextColumn::make('hora_salida')
+                    ->placeholder('Sin Salida')
+                    ->getStateUsing(function ($record) {
+                        if ($record->fecha_salida) {
+                            return $record->fecha_salida->format('h:i:s A');
+                        }
+                        return '';
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 SelectColumn::make('desembolso')
                     ->placeholder('')
                     ->options([
@@ -857,8 +855,7 @@ class TrabajoResource extends Resource
                     ->action(function (Trabajo $record) {
 
                         $record->update([
-                            'fecha_salida' => now(),
-                            'hora_salida' => now()
+                            'fecha_salida' => now()
                         ]);
 
                         TrabajoService::actualizarTrabajoPorId($record);
@@ -882,7 +879,6 @@ class TrabajoResource extends Resource
                     ->action(function (Trabajo $record) {
                         $record->update([
                             'fecha_salida' => null,
-                            'hora_salida' => null,
                             'desembolso' => null
                         ]);
 

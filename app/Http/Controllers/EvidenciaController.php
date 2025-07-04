@@ -74,7 +74,7 @@ class EvidenciaController extends Controller
                 'user_id' => $user->id,
                 'evidencia_url' => $path,
                 'tipo' => $file->getMimeType() === 'video/mp4' ? 'video' : 'imagen',
-                'observacion' => $index === 0 ? $observacion : null, // Solo la primera evidencia tiene descripción
+                'observacion' => $observacion
             ]);
         }
 

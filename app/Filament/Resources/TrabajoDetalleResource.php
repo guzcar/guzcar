@@ -68,6 +68,10 @@ class TrabajoDetalleResource extends Resource
                         ->toggleable(isToggledHiddenByDefault: true),
                 ]),
                 ColumnGroup::make('Vehiculo', [
+                    TextColumn::make('trabajo.vehiculo.tipoVehiculo.nombre')
+                        ->label('Tipo')
+                        ->sortable()
+                        ->searchable(isIndividual: true),
                     TextColumn::make('trabajo.vehiculo.placa')
                         ->label('Placa')
                         ->placeholder('Sin Placa')
@@ -98,8 +102,7 @@ class TrabajoDetalleResource extends Resource
                 ]),
                 ColumnGroup::make('Detalles del trabajo', [
                     TextColumn::make('descripcion')
-                        ->wrap()
-                        ->lineClamp(3)
+                        ->html()
                         ->searchable(isIndividual: true)
                         ->sortable()
                 ]),
