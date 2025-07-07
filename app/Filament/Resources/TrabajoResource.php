@@ -738,7 +738,8 @@ class TrabajoResource extends Resource
                     ->offIcon('heroicon-s-envelope-open')
                     ->onColor('success')
                     ->toggleable(true)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->hidden(fn() => !auth()->user()->can('update_trabajo')),
                 TextColumn::make('importe')
                     ->sortable()
                     ->alignRight()

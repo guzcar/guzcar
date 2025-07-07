@@ -117,6 +117,7 @@ class TrabajoDetalleResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('trabajo_fecha_ingreso', 'desc')
             ->filters([
                 //
             ])
@@ -145,5 +146,12 @@ class TrabajoDetalleResource extends Resource
             // 'create' => Pages\CreateTrabajoDetalle::route('/create'),
             // 'edit' => Pages\EditTrabajoDetalle::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->join('trabajos', 'trabajo_detalles.trabajo_id', '=', 'trabajos.id')
+            ->select('trabajo_detalles.*', 'trabajos.fecha_ingreso as trabajo_fecha_ingreso');
     }
 }
