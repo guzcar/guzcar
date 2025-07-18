@@ -93,19 +93,21 @@ class DespachoResource extends Resource
                                     ->label('Trabajo en vehículo')
                                     ->prefixIcon('heroicon-s-truck')
                                     ->options(function (Get $get) {
-                                        $fechaActual = now()->format('Y-m-d');
+                                        $hoy = now()->format('Y-m-d');
+                                        $ayer = now()->subDay()->format('Y-m-d');
                                         $trabajoId = $get('trabajo_id');
 
                                         return Trabajo::with(['vehiculo', 'vehiculo.tipoVehiculo'])
-                                            ->where(function ($query) use ($fechaActual, $trabajoId) {
+                                            ->where(function ($query) use ($hoy, $ayer, $trabajoId) {
                                                 if ($trabajoId) {
                                                     $query->where('id', $trabajoId);
                                                 }
 
-                                                $query->orWhere(function ($subQuery) use ($fechaActual) {
+                                                $query->orWhere(function ($subQuery) use ($hoy, $ayer) {
                                                     $subQuery->where('disponible', true)
                                                         ->orWhereNull('fecha_salida')
-                                                        ->orWhereDate('fecha_salida', '>=', $fechaActual);
+                                                        ->orWhereDate('fecha_salida', $hoy)
+                                                        ->orWhereDate('fecha_salida', $ayer);
                                                 });
                                             })
                                             ->orderBy('created_at', 'desc')
