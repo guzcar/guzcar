@@ -83,11 +83,19 @@ class EditTrabajo extends EditRecord
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
 
                 Action::make('Descargar proforma')
-                    ->icon('heroicon-s-document-text')
+                    ->icon('heroicon-s-document')
                     ->url(
                         fn(Trabajo $trabajo): string => route('trabajo.pdf.proforma', ['trabajo' => $trabajo]),
                         shouldOpenInNewTab: true
                     ),
+
+                Action::make('Descargar informe')
+                    ->icon('heroicon-s-document-text')
+                    ->url(
+                        fn(Trabajo $trabajo): string => route('trabajo.pdf.informe', ['trabajo' => $trabajo]),
+                        shouldOpenInNewTab: true
+                    )
+                    ->hidden(fn() => !auth()->user()->can('view_trabajo::informe')),
 
                 Action::make('Descargar evidencias')
                     ->icon('heroicon-s-photo')

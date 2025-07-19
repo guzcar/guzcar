@@ -207,4 +207,33 @@ class TrabajoController extends Controller
         $fileName = 'Evidencias ' . $trabajo->codigo . '.pdf';
         return $pdf->stream($fileName);
     }
+
+    public function informe($id)
+    {
+        $trabajo = Trabajo::with([
+            'vehiculo.clientes',
+            'vehiculo.tipoVehiculo',
+            'vehiculo.marca',
+            'informes'
+        ])->find($id);
+
+        // Construir el título con los datos del vehículo
+        $titulo = "# ".$trabajo->vehiculo->placa." ".
+                ($trabajo->vehiculo->tipoVehiculo->nombre ?? '')." ".
+                ($trabajo->vehiculo->marca->nombre ?? '')." ".
+                ($trabajo->vehiculo->modelo->nombre ?? '');
+
+        $pdf = App::make('dompdf.wrapper');
+        
+        // Pasar solo los datos necesarios a la vista
+        $pdf->loadView('pdf.informe', [
+            'trabajo' => $trabajo,
+            'informes' => $trabajo->informes,
+            'titulo' => $titulo
+        ])->setPaper('A4', 'portrait');
+
+        $fileName = "Informe {$trabajo->codigo}.pdf";
+
+        return $pdf->stream($fileName);
+    }
 }

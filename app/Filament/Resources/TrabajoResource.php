@@ -7,6 +7,7 @@ use App\Filament\Resources\TrabajoResource\RelationManagers;
 use App\Filament\Resources\TrabajoResource\RelationManagers\DescuentosRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\DetallesRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\EvidenciasRelationManager;
+use App\Filament\Resources\TrabajoResource\RelationManagers\InformesRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\OtrosRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\PagosRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\ServiciosRelationManager;
@@ -950,11 +951,19 @@ class TrabajoResource extends Resource
                         ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
 
                     Action::make('Descargar proforma')
-                        ->icon('heroicon-s-document-text')
+                        ->icon('heroicon-s-document')
                         ->url(
                             fn(Trabajo $trabajo): string => route('trabajo.pdf.proforma', ['trabajo' => $trabajo]),
                             shouldOpenInNewTab: true
                         ),
+
+                    Action::make('Descargar informe')
+                        ->icon('heroicon-s-document-text')
+                        ->url(
+                            fn(Trabajo $trabajo): string => route('trabajo.pdf.informe', ['trabajo' => $trabajo]),
+                            shouldOpenInNewTab: true
+                        )
+                        ->hidden(fn() => !auth()->user()->can('view_trabajo::informe')),
 
                     Action::make('Descargar evidencias')
                         ->icon('heroicon-s-photo')
@@ -1036,6 +1045,7 @@ class TrabajoResource extends Resource
     {
         return [
             DetallesRelationManager::class,
+            InformesRelationManager::class,
             ServiciosRelationManager::class,
             TrabajoArticulosRelationManager::class,
             OtrosRelationManager::class,

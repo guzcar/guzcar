@@ -90,6 +90,11 @@ class Trabajo extends Model
         return $this->hasMany(TrabajoDetalle::class);
     }
 
+    public function informes()
+    {
+        return $this->hasMany(TrabajoInforme::class);
+    }
+
     public function servicios(): HasMany
     {
         return $this->hasMany(TrabajoServicio::class, 'trabajo_id');

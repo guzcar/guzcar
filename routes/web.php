@@ -72,6 +72,7 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     // PDF
     Route::get('/admin/trabajos/pdf/{trabajo}/presupuesto', [PdfTrabajoController::class, 'presupuesto'])->name('trabajo.pdf.presupuesto');
     Route::get('/admin/trabajos/pdf/{trabajo}/proforma', [PdfTrabajoController::class, 'proforma'])->name('trabajo.pdf.proforma');
+    Route::get('/admin/trabajos/pdf/{trabajo}/informe', [PdfTrabajoController::class, 'informe'])->name('trabajo.pdf.informe');
     Route::get('/admin/evidencias/pdf/{trabajo}', [PdfTrabajoController::class, 'evidencia'])->name('trabajo.pdf.evidencia');
     Route::get('/admin/despachos/pdf/{despacho}', [PdfDespachoController::class, 'downloadPdf'])->name('despachos.pdf');
     Route::get('/admin/ventas/pdf/{venta}', [PdfVentaController::class, 'downloadPdf'])->name('ventas.pdf');

@@ -132,6 +132,10 @@
             font-weight: bold;
         }
 
+        .normal {
+            font-weight: normal;
+        }
+
         .table-void {
             border-collapse: collapse;
             width: 100%;
