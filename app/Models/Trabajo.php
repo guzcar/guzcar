@@ -12,6 +12,8 @@ class Trabajo extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'trabajos';
+
     protected $fillable = [
         'control',
         'codigo',
@@ -25,6 +27,7 @@ class Trabajo extends Model
         'descripcion_servicio',
         'desembolso',
         'presupuesto_enviado',
+        'aplica_detraccion',
         'disponible',
         'garantia',
         'observaciones',

@@ -2,19 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TrabajoResource\Pages;
-use App\Filament\Resources\TrabajoResource\RelationManagers;
-use App\Filament\Resources\TrabajoResource\RelationManagers\DescuentosRelationManager;
-use App\Filament\Resources\TrabajoResource\RelationManagers\DetallesRelationManager;
-use App\Filament\Resources\TrabajoResource\RelationManagers\EvidenciasRelationManager;
-use App\Filament\Resources\TrabajoResource\RelationManagers\InformesRelationManager;
-use App\Filament\Resources\TrabajoResource\RelationManagers\OtrosRelationManager;
-use App\Filament\Resources\TrabajoResource\RelationManagers\PagosRelationManager;
-use App\Filament\Resources\TrabajoResource\RelationManagers\ServiciosRelationManager;
-use App\Filament\Resources\TrabajoResource\RelationManagers\TrabajoArticulosRelationManager;
+use App\Filament\Resources\ContabilidadResource\Pages;
+use App\Filament\Resources\ContabilidadResource\RelationManagers;
+use App\Filament\Resources\ContabilidadResource\RelationManagers\DescuentosRelationManager;
+use App\Filament\Resources\ContabilidadResource\RelationManagers\DetallesRelationManager;
+use App\Filament\Resources\ContabilidadResource\RelationManagers\EvidenciasRelationManager;
+use App\Filament\Resources\ContabilidadResource\RelationManagers\InformesRelationManager;
+use App\Filament\Resources\ContabilidadResource\RelationManagers\OtrosRelationManager;
+use App\Filament\Resources\ContabilidadResource\RelationManagers\PagosRelationManager;
+use App\Filament\Resources\ContabilidadResource\RelationManagers\ServiciosRelationManager;
+use App\Filament\Resources\ContabilidadResource\RelationManagers\TrabajoArticulosRelationManager;
 use App\Models\Cliente;
+use App\Models\Comprobante;
+use App\Models\Contabilidad;
 use App\Models\Servicio;
 use App\Models\Trabajo;
+use App\Models\TrabajoPago;
 use App\Models\User;
 use App\Models\Vehiculo;
 use App\Models\VehiculoMarca;
@@ -28,6 +31,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -40,9 +44,11 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\ActionSize;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
@@ -69,26 +75,31 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
-class TrabajoResource extends Resource
+class ContabilidadResource extends Resource
 {
-    protected static ?string $model = Trabajo::class;
+    protected static ?string $model = Contabilidad::class;
 
     protected static ?string $navigationGroup = 'Core';
 
-    protected static ?int $navigationSort = 0;
+    protected static ?int $navigationSort = 5;
 
-    protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
+    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
 
-    protected static ?string $modelLabel = 'Trabajo';
+    protected static ?string $modelLabel = 'Control financiero';
 
-    protected static ?string $pluralModelLabel = 'Trabajos';
+    protected static ?string $pluralModelLabel = 'Control financiero';
 
-    protected static ?string $navigationLabel = 'Control vehicular';
+    protected static ?string $navigationLabel = 'Control financiero';
+
+    protected static ?string $slug = 'contabilidad';
 
     public static function form(Form $form): Form
     {
@@ -526,86 +537,137 @@ class TrabajoResource extends Resource
                             ->schema([
                                 Section::make()
                                     ->schema([
-                                        Repeater::make('tecnicos')
-                                            ->label('')
-                                            ->createItemButtonLabel('Añadir técnico')
-                                            ->relationship('tecnicos')
-                                            ->defaultItems(0)
-                                            ->simple(
-                                                Select::make('tecnico_id')
-                                                    ->label('Seleccionar Técnico')
-                                                    ->relationship('tecnico', 'name', fn($query) => $query->withTrashed())
+                                        TextInput::make('garantia')
+                                            ->label('Garantía'),
+                                        RichEditor::make('observaciones')
+                                            ->label('Observaciones')
+                                            ->toolbarButtons([
+                                                'blockquote',
+                                                'bold',
+                                                'bulletList',
+                                                'heading',
+                                                'italic',
+                                                'link',
+                                                'orderedList',
+                                                'redo',
+                                                'strike',
+                                                'table',
+                                                'undo',
+                                            ]),
+                                    ])
+                                    ->heading('Detalles'),
+                                Section::make()
+                                    ->schema([
+                                        Repeater::make('comprobantes')
+                                            ->collapsed()
+                                            ->itemLabel(
+                                                fn(array $state): ?string =>
+                                                Comprobante::find($state['comprobante_id'])?->codigo
+                                            )
+                                            ->label('Comprobantes')
+                                            ->schema([
+                                                Select::make('comprobante_id')
+                                                    ->label('Comprobante')
+                                                    ->options(fn() => Comprobante::query()->pluck('codigo', 'id'))
+                                                    ->searchable()
+                                                    ->required()
                                                     ->distinct()
                                                     ->disableOptionsWhenSelectedInSiblingRepeaterItems()
-                                                    ->searchable()
-                                                    ->preload()
-                                                    ->required()
-                                            )
-                                    ])
-                                    ->heading('Técnicos')
-                                    ->hiddenOn('edit'),
-                                Section::make()
-                                    ->schema([
-                                        Toggle::make('disponible')
-                                            ->label('Activar fuera de plazo')
-                                            ->hiddenOn('create'),
-                                        Repeater::make('tecnicos')
-                                            ->label('')
-                                            ->createItemButtonLabel('Añadir técnico')
-                                            ->relationship('tecnicos')
-                                            ->defaultItems(0)
-                                            ->schema([
-                                                Grid::make()
-                                                    ->schema([
-                                                        Select::make('tecnico_id')
-                                                            ->label('Seleccionar Técnico')
-                                                            ->relationship('tecnico', 'name', fn($query) => $query->withTrashed())
-                                                            ->distinct()
-                                                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
-                                                            ->searchable()
-                                                            ->preload()
+                                                    ->createOptionForm([
+                                                        Grid::make()
+                                                            ->schema([
+                                                                TextInput::make('codigo')
+                                                                    ->required()
+                                                                    ->unique('comprobantes', 'codigo')
+                                                                    ->validationMessages([
+                                                                        'unique' => 'Este código de comprobante ya existe',
+                                                                    ]),
+                                                                DatePicker::make('emision')
+                                                                    ->default(now())
+                                                                    ->required(),
+                                                                TextInput::make('total')
+                                                                    ->numeric()
+                                                                    ->required(),
+                                                            ]),
+                                                        FileUpload::make('url')
                                                             ->required()
-                                                            ->columnSpan(2),
-                                                        Toggle::make('finalizado')
-                                                            ->inline(false)
-                                                            ->onIcon('heroicon-m-check')
-                                                            ->offIcon('heroicon-m-x-mark')
-                                                            ->onColor('success')
-                                                            ->offColor('danger')
-                                                            ->columnSpan(1)
+                                                            ->directory('comprobantes'),
                                                     ])
-                                                    ->columns(3),
-                                                // Grid::make()
-                                                //     ->schema([
-                                                //         Placeholder::make('created_at')
-                                                //             ->label('Fecha de asignación')
-                                                //             ->content(fn($record) => $record->created_at->format('d/m/Y H:i:s')),
-                                                //         Placeholder::make('updated_at')
-                                                //             ->label('Fecha de culminación')
-                                                //             ->content(fn($record) => $record ? $record->updated_at->format('d/m/Y H:i:s') : 'No culminado')
-                                                //     ])
-                                                //     ->columns(2)
+                                                    ->createOptionUsing(function (array $data) {
+                                                        return DB::transaction(function () use ($data) {
+                                                            $comprobante = Comprobante::create([
+                                                                'codigo' => $data['codigo'],
+                                                                'emision' => $data['emision'],
+                                                                'total' => $data['total'],
+                                                                'url' => $data['url'],
+                                                            ]);
+                                                            return $comprobante->id;
+                                                        });
+                                                    })
+                                                    ->editOptionForm(function ($state) {
+                                                        $comprobante = Comprobante::find($state);
+
+                                                        return [
+                                                            Grid::make()
+                                                                ->schema([
+                                                                    Hidden::make('id')->default($comprobante->id), // Añadido para mantener referencia
+                                                                    TextInput::make('codigo')
+                                                                        ->required()
+                                                                        ->rules([
+                                                                            Rule::unique('comprobantes', 'codigo')
+                                                                                ->ignore($comprobante->id)
+                                                                        ])
+                                                                        ->validationMessages([
+                                                                            'unique' => 'Este código de comprobante ya existe',
+                                                                        ]),
+                                                                    DatePicker::make('emision')
+                                                                        ->required(),
+                                                                    TextInput::make('total')
+                                                                        ->numeric()
+                                                                        ->required(),
+                                                                ]),
+                                                            FileUpload::make('url')
+                                                                ->directory('comprobantes'),
+                                                        ];
+                                                    })
+                                                    ->fillEditOptionActionFormUsing(function (string $state) {
+                                                        if ($state) {
+                                                            $comprobante = Comprobante::find($state);
+                                                            return $comprobante ? ['comprobante_id' => $comprobante->id] + $comprobante->toArray() : [];
+                                                        }
+                                                        return [];
+                                                    })
+                                                    ->updateOptionUsing(function (array $data, string $state) {
+                                                        DB::transaction(function () use ($data, $state) {
+                                                            $comprobante = Comprobante::findOrFail($state);
+                                                            $comprobante->update([
+                                                                'codigo' => $data['codigo'],
+                                                                'emision' => $data['emision'],
+                                                                'total' => $data['total'],
+                                                                'url' => $data['url'] ?? $comprobante->url,
+                                                            ]);
+                                                        });
+                                                    }),
                                             ])
-                                            ->collapsed()
-                                            ->itemLabel(fn(array $state): ?string => $state['tecnico_id'] ? User::withTrashed()->find($state['tecnico_id'])->name : null)
-                                    ])
-                                    ->heading('Técnicos')
-                                    ->hiddenOn('create'),
-                                Section::make()
-                                    ->schema([
-                                        Repeater::make('archivos')
-                                            ->label('')
-                                            ->createItemButtonLabel('Añadir archivo')
                                             ->defaultItems(0)
-                                            ->relationship()
-                                            ->simple(
-                                                FileUpload::make('archivo_url')
-                                                    ->directory('trabajo_archivo')
-                                                    ->required()
-                                            )
+                                            ->minItems(0)
+                                            ->reorderable(false)
+                                            ->columnSpanFull()
+                                            ->addActionLabel('Agregar Comprobante')
+                                            ->afterStateHydrated(function (Set $set, ?Contabilidad $record) {
+                                                if (!$record || !$record->exists) {
+                                                    return;
+                                                }
+                                                $items = $record->comprobantes()
+                                                    ->pluck('comprobantes.id')
+                                                    ->map(fn($id) => ['comprobante_id' => $id])
+                                                    ->values()
+                                                    ->toArray();
+
+                                                $set('comprobantes', $items);
+                                            }),
                                     ])
-                                    ->heading('Archivos')
-                                    ->hiddenOn('create'),
+                                    ->heading('Comprobantes'),
                             ])
                             ->columnspan(1)
                             ->columns(1),
@@ -633,23 +695,18 @@ class TrabajoResource extends Resource
                         return $record->fecha_ingreso->format('h:i:s A');
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
-                CheckboxColumn::make('control')
-                    ->alignCenter()
-                    ->hidden(fn() => !auth()->user()->can('update_trabajo')),
                 TextColumn::make('vehiculo.placa')
                     ->label('Placa')
+                    ->badge()
+                    ->color('gray')
                     ->placeholder('Sin Placa')
                     ->sortable()
-                    ->searchable(isIndividual: true)
-                    ->badge()
-                    ->color(function ($record) { // Accede al registro completo
-                        return $record->control ? 'success' : 'gray'; // Color dinámico basado en "control"
-                    }),
+                    ->searchable(isIndividual: true),
                 TextColumn::make('vehiculo.tipoVehiculo.nombre')
                     ->label('Tipo')
                     ->sortable()
                     ->searchable(isIndividual: true)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('vehiculo.marca.nombre')
                     ->placeholder('Sin Marca')
                     ->label('Marca')
@@ -674,19 +731,19 @@ class TrabajoResource extends Resource
                     ->searchable(isIndividual: true)
                     ->badge()
                     ->wrap()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('descripcion_servicio')
                     ->searchable(isIndividual: true)
                     ->wrap()
                     ->lineClamp(2)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('usuarios.name')
                     ->placeholder('Sin Técnicos')
                     ->label('Técnicos')
                     ->searchable(isIndividual: true)
                     ->badge()
                     ->wrap()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('fecha_salida')
                     ->label('Fecha salida')
                     ->state(function ($record) {
@@ -703,6 +760,113 @@ class TrabajoResource extends Resource
                         return '';
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
+                SelectColumn::make('desembolso')
+                    ->placeholder('')
+                    ->options([
+                        'A CUENTA' => 'A CUENTA',
+                        'COBRADO' => 'COBRADO',
+                        'POR COBRAR' => 'POR COBRAR',
+                    ])
+                    ->toggleable(isToggledHiddenByDefault: false),
+                ToggleColumn::make('presupuesto_enviado')
+                    ->alignCenter()
+                    ->label('Presupuesto')
+                    ->onIcon('heroicon-s-envelope')
+                    ->offIcon('heroicon-s-envelope-open')
+                    ->onColor('success')
+                    ->toggleable(true)
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('importe')
+                    ->sortable()
+                    ->alignRight()
+                    ->label('Importe total')
+                    ->prefix('S/ ')
+                    ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
+                    ->toggleable(isToggledHiddenByDefault: false),
+                // TextColumn::make('importe_2')
+                //     ->getStateUsing(fn($record) => $record->importe())
+                //     ->alignRight()
+                //     ->prefix('S/ ')
+                //     ->formatStateUsing(fn($state): string => number_format($state, 2, '.', ','))
+                //     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
+                TextColumn::make('a_cuenta')
+                    ->sortable()
+                    ->alignRight()
+                    ->prefix('S/ ')
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('.getPorCobrar')
+                    ->alignRight()
+                    ->label('Por cobrar')
+                    ->getStateUsing(function (Trabajo $record): string {
+                        return number_format($record->getPorCobrar(), 2, '.', '');
+                    })
+                    ->prefix('S/ ')
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                
+                ToggleColumn::make('aplica_detraccion')
+                    ->alignCenter()
+                    ->label('Aplica detracción')
+                    ->onIcon('heroicon-s-currency-dollar')
+                    ->offIcon('heroicon-s-banknotes')
+                    ->onColor('warning')
+                    ->toggleable(true)
+                    ->toggleable(isToggledHiddenByDefault: false),
+TextColumn::make('importe_neto')
+    ->label('Importe neto')
+    ->alignRight()
+    ->prefix('S/ ')
+    ->getStateUsing(function ($record) {
+        $importe = $record->importe;
+        // Si aplica detracción, calcula el 88%, sino toma el 100%
+        $importeNeto = $record->aplica_detraccion ? $importe * 0.88 : $importe;
+        return number_format($importeNeto, 2, '.', '');
+    })
+    ->toggleable(isToggledHiddenByDefault: false),
+    
+                Tables\Columns\ViewColumn::make('comprobantes_badges')
+                    ->label('Comprobantes')
+                    ->disableClick()
+                    ->view('filament.tables.columns.comprobantes-badges')
+                    ->state(function ($record) {
+
+                        return $record->comprobantes->map(function ($c) {
+                            $path = $c->url;
+                            $href = $path
+                                ? (Str::startsWith($path, ['http://', 'https://', '/'])
+                                    ? $path
+                                    : Storage::disk('public')->url($path))
+                                : null;
+
+                            return [
+                                'id' => $c->id,
+                                'codigo' => $c->codigo,
+                                'emision' => $c->emision?->toDateTimeString(), // Convertir a string si es Carbon
+                                'total' => (float) $c->total, // Asegurar que sea float
+                                'url' => $href,
+                            ];
+                        })->values()->all();
+                    }),
+
+                Tables\Columns\ViewColumn::make('pagos_badges')
+                    ->label('Pagos')
+                    ->disableClick()
+                    ->view('filament.tables.columns.pagos-badges')
+                    ->state(function (Trabajo $record) {
+                        return $record->pagos
+                            ->map(function (TrabajoPago $pago) {
+                                return [
+                                    'id' => $pago->id,
+                                    'monto' => number_format((float) $pago->monto, 2, '.', ''),
+                                    'fecha_pago' => optional($pago->fecha_pago)->format('d/m/Y'),
+                                    'detalle' => $pago->detalle?->nombre,
+                                    'observacion' => $pago->observacion,
+                                ];
+                            })
+                            ->values()
+                            ->all();
+                    }),
+
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')
@@ -748,6 +912,25 @@ class TrabajoResource extends Resource
                 SelectFilter::make('taller_id')
                     ->label('Taller')
                     ->relationship('taller', 'nombre'),
+                SelectFilter::make('desembolso')
+                    ->label('Estado del Desembolso')
+                    ->options([
+                        'A CUENTA' => 'A Cuenta',
+                        'COBRADO' => 'Cobrado',
+                        'POR COBRAR' => 'Por Cobrar',
+                    ])
+                    ->placeholder('Todos')
+                    ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
+                TernaryFilter::make('presupuestos')
+                    ->label('Estado de presupuesto')
+                    ->placeholder('Todos')
+                    ->trueLabel('Enviados')
+                    ->falseLabel('Por enviar')
+                    ->queries(
+                        true: fn($query) => $query->where('presupuesto_enviado', true),
+                        false: fn($query) => $query->where('presupuesto_enviado', false),
+                        blank: fn($query) => $query, // Mostrar todos (opción por defecto)
+                    ),
                 DateRangeFilter::make('fecha_ingreso'),
                 DateRangeFilter::make('fecha_salida'),
                 TernaryFilter::make('aplazados')
@@ -763,67 +946,69 @@ class TrabajoResource extends Resource
                 TrashedFilter::make(),
             ])
             ->actions([
-
-                Action::make('terminar')
-                    ->label('Terminar')
-                    ->color('success')
-                    ->icon('heroicon-s-check')
-                    ->visible(fn(Trabajo $record) => is_null($record->fecha_salida)) // Visible solo si fecha_salida es null
-                    ->action(function (Trabajo $record) {
-
-                        $record->update([
-                            'fecha_salida' => now()
-                        ]);
-
-                        TrabajoService::actualizarTrabajoPorId($record);
-
-                        Notification::make()
-                            ->title('El trabajo ha sido marcado como terminado.')
-                            ->success()
-                            ->send();
-                    })
-                    ->button()
-                    ->size(ActionSize::Medium)
-                    ->hidden(fn() => !auth()->user()->can('update_trabajo')),
-
-                Action::make('reabrir')->requiresConfirmation()
-                    ->modalHeading('Reabrir Trabajo')
-                    ->modalDescription('¿Estás segura/o de que deseas reabrir el trabajo? Esto eliminará la fecha de salida actual, pero podrás asignar una nueva más tarde.')
-                    ->label('Reabrir')
-                    ->color('warning')
-                    ->icon('heroicon-s-arrow-path')
-                    ->visible(fn(Trabajo $record) => !is_null($record->fecha_salida)) // Visible solo si fecha_salida tiene valor
-                    ->action(function (Trabajo $record) {
-                        $record->update([
-                            'fecha_salida' => null,
-                            'desembolso' => null
-                        ]);
-
-                        Notification::make()
-                            ->title('El trabajo ha sido reabierto.')
-                            ->success()
-                            ->send();
-                    })
-                    ->button()
-                    ->size(ActionSize::Medium)
-                    ->hidden(fn() => !auth()->user()->can('update_trabajo')),
-
                 ActionGroup::make([
-                    Action::make('Descargar informe')
-                        ->icon('heroicon-s-document-text')
-                        ->url(
-                            fn(Trabajo $trabajo): string => route('trabajo.pdf.informe', ['trabajo' => $trabajo]),
-                            shouldOpenInNewTab: true
-                        )
-                        ->hidden(fn() => !auth()->user()->can('view_trabajo::informe')),
 
-                    Action::make('Descargar evidencias')
-                        ->icon('heroicon-s-photo')
+                    Action::make('Descargar presupuesto')
+                        ->icon('heroicon-s-document-currency-dollar')
+                        ->form([
+                            // Grid::make()
+                            //     ->schema([
+                            //         Section::make()
+                            //             ->schema([
+                            Checkbox::make('igv')
+                                ->label('Incluir IGV')
+                                ->reactive(),
+                            TextInput::make('igv_porcentaje')
+                                ->label('Porcentaje')
+                                ->suffix('%')
+                                ->default('18')
+                                ->numeric()
+                                ->integer()
+                                ->minValue(0)
+                                ->disabled(function (callable $get) {
+                                    return !$get('igv');
+                                }),
+                            // ])
+                            // ->heading('Configuración de IGV')
+                            // ->columnSpan(['xl' => 1, 'lg' => 1, 'md' => 1, 'sm' => 1]),
+
+                            // Section::make()
+                            //     ->schema([
+                            //         Checkbox::make('servicios')
+                            //             ->label('Incluir servicios')
+                            //             ->default(true),
+                            //         Checkbox::make('articulos')
+                            //             ->label('Incluir artículos')
+                            //             ->default(true),
+                            //     ])
+                            //     ->heading('Opciones de Descarga')
+                            //     ->columnSpan(['xl' => 1, 'lg' => 1, 'md' => 1, 'sm' => 1]),
+                            // ])
+                            // ->columns(['xl' => 2, 'lg' => 2, 'md' => 2, 'sm' => 2]),
+                        ])
+                        ->action(function (Contabilidad $trabajo, array $data, $livewire) {
+
+                            $params = [
+                                'igv' => $data['igv'] ?? false,
+                                'igv_porcentaje' => $data['igv_porcentaje'] ?? 18,
+                                // 'servicios' => $data['servicios'] ?? true,
+                                // 'articulos' => $data['articulos'] ?? true,
+                            ];
+
+                            $url = route('trabajo.pdf.presupuesto', ['trabajo' => $trabajo] + $params);
+                            $livewire->js("window.open('{$url}', '_blank');");
+                        })
+                        ->modalHeading('Configuración de Descarga')
+                        ->modalButton('Descargar')
+                        ->modalWidth('md')
+                        ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
+
+                    Action::make('Descargar proforma')
+                        ->icon('heroicon-s-document')
                         ->url(
-                            fn(Trabajo $trabajo): string => route('trabajo.pdf.evidencia', ['trabajo' => $trabajo]),
+                            fn(Contabilidad $trabajo): string => route('trabajo.pdf.proforma', ['trabajo' => $trabajo]),
                             shouldOpenInNewTab: true
-                        )
-                        ->hidden(fn() => !auth()->user()->can('view_evidencia')),
+                        ),
                 ])
                     ->button()
                     ->label('Descargar')
@@ -839,6 +1024,58 @@ class TrabajoResource extends Resource
                 ])
                     ->color('gray')
                     ->button(),
+
+                Action::make('verPago')
+                    ->label('Ver pago')
+                    ->icon('heroicon-o-currency-dollar')
+                    ->extraAttributes(['class' => 'hidden']) // oculta en UI, pero registrada
+                    ->modalHeading('Detalles del pago')
+                    ->modalWidth(MaxWidth::Large)
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Cerrar')
+                    ->mountUsing(function (Form $form, Trabajo $record, array $arguments) {
+                        $pagoId = $arguments['pago_id'] ?? null;
+                        if (!$pagoId)
+                            return;
+
+                        $pago = TrabajoPago::with('detalle')->findOrFail($pagoId);
+
+                        $form->fill([
+                            // estado “oculto” que leerán los Placeholder
+                            'monto_state' => number_format((float) $pago->monto, 2, '.', ''),
+                            'fecha_pago_state' => $pago->fecha_pago ? Carbon::parse($pago->fecha_pago)->format('d/m/Y') : '—',
+                            'detalle_state' => $pago->detalle?->nombre ?? '—',
+                            'observacion_state' => $pago->observacion ?? '—',
+                        ]);
+                    })
+                    ->form([
+                        Grid::make(2)->schema([
+                            Placeholder::make('monto_view')
+                                ->label('Monto')
+                                ->content(fn(Get $get) => 'S/ ' . number_format((float) ($get('monto_state') ?? 0), 2, '.', '')),
+
+                            Placeholder::make('fecha_pago_view')
+                                ->label('Fecha de pago')
+                                ->content(fn(Get $get) => $get('fecha_pago_state') ?: '—'),
+
+                            Placeholder::make('detalle_view')
+                                ->label('Detalle')
+                                ->content(fn(Get $get) => $get('detalle_state') ?: '—')
+                                ->columnSpan(2),
+
+                            Placeholder::make('observacion_view')
+                                ->label('Observación')
+                                ->content(fn(Get $get) => $get('observacion_state') ?: '—')
+                                ->columnSpan(2),
+
+                            // registran las keys de estado que llenamos en mountUsing()
+                            Hidden::make('monto_state'),
+                            Hidden::make('fecha_pago_state'),
+                            Hidden::make('detalle_state'),
+                            Hidden::make('observacion_state'),
+                        ]),
+                    ])
+                    ->closeModalByClickingAway(true)
             ])
             ->bulkActions([
                 ExportBulkAction::make(),
@@ -848,61 +1085,33 @@ class TrabajoResource extends Resource
                 //     RestoreBulkAction::make(),
                 // ]),
             ])
-            ->headerActions([
-                ActionGroup::make([
-                    Action::make('reiniciarControl')
-                        ->label('Reiniciar Control')
-                        ->requiresConfirmation()
-                        ->modalHeading('Reiniciar Control')
-                        ->modalDescription('¿Estás segura/o de que deseas reiniciar el control de todos los registros? Esta acción no se puede deshacer.')
-                        ->action(function () {
-                            DB::table('trabajos')->update(['control' => false]);
-                            Notification::make()
-                                ->title('Control reiniciado')
-                                ->body('Todos los registros han sido actualizados correctamente.')
-                                ->success()
-                                ->send();
-                        })
-                        ->color('danger')
-                        ->icon('heroicon-o-arrow-path'),
-
-                    Action::make('cerrarAplazados')
-                        ->label('Cerrar aplazados')
-                        ->requiresConfirmation()
-                        ->modalHeading('Cerrar trabajos aplazados')
-                        ->modalDescription('¿Estás seguro/a de que deseas cerrar todos los trabajos marcados como aplazados?.')
-                        ->action(function () {
-                            DB::table('trabajos')->update(['disponible' => false]);
-                            Notification::make()
-                                ->title('Aplazados cerrados')
-                                ->body('Todos los trabajos aplazados han sido actualizados correctamente.')
-                                ->success()
-                                ->send();
-                        })
-                        ->color('warning')
-                        ->icon('heroicon-o-clock')
-                ])
-                    ->button()
-                    ->color('gray'),
-            ]);
+            ->headerActions([])
+            ->recordClasses(fn(Trabajo $record) => match ($record->desembolso) {
+                'A CUENTA' => 'desembolso-a-cuenta',
+                'COBRADO' => 'desembolso-cobrado',
+                'POR COBRAR' => 'desembolso-por-cobrar',
+                default => null,
+            });
     }
 
     public static function getRelations(): array
     {
         return [
-            DetallesRelationManager::class,
-            InformesRelationManager::class,
-            EvidenciasRelationManager::class,
+            ServiciosRelationManager::class,
+            TrabajoArticulosRelationManager::class,
+            OtrosRelationManager::class,
+            PagosRelationManager::class,
+            DescuentosRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTrabajos::route('/'),
-            'create' => Pages\CreateTrabajo::route('/create'),
-            'view' => Pages\ViewTrabajo::route('/{record}'),
-            'edit' => Pages\EditTrabajo::route('/{record}/edit'),
+            'index' => Pages\ListContabilidades::route('/'),
+            // 'create' => Pages\CreateContabilidad::route('/create'),
+            'view' => Pages\ViewContabilidad::route('/{record}'),
+            'edit' => Pages\EditContabilidad::route('/{record}/edit'),
         ];
     }
 
@@ -911,6 +1120,11 @@ class TrabajoResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
+            ])
+            ->with([
+                'pagos:id,trabajo_id,monto,fecha_pago,detalle_id,observacion',
+                'pagos.detalle:id,nombre',
+                'comprobantes:id,total,emision,codigo,url', // Añade esta línea
             ]);
     }
 }

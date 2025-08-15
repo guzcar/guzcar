@@ -32,14 +32,15 @@ return new class extends Migration {
                 ->constrained('talleres')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
-            $table->date('fecha_ingreso');
-            $table->date('fecha_salida')->nullable();
+            $table->dateTime('fecha_ingreso');
+            $table->dateTime('fecha_salida')->nullable();
             $table->decimal('kilometraje', 10, 2)->nullable();
             $table->text('descripcion_servicio');
             $table->decimal('importe')->default(0);
             $table->decimal('a_cuenta')->default(0);
             $table->enum('desembolso', ['A CUENTA', 'COBRADO', 'POR COBRAR'])->nullable();
             $table->boolean('presupuesto_enviado')->default(false);
+            $table->boolean('aplica_detraccion')->default(false);
             $table->boolean('disponible')->default(false);
             $table->string('garantia')->nullable();
             $table->text('observaciones')->nullable();

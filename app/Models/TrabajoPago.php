@@ -19,6 +19,10 @@ class TrabajoPago extends Model
         'detalle_id',
     ];
 
+    protected $casts = [
+        'fecha_pago' => 'datetime',
+    ];
+
     public function detalle(): BelongsTo
     {
         return $this->belongsTo(TrabajoPagoDetalle::class, 'detalle_id');
