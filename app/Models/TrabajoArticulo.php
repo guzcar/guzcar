@@ -24,6 +24,7 @@ class TrabajoArticulo extends Model
         'observacion',
         'confirmado',
         'presupuesto',
+        'sort',
     ];
 
     protected $casts = [

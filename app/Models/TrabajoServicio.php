@@ -17,6 +17,7 @@ class TrabajoServicio extends Model
         'detalle',
         'precio',
         'cantidad',
+        'sort',
     ];
 
     public function servicio()

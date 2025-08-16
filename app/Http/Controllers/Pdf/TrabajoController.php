@@ -18,19 +18,26 @@ class TrabajoController extends Controller
     {
         $trabajo = Trabajo::with([
             'trabajoArticulos' => function ($query) {
-                $query->where('presupuesto', true); // Solo artículos con presupuesto true
+                $query->where('presupuesto', true)
+                    ->orderBy('sort'); // Ordenar por sort
             },
             'trabajoArticulos.articulo.categoria',
             'trabajoArticulos.articulo.subCategoria',
             'trabajoArticulos.articulo.marca',
             'trabajoArticulos.articulo.unidad',
             'trabajoArticulos.articulo.presentacion',
-            'otros',
+            'servicios' => function ($query) {
+                $query->orderBy('sort'); // Ordenar servicios por sort
+            },
+            'otros' => function ($query) {
+                $query->orderBy('sort'); // Ordenar otros por sort
+            },
             'descuentos',
             'cliente',
             'vehiculo.clientes',
         ])->find($id);
 
+        // Resto del código permanece igual...
         $clientePrincipal = $trabajo->cliente ?? $trabajo->vehiculo->clientes->first();
 
         $vehiculo = $trabajo->vehiculo;
@@ -49,12 +56,12 @@ class TrabajoController extends Controller
             $tiempo = $dias == 1 ? "{$dias} DÍA" : "{$dias} DÍAS";
         }
 
-        // Subtotal de servicios
+        // Subtotal de servicios (ya vienen ordenados por sort)
         $subtotal_servicios = $trabajo->servicios->sum(function ($trabajoServicio) {
             return $trabajoServicio->cantidad * $trabajoServicio->precio;
         });
 
-        // Agrupar artículos por ID y precio, sumando sus cantidades
+        // Agrupar artículos por ID y precio, sumando sus cantidades (manteniendo el orden)
         $articulosAgrupados = $trabajo->trabajoArticulos->groupBy(function ($articulo) {
             return $articulo->articulo_id . '-' . $articulo->precio;
         })->map(function ($grupo) {
@@ -70,7 +77,7 @@ class TrabajoController extends Controller
             return $articulo['cantidad'] * $articulo['precio'];
         });
 
-        // Subtotal de trabajo_otros
+        // Subtotal de trabajo_otros (ya vienen ordenados por sort)
         $subtotal_trabajo_otros = $trabajo->otros->sum(function ($trabajoOtro) {
             return $trabajoOtro->cantidad * $trabajoOtro->precio;
         });
@@ -89,24 +96,6 @@ class TrabajoController extends Controller
             $total_con_descuentos = $total - $total_descuentos;
         }
 
-        // return view(
-        //     'pdf.presupuesto',
-        //     compact(
-        //         'trabajo',
-        //         'vehiculo',
-        //         'tiempo',
-        //         'subtotal_servicios',
-        //         'subtotal_articulos',
-        //         'articulosAgrupados',
-        //         'subtotal_trabajo_otros',
-        //         'total',
-        //         'descuentos',
-        //         'total_descuentos',
-        //         'total_con_descuentos',
-        //         'clientePrincipal'
-        //     )
-        // );
-
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('pdf.presupuesto', compact(
             'trabajo',
@@ -124,7 +113,6 @@ class TrabajoController extends Controller
         ))->setPaper('A4', 'portrait');
 
         $codenow = now()->format('ymdhis');
-
         $fileName = "Presupuesto {$trabajo->codigo} - {$codenow}.pdf";
 
         return $pdf->stream($fileName);
@@ -134,18 +122,22 @@ class TrabajoController extends Controller
     {
         $trabajo = Trabajo::with([
             'trabajoArticulos' => function ($query) {
-                $query->where('presupuesto', true);
+                $query->where('presupuesto', true)
+                    ->orderBy('sort'); // Ordenar por sort
             },
             'trabajoArticulos.articulo.categoria',
             'trabajoArticulos.articulo.subCategoria',
             'trabajoArticulos.articulo.marca',
             'trabajoArticulos.articulo.unidad',
             'trabajoArticulos.articulo.presentacion',
-            'otros',
+            'otros' => function ($query) {
+                $query->orderBy('sort'); // Ordenar otros por sort
+            },
             'cliente',
             'vehiculo.clientes',
         ])->find($id);
 
+        // Resto del código permanece igual...
         $clientePrincipal = $trabajo->cliente ?? $trabajo->vehiculo->clientes->first();
         $vehiculo = $trabajo->vehiculo;
 
@@ -168,14 +160,6 @@ class TrabajoController extends Controller
                 'cantidad' => $grupo->sum('cantidad'),
             ];
         });
-
-        // return view('pdf.proforma', compact(
-        //     'trabajo',
-        //     'vehiculo',
-        //     'tiempo',
-        //     'articulosAgrupados',
-        //     'clientePrincipal'
-        // ));
 
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('pdf.proforma', compact(
@@ -200,8 +184,6 @@ class TrabajoController extends Controller
             ->orderBy('sort')
             ->get();
 
-        // return view('pdf.evidencia', compact('trabajo', 'evidencias'));
-
         $pdf = App::make('dompdf.wrapper');
         $pdf->loadView('pdf.evidencia', compact('trabajo', 'evidencias'))->setPaper('A4', 'portrait');
         $fileName = 'Evidencias ' . $trabajo->codigo . '.pdf';
@@ -218,13 +200,13 @@ class TrabajoController extends Controller
         ])->find($id);
 
         // Construir el título con los datos del vehículo
-        $titulo = "# ".$trabajo->vehiculo->placa." ".
-                ($trabajo->vehiculo->tipoVehiculo->nombre ?? '')." ".
-                ($trabajo->vehiculo->marca->nombre ?? '')." ".
-                ($trabajo->vehiculo->modelo->nombre ?? '');
+        $titulo = "# " . $trabajo->vehiculo->placa . " " .
+            ($trabajo->vehiculo->tipoVehiculo->nombre ?? '') . " " .
+            ($trabajo->vehiculo->marca->nombre ?? '') . " " .
+            ($trabajo->vehiculo->modelo->nombre ?? '');
 
         $pdf = App::make('dompdf.wrapper');
-        
+
         // Pasar solo los datos necesarios a la vista
         $pdf->loadView('pdf.informe', [
             'trabajo' => $trabajo,

@@ -41,6 +41,8 @@ class OtrosRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->reorderable('sort')
+            ->defaultSort('sort', 'asc')
             ->columns([
                 TextColumn::make('descripcion'),
                 TextColumn::make('precio')

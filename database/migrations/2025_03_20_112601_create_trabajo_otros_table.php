@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->text('descripcion');
             $table->decimal('precio')->unsigned();
             $table->unsignedInteger('cantidad')->default(1);
+            $table->unsignedBigInteger('sort')->default(0);
             $table->timestamps();
         });
 

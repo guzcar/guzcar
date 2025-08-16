@@ -47,6 +47,7 @@ return new class extends Migration {
             $table->text('observacion')->nullable();
             $table->boolean('confirmado')->default(false);
             $table->boolean('presupuesto')->default(true);
+            $table->unsignedBigInteger('sort')->default(0);
             $table->timestamps();
         });
 

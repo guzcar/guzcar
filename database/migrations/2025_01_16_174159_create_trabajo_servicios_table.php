@@ -23,6 +23,7 @@ return new class extends Migration {
             $table->text('detalle')->nullable();
             $table->decimal('precio');
             $table->unsignedInteger('cantidad')->default(1);
+            $table->unsignedBigInteger('sort')->default(0);
             $table->timestamps();
         });
     }
