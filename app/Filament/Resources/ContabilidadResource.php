@@ -764,6 +764,7 @@ class ContabilidadResource extends Resource
                         'POR COBRAR' => 'POR COBRAR',
                     ])
                     ->toggleable(isToggledHiddenByDefault: false),
+
                 ToggleColumn::make('presupuesto_enviado')
                     ->alignCenter()
                     ->label('Presupuesto')
@@ -779,6 +780,18 @@ class ContabilidadResource extends Resource
                     ->label('Importe total')
                     ->prefix('S/ ')
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                TextColumn::make('importe_neto')
+                    ->label('Importe neto')
+                    ->alignRight()
+                    ->prefix('S/ ')
+                    ->formatStateUsing(fn($state) => number_format($state, 2, '.', ''))
+                    ->numeric(
+                        decimalPlaces: 2,
+                        decimalSeparator: '.',
+                        thousandsSeparator: ''
+                    )
                     ->toggleable(isToggledHiddenByDefault: false),
 
                 Tables\Columns\ViewColumn::make('comprobantes_badges')
@@ -806,30 +819,9 @@ class ContabilidadResource extends Resource
                         })->values()->all();
                     }),
 
-                TextColumn::make('importe_neto')
-                    ->label('Importe neto')
-                    ->alignRight()
-                    ->prefix('S/ ')
-                    ->formatStateUsing(fn($state) => number_format($state, 2, '.', ''))
-                    ->numeric(
-                        decimalPlaces: 2,
-                        decimalSeparator: '.',
-                        thousandsSeparator: ''
-                    )
-                    ->toggleable(isToggledHiddenByDefault: false),
-
                 TextColumn::make('a_cuenta')
                     ->sortable()
                     ->alignRight()
-                    ->prefix('S/ ')
-                    ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('.getPorCobrar')
-                    ->alignRight()
-                    ->label('Por cobrar')
-                    ->getStateUsing(function (Trabajo $record): string {
-                        return number_format($record->getPorCobrar(), 2, '.', '');
-                    })
                     ->prefix('S/ ')
                     ->toggleable(isToggledHiddenByDefault: false),
 
@@ -851,6 +843,15 @@ class ContabilidadResource extends Resource
                             ->values()
                             ->all();
                     }),
+
+                TextColumn::make('.getPorCobrar')
+                    ->alignRight()
+                    ->label('Por cobrar')
+                    ->getStateUsing(function (Trabajo $record): string {
+                        return number_format($record->getPorCobrar(), 2, '.', '');
+                    })
+                    ->prefix('S/ ')
+                    ->toggleable(isToggledHiddenByDefault: false),
 
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
