@@ -13,4 +13,17 @@ class Contabilidad extends Trabajo
         return $this->belongsToMany(Comprobante::class, 'trabajo_comprobantes', 'trabajo_id', 'comprobante_id')
             ->withTimestamps();
     }
+
+    public function getImporteNetoAttribute(): float
+    {
+        if ($this->comprobantes->isEmpty()) {
+            return (float) $this->importe;
+        }
+
+        return $this->comprobantes->sum(function ($comprobante) {
+            return $comprobante->aplica_detraccion
+                ? $comprobante->total * 0.88
+                : $comprobante->total;
+        });
+    }
 }

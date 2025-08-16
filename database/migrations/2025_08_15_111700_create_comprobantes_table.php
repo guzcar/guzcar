@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('codigo', 20)->unique();
             $table->dateTime('emision');
             $table->decimal('total');
+            $table->boolean('aplica_detraccion')->default(false);
             $table->string('url')->nullable();
             $table->timestamps();
         });

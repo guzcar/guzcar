@@ -40,7 +40,6 @@ return new class extends Migration {
             $table->decimal('a_cuenta')->default(0);
             $table->enum('desembolso', ['A CUENTA', 'COBRADO', 'POR COBRAR'])->nullable();
             $table->boolean('presupuesto_enviado')->default(false);
-            $table->boolean('aplica_detraccion')->default(false);
             $table->boolean('disponible')->default(false);
             $table->string('garantia')->nullable();
             $table->text('observaciones')->nullable();

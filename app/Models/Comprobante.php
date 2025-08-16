@@ -9,10 +9,17 @@ class Comprobante extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['codigo', 'emision', 'total', 'url'];
+    protected $fillable = [
+        'codigo',
+        'emision',
+        'total',
+        'aplica_detraccion',
+        'url'
+    ];
 
     protected $casts = [
         'emision' => 'datetime',
         'total' => 'decimal:2',
+        'aplica_detraccion' => 'boolean',
     ];
 }

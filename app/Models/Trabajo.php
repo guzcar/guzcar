@@ -27,7 +27,6 @@ class Trabajo extends Model
         'descripcion_servicio',
         'desembolso',
         'presupuesto_enviado',
-        'aplica_detraccion',
         'disponible',
         'garantia',
         'observaciones',

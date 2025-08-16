@@ -501,24 +501,6 @@ class ContabilidadResource extends Resource
                                     ->relationship('taller', 'nombre')
                                     ->default(1)
                                     ->required(),
-                                // ->createOptionForm([
-                                //     TextInput::make('nombre')
-                                //         ->unique(ignoreRecord: true)
-                                //         ->required()
-                                //         ->maxLength(255),
-                                //     TextInput::make('ubicacion')
-                                //         ->required()
-                                //         ->maxLength(255),
-                                // ])
-                                // ->editOptionForm([
-                                //     TextInput::make('nombre')
-                                //         ->unique(ignoreRecord: true)
-                                //         ->required()
-                                //         ->maxLength(255),
-                                //     TextInput::make('ubicacion')
-                                //         ->required()
-                                //         ->maxLength(255),
-                                // ]),
                                 DateTimePicker::make('fecha_ingreso')
                                     ->default(now())
                                     ->required(),
@@ -588,6 +570,12 @@ class ContabilidadResource extends Resource
                                                                 TextInput::make('total')
                                                                     ->numeric()
                                                                     ->required(),
+                                                                Toggle::make('aplica_detraccion')
+                                                                    ->inline(false)
+                                                                    ->label('Aplica detracción')
+                                                                    ->onIcon('heroicon-s-currency-dollar')
+                                                                    ->offIcon('heroicon-s-banknotes')
+                                                                    ->onColor('warning')
                                                             ]),
                                                         FileUpload::make('url')
                                                             ->required()
@@ -599,6 +587,7 @@ class ContabilidadResource extends Resource
                                                                 'codigo' => $data['codigo'],
                                                                 'emision' => $data['emision'],
                                                                 'total' => $data['total'],
+                                                                'aplica_detraccion' => $data['aplica_detraccion'],
                                                                 'url' => $data['url'],
                                                             ]);
                                                             return $comprobante->id;
@@ -625,6 +614,12 @@ class ContabilidadResource extends Resource
                                                                     TextInput::make('total')
                                                                         ->numeric()
                                                                         ->required(),
+                                                                    Toggle::make('aplica_detraccion')
+                                                                        ->inline(false)
+                                                                        ->label('Aplica detracción')
+                                                                        ->onIcon('heroicon-s-currency-dollar')
+                                                                        ->offIcon('heroicon-s-banknotes')
+                                                                        ->onColor('warning')
                                                                 ]),
                                                             FileUpload::make('url')
                                                                 ->directory('comprobantes'),
@@ -644,6 +639,7 @@ class ContabilidadResource extends Resource
                                                                 'codigo' => $data['codigo'],
                                                                 'emision' => $data['emision'],
                                                                 'total' => $data['total'],
+                                                                'aplica_detraccion' => $data['aplica_detraccion'],
                                                                 'url' => $data['url'] ?? $comprobante->url,
                                                             ]);
                                                         });
@@ -783,12 +779,6 @@ class ContabilidadResource extends Resource
                     ->prefix('S/ ')
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
                     ->toggleable(isToggledHiddenByDefault: false),
-                // TextColumn::make('importe_2')
-                //     ->getStateUsing(fn($record) => $record->importe())
-                //     ->alignRight()
-                //     ->prefix('S/ ')
-                //     ->formatStateUsing(fn($state): string => number_format($state, 2, '.', ','))
-                //     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
                 TextColumn::make('a_cuenta')
                     ->sortable()
                     ->alignRight()
@@ -803,27 +793,18 @@ class ContabilidadResource extends Resource
                     ->prefix('S/ ')
                     ->toggleable(isToggledHiddenByDefault: false),
 
-                
-                ToggleColumn::make('aplica_detraccion')
-                    ->alignCenter()
-                    ->label('Aplica detracción')
-                    ->onIcon('heroicon-s-currency-dollar')
-                    ->offIcon('heroicon-s-banknotes')
-                    ->onColor('warning')
-                    ->toggleable(true)
+                TextColumn::make('importe_neto')
+                    ->label('Importe neto')
+                    ->alignRight()
+                    ->prefix('S/ ')
+                    ->formatStateUsing(fn($state) => number_format($state, 2, '.', ''))
+                    ->numeric(
+                        decimalPlaces: 2,
+                        decimalSeparator: '.',
+                        thousandsSeparator: ''
+                    )
                     ->toggleable(isToggledHiddenByDefault: false),
-TextColumn::make('importe_neto')
-    ->label('Importe neto')
-    ->alignRight()
-    ->prefix('S/ ')
-    ->getStateUsing(function ($record) {
-        $importe = $record->importe;
-        // Si aplica detracción, calcula el 88%, sino toma el 100%
-        $importeNeto = $record->aplica_detraccion ? $importe * 0.88 : $importe;
-        return number_format($importeNeto, 2, '.', '');
-    })
-    ->toggleable(isToggledHiddenByDefault: false),
-    
+
                 Tables\Columns\ViewColumn::make('comprobantes_badges')
                     ->label('Comprobantes')
                     ->disableClick()
@@ -843,6 +824,7 @@ TextColumn::make('importe_neto')
                                 'codigo' => $c->codigo,
                                 'emision' => $c->emision?->toDateTimeString(), // Convertir a string si es Carbon
                                 'total' => (float) $c->total, // Asegurar que sea float
+                                'aplica_detraccion' => $c->aplica_detraccion ? "\nAPLICA DETRACCIÓN · S/" . number_format($c->total * 0.88, 2) : "",
                                 'url' => $href,
                             ];
                         })->values()->all();
@@ -1124,7 +1106,7 @@ TextColumn::make('importe_neto')
             ->with([
                 'pagos:id,trabajo_id,monto,fecha_pago,detalle_id,observacion',
                 'pagos.detalle:id,nombre',
-                'comprobantes:id,total,emision,codigo,url', // Añade esta línea
+                'comprobantes:id,total,emision,codigo,aplica_detraccion,url', // Añade esta línea
             ]);
     }
 }

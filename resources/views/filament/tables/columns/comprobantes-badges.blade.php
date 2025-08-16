@@ -18,8 +18,9 @@
             $codigo = $comp['codigo'] ?? 'Comprobante';
             $emision = isset($comp['emision']) ? Carbon::parse($comp['emision'])->format('d/m/Y') : '--/--/----';
             $total = isset($comp['total']) ? 'S/ ' . number_format((float)$comp['total'], 2) : 'S/ 0.00';
+            $detraccion = $comp['aplica_detraccion'];
             $href = $comp['url'] ?? null;
-            $tooltip = "{$emision} · {$total}";
+            $tooltip = "{$emision} · {$total}{$detraccion}";
         @endphp
 
         <div class="inline-flex w-max">
