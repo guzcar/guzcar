@@ -772,37 +772,13 @@ class ContabilidadResource extends Resource
                     ->onColor('success')
                     ->toggleable(true)
                     ->toggleable(isToggledHiddenByDefault: false),
+
                 TextColumn::make('importe')
                     ->sortable()
                     ->alignRight()
                     ->label('Importe total')
                     ->prefix('S/ ')
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('a_cuenta')
-                    ->sortable()
-                    ->alignRight()
-                    ->prefix('S/ ')
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make('.getPorCobrar')
-                    ->alignRight()
-                    ->label('Por cobrar')
-                    ->getStateUsing(function (Trabajo $record): string {
-                        return number_format($record->getPorCobrar(), 2, '.', '');
-                    })
-                    ->prefix('S/ ')
-                    ->toggleable(isToggledHiddenByDefault: false),
-
-                TextColumn::make('importe_neto')
-                    ->label('Importe neto')
-                    ->alignRight()
-                    ->prefix('S/ ')
-                    ->formatStateUsing(fn($state) => number_format($state, 2, '.', ''))
-                    ->numeric(
-                        decimalPlaces: 2,
-                        decimalSeparator: '.',
-                        thousandsSeparator: ''
-                    )
                     ->toggleable(isToggledHiddenByDefault: false),
 
                 Tables\Columns\ViewColumn::make('comprobantes_badges')
@@ -829,6 +805,33 @@ class ContabilidadResource extends Resource
                             ];
                         })->values()->all();
                     }),
+
+                TextColumn::make('importe_neto')
+                    ->label('Importe neto')
+                    ->alignRight()
+                    ->prefix('S/ ')
+                    ->formatStateUsing(fn($state) => number_format($state, 2, '.', ''))
+                    ->numeric(
+                        decimalPlaces: 2,
+                        decimalSeparator: '.',
+                        thousandsSeparator: ''
+                    )
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                TextColumn::make('a_cuenta')
+                    ->sortable()
+                    ->alignRight()
+                    ->prefix('S/ ')
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                TextColumn::make('.getPorCobrar')
+                    ->alignRight()
+                    ->label('Por cobrar')
+                    ->getStateUsing(function (Trabajo $record): string {
+                        return number_format($record->getPorCobrar(), 2, '.', '');
+                    })
+                    ->prefix('S/ ')
+                    ->toggleable(isToggledHiddenByDefault: false),
 
                 Tables\Columns\ViewColumn::make('pagos_badges')
                     ->label('Pagos')
