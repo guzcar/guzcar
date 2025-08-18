@@ -775,11 +775,33 @@ class ContabilidadResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: false),
 
                 TextColumn::make('importe')
+                    ->label('Sub-Total')
                     ->sortable()
                     ->alignRight()
-                    ->label('Importe total')
                     ->prefix('S/ ')
-                    ->hidden(fn() => !auth()->user()->can('view_trabajo::pago'))
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                TextColumn::make('importe_total')
+                    ->label('Importe Total (+ IGV)')
+                    ->placeholder('No aplica')
+                    ->alignRight()
+                    ->prefix('S/ ')
+                    ->state(function ($record) {
+                        if ($record->igv) {
+                            // Calcular el total con IGV (18%)
+                            $total = $record->importe * 1.18;
+                            return number_format($total, 2, '.', '');
+                        }
+                        return null;
+                    })
+                    ->toggleable(isToggledHiddenByDefault: false),
+
+                ToggleColumn::make('igv')
+                    ->alignCenter()
+                    ->label('IGV')
+                    ->onIcon('heroicon-m-receipt-percent')
+                    ->onColor('warning')
+                    ->toggleable(true)
                     ->toggleable(isToggledHiddenByDefault: false),
 
                 TextColumn::make('importe_neto')

@@ -28,6 +28,7 @@ class Trabajo extends Model
         'desembolso',
         'presupuesto_enviado',
         'disponible',
+        'igv',
         'garantia',
         'observaciones',
     ];

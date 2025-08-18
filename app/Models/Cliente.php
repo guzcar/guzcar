@@ -20,6 +20,6 @@ class Cliente extends Model
 
     public function vehiculos(): BelongsToMany
     {
-        return $this->belongsToMany(Vehiculo::class, 'cliente_vehiculos', 'vehiculo_id', 'cliente_id');
+        return $this->belongsToMany(Vehiculo::class, 'cliente_vehiculos', 'cliente_id', 'vehiculo_id');
     }
 }

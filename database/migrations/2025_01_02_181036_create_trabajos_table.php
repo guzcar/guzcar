@@ -41,6 +41,7 @@ return new class extends Migration {
             $table->enum('desembolso', ['A CUENTA', 'COBRADO', 'POR COBRAR'])->nullable();
             $table->boolean('presupuesto_enviado')->default(false);
             $table->boolean('disponible')->default(false);
+            $table->boolean('igv')->default(false);
             $table->string('garantia')->nullable();
             $table->text('observaciones')->nullable();
             $table->timestamps();

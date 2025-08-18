@@ -78,6 +78,26 @@ class ClienteResource extends Resource
                 PhoneColumn::make('telefono')
                     ->searchable(isIndividual: true)
                     ->placeholder('Sin telefono'),
+                TextColumn::make('vehiculos.placa')
+                    ->searchable(isIndividual: true)
+                    ->badge()
+                    ->color('gray')
+                    ->placeholder('Sin vehículos')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('vehiculos.marca.nombre')
+                    ->label('Marcas')
+                    ->searchable(isIndividual: true)
+                    ->badge()
+                    ->color('gray')
+                    ->placeholder('Sin vehículos')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('vehiculos.modelo.nombre')
+                    ->label('Modelos')
+                    ->searchable(isIndividual: true)
+                    ->badge()
+                    ->color('gray')
+                    ->placeholder('Sin vehículos')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')

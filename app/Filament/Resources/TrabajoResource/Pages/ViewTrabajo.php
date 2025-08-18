@@ -25,7 +25,7 @@ class ViewTrabajo extends ViewRecord
             'trabajo' => $trabajo,
             'evidencias' => $trabajo->evidencias()
                 ->orderBy('created_at', 'desc')
-                ->simplePaginate(12),
+                ->get(),
         ];
     }
 
