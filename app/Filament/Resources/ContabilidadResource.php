@@ -762,6 +762,7 @@ class ContabilidadResource extends Resource
                         'A CUENTA' => 'A CUENTA',
                         'COBRADO' => 'COBRADO',
                         'POR COBRAR' => 'POR COBRAR',
+                        'SIN COBRO' => 'SIN COBRO',
                     ])
                     ->toggleable(isToggledHiddenByDefault: false),
 
@@ -926,6 +927,7 @@ class ContabilidadResource extends Resource
                         'A CUENTA' => 'A Cuenta',
                         'COBRADO' => 'Cobrado',
                         'POR COBRAR' => 'Por Cobrar',
+                        'SIN COBRO' => 'Sin Cobro',
                     ])
                     ->placeholder('Todos')
                     ->hidden(fn() => !auth()->user()->can('view_trabajo::pago')),
@@ -1098,6 +1100,7 @@ class ContabilidadResource extends Resource
                 'A CUENTA' => 'desembolso-a-cuenta',
                 'COBRADO' => 'desembolso-cobrado',
                 'POR COBRAR' => 'desembolso-por-cobrar',
+                'SIN COBRO' => 'desembolso-cobrado',
                 default => null,
             });
     }

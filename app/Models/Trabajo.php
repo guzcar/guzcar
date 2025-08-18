@@ -34,6 +34,7 @@ class Trabajo extends Model
     ];
 
     protected $casts = [
+        'igv' => 'boolean',
         'fecha_ingreso' => 'datetime',
         'fecha_salida' => 'datetime',
     ];
@@ -176,10 +177,16 @@ class Trabajo extends Model
         $importe = (float) $this->importe;
         $aCuenta = (float) $this->a_cuenta;
 
+        // Si el campo 'igv' es verdadero, incrementar el importe en un 18%
+        if ($this->igv) {
+            $importe *= 1.18; // Incrementamos en 18%
+        }
+
         // Calcular la diferencia
         $porCobrar = $importe - $aCuenta;
 
         // Devolver 0 si el resultado es negativo
         return max($porCobrar, 0);
     }
+
 }

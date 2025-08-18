@@ -38,7 +38,7 @@ return new class extends Migration {
             $table->text('descripcion_servicio');
             $table->decimal('importe')->default(0);
             $table->decimal('a_cuenta')->default(0);
-            $table->enum('desembolso', ['A CUENTA', 'COBRADO', 'POR COBRAR'])->nullable();
+            $table->enum('desembolso', ['A CUENTA', 'COBRADO', 'POR COBRAR', 'SIN COBRO'])->nullable();
             $table->boolean('presupuesto_enviado')->default(false);
             $table->boolean('disponible')->default(false);
             $table->boolean('igv')->default(false);
