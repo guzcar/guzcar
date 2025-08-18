@@ -884,7 +884,8 @@ class TrabajoResource extends Resource
                 ])
                     ->button()
                     ->color('gray'),
-            ]);
+            ])
+            ->recordClasses(fn(Trabajo $record) => ($record->control && $record->fecha_salida !== null) ? 'desembolso-por-cobrar' : null);
     }
 
     public static function getRelations(): array
