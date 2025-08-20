@@ -142,7 +142,7 @@
                         </div>
                         <div>
                             <label for="observacion" class="form-label">Descripción</label>
-                            <textarea required name="observacion" class="form-control" id="observacion" rows="5"
+                            <textarea name="observacion" class="form-control" id="observacion" rows="5"
                                 placeholder="Breve descripción del trabajo realizado"></textarea>
                         </div>
                         <div id="error-container"></div>
@@ -172,7 +172,7 @@
                     <div class="modal-body">
                         <div>
                             <label for="observacionEditar" class="form-label">Descripción</label>
-                            <textarea required name="observacion" class="form-control" id="observacionEditar"
+                            <textarea name="observacion" class="form-control" id="observacionEditar"
                                 rows="3"></textarea>
                         </div>
                     </div>
