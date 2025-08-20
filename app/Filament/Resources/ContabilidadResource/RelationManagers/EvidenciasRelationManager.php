@@ -21,12 +21,13 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
 
 class EvidenciasRelationManager extends RelationManager
 {
     protected static string $relationship = 'evidencias_2';
 
-    protected static ?string $title = 'Evidencias';
+    protected static ?string $title = 'Detalles de técnicos';
 
     public function form(Form $form): Form
     {
@@ -111,7 +112,8 @@ class EvidenciasRelationManager extends RelationManager
                                     //     return $user ? $user->name : 'Usuario eliminado';
                                     // }),
                                     ->required(),
-                                Textarea::make('observacion'),
+                                Textarea::make('observacion')
+                                    ->label('Descripción'),
                             ])
                             ->columns(1)
                             ->columnSpan(1)
@@ -124,35 +126,43 @@ class EvidenciasRelationManager extends RelationManager
         return $table
             ->reorderable('sort')
             ->columns([
+                TextColumn::make('observacion')
+                    ->label('Descripción')
+                    ->placeholder('Sin descripción')
+                    ->wrap()
+                    ->copyable()
+                    ->lineClamp(5),
                 ImageColumn::make('evidencia_url')
-                    ->size(150)
                     ->label('Evidencia')
-                    ->getStateUsing(function (Evidencia $record): string {
+                    ->size(80)
+                    ->getStateUsing(function (Evidencia $record): ?string {
                         if ($record->tipo === 'imagen') {
-                            return $record->evidencia_url;
+                            // si viene ruta de storage, la convertimos a URL pública
+                            return filter_var($record->evidencia_url, FILTER_VALIDATE_URL)
+                                ? $record->evidencia_url
+                                : Storage::disk('public')->url($record->evidencia_url);
                         }
                         return asset('images/video.png');
                     })
+                    ->url(function (Evidencia $record): ?string {
+                        if (!$record->evidencia_url)
+                            return null;
+
+                        return filter_var($record->evidencia_url, FILTER_VALIDATE_URL)
+                            ? $record->evidencia_url
+                            : Storage::url($record->evidencia_url);
+                    })
+                    ->openUrlInNewTab()
                     ->alignCenter()
-                    ->verticallyAlignCenter(),
-                TextColumn::make('mostrar')
-                    ->label('Mostrar')
-                    ->formatStateUsing(fn($state) => $state ? 'Si' : 'No')
-                    ->badge()
-                    ->color(fn($state) => $state ? 'success' : 'danger')
-                    ->alignCenter(),
+                    ->verticallyAlignCenter()
+                    ->tooltip('Abrir en una nueva pestaña'),
                 TextColumn::make('user.name')
                     ->label('Subido por'),
-                TextColumn::make('observacion')
-                    ->label('Observación')
-                    ->placeholder('Sin obserbación')
-                    ->wrap()
-                    ->lineClamp(3),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
                     ->label('Fecha de edición')
                     ->dateTime('d/m/Y H:i:s')

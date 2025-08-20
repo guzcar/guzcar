@@ -1108,6 +1108,7 @@ class ContabilidadResource extends Resource
     public static function getRelations(): array
     {
         return [
+            EvidenciasRelationManager::class,
             ServiciosRelationManager::class,
             TrabajoArticulosRelationManager::class,
             OtrosRelationManager::class,

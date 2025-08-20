@@ -70,12 +70,12 @@ class Trabajo extends Model
 
     public function evidencias(): HasMany
     {
-        return $this->hasMany(Evidencia::class);
+        return $this->hasMany(Evidencia::class, 'trabajo_id');
     }
 
     public function evidencias_2(): HasMany
     {
-        return $this->hasMany(Evidencia::class)->orderBy('mostrar', 'desc');
+        return $this->hasMany(Evidencia::class, 'trabajo_id')->orderBy('mostrar', 'desc');
     }
 
     public function tecnicos()
@@ -135,36 +135,6 @@ class Trabajo extends Model
     {
         return $this->hasMany(TrabajoDescuento::class, 'trabajo_id');
     }
-
-    // public function importe(): float
-    // {
-    //     // 1. Sumar todos los servicios (precio x cantidad)
-    //     $totalServicios = $this->servicios->sum(
-    //         fn($servicio) => $servicio->precio * $servicio->cantidad
-    //     );
-
-    //     // 2. Sumar artículos con presupuesto activo (precio x cantidad)
-    //     $totalArticulos = $this->trabajoArticulos->where('presupuesto', true)->sum(
-    //         fn($articulo) => $articulo->precio * $articulo->cantidad
-    //     );
-
-    //     // 3. Sumar otros conceptos (precio x cantidad)
-    //     $totalOtros = $this->otros->sum(
-    //         fn($otro) => $otro->precio * $otro->cantidad
-    //     );
-
-    //     // 4. Calcular subtotal antes de descuentos
-    //     $subtotal = $totalServicios + $totalArticulos + $totalOtros;
-
-    //     // 5. Aplicar descuentos generales si existen (suma de porcentajes)
-    //     if ($this->descuentos->isNotEmpty()) {
-    //         $porcentajeDescuento = $this->descuentos->sum('descuento');
-    //         $subtotal *= (1 - ($porcentajeDescuento / 100));
-    //     }
-
-    //     // 6. Retornar el importe final (nunca negativo)
-    //     return $subtotal;
-    // }
 
     /**
      * Calcula la diferencia entre el importe total y los pagos realizados.

@@ -7,6 +7,7 @@ use App\Models\Trabajo;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Str;
 
 class ViewTrabajo extends ViewRecord
 {
@@ -21,11 +22,23 @@ class ViewTrabajo extends ViewRecord
             'detalles'
         ]);
 
+        $evidencias = $trabajo->evidencias()
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Observaciones únicas (sin nulos/blank, trim y case-insensitive)
+        $observaciones = $trabajo->evidencias()
+            ->whereNotNull('observacion')
+            ->pluck('observacion')
+            ->map(fn ($o) => trim($o))
+            ->filter(fn ($o) => $o !== '')
+            ->unique(fn ($o) => Str::lower($o))
+            ->values();
+
         return [
-            'trabajo' => $trabajo,
-            'evidencias' => $trabajo->evidencias()
-                ->orderBy('created_at', 'desc')
-                ->get(),
+            'trabajo'        => $trabajo,
+            'evidencias'     => $evidencias,
+            'observaciones'  => $observaciones, // <- pásalas a la vista
         ];
     }
 

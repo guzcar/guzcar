@@ -118,4 +118,21 @@
             </ul>
         </x-filament::section>
     </div>
+    
+
+    <h2 class="text-xl font-bold">Descripción de los técnicos</h2>
+
+    <x-filament::section>
+        <x-slot name="heading">
+            Detalles
+        </x-slot>
+
+        <ul class="list-disc list-inside space-y-1">
+            @forelse($observaciones as $obs)
+                <li class="text-gray-800 dark:text-gray-300">{{ $obs }}</li>
+            @empty
+                <p class="text-gray-500 dark:text-gray-400">Sin observaciones.</p>
+            @endforelse
+        </ul>
+    </x-filament::section>
 </x-filament::page>

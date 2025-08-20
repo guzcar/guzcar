@@ -892,6 +892,7 @@ class TrabajoResource extends Resource
     {
         return [
             DetallesRelationManager::class,
+            TrabajoArticulosRelationManager::class,
             InformesRelationManager::class,
             EvidenciasRelationManager::class,
         ];
