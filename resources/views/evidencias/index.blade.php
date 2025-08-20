@@ -143,7 +143,7 @@
                         <div>
                             <label for="observacion" class="form-label">Descripción</label>
                             <textarea required name="observacion" class="form-control" id="observacion" rows="5"
-                                placeholder="Escribe tu descripción de las evidencias aquí"></textarea>
+                                placeholder="Breve descripción del trabajo realizado"></textarea>
                         </div>
                         <div id="error-container"></div>
 

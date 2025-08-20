@@ -180,7 +180,7 @@
             @forelse($observaciones as $obs)
                 <li class="text-gray-800 dark:text-gray-300">{{ $obs }}</li>
             @empty
-                <p class="text-gray-500 dark:text-gray-400">Sin observaciones.</p>
+                <p class="text-gray-500 dark:text-gray-400">Sin descripciones.</p>
             @endforelse
         </ul>
     </x-filament::section>
