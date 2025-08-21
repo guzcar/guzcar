@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TrabajoResource\Pages;
 use App\Filament\Resources\TrabajoResource\RelationManagers;
+use App\Filament\Resources\TrabajoResource\RelationManagers\DescripcionTecnicosRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\DescuentosRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\DetallesRelationManager;
 use App\Filament\Resources\TrabajoResource\RelationManagers\EvidenciasRelationManager;
@@ -891,6 +892,7 @@ class TrabajoResource extends Resource
     public static function getRelations(): array
     {
         return [
+            DescripcionTecnicosRelationManager::class,
             DetallesRelationManager::class,
             TrabajoArticulosRelationManager::class,
             InformesRelationManager::class,

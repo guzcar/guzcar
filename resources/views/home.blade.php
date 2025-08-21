@@ -56,6 +56,13 @@
                                                 </li>
                                                 <li>
                                                     <a class="dropdown-item py-2"
+                                                        href="{{ route('gestion.detalles.index', $trabajo) }}">
+                                                        <i class="text-secondary fa-fw me-2 fa-solid fa-file-lines"></i>
+                                                        Trabajo realizado
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item py-2"
                                                         href="{{ route('gestion.evidencias.all', $trabajo) }}">
                                                         <i class="text-secondary fa-fw me-2 fa-solid fa-images"></i>
                                                         Todas las evidencias

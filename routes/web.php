@@ -12,6 +12,7 @@ use App\Http\Controllers\Pdf\DespachoController as PdfDespachoController;
 use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
 use App\Http\Controllers\Pdf\VentaController as PdfVentaController;
 use App\Http\Controllers\TrabajoController;
+use App\Http\Controllers\TrabajoDescripcionTecnicoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehiculoController;
 use Illuminate\Support\Facades\Route;
@@ -83,6 +84,12 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     Route::post('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'store'])->name('gestion.evidencias.store');
     Route::put('/trabajos/{trabajo}/evidencias/{evidencia}', [EvidenciaController::class, 'update'])->name('gestion.evidencias.update');
     Route::delete('/trabajos/{trabajo}/evidencias/{evidencia}', [EvidenciaController::class, 'destroy'])->name('gestion.evidencias.destroy');
+
+    // Detalles de trabajos
+    Route::get('/trabajos/{trabajo}/detalles', [TrabajoDescripcionTecnicoController::class, 'index'])->name('gestion.detalles.index');
+    Route::post('/trabajos/{trabajo}/detalles', [TrabajoDescripcionTecnicoController::class, 'store'])->name('gestion.detalles.store');
+    Route::put('/trabajos/{trabajo}/detalles/{detalle}', [TrabajoDescripcionTecnicoController::class, 'update'])->name('gestion.detalles.update');
+    Route::delete('/trabajos/{trabajo}/detalles/{detalle}', [TrabajoDescripcionTecnicoController::class, 'destroy'])->name('gestion.detalles.destroy');
 
     // Editar perfil
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('user.edit');
