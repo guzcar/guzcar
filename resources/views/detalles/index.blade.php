@@ -130,11 +130,19 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <label class="form-label">Descripción del trabajo</label>
 
-                        <!-- Trix usa este input oculto como “source of truth” -->
-                        <input id="descripcion" type="hidden" name="descripcion" value="{{ old('descripcion') }}">
-                        <trix-editor input="descripcion" class="trix-content"></trix-editor>
+                        <div class="mb-3">
+                            <label for="descripcionEditor" class="form-label">Descripción del trabajo</label>
+
+                            <!-- Trix usa este input oculto como “source of truth” -->
+                            <input id="descripcion" type="hidden" name="descripcion" value="{{ old('descripcion') }}">
+
+                            <!-- Placeholder en el editor -->
+                            <trix-editor id="descripcionEditor" input="descripcion" class="trix-content"
+                                placeholder="Escribe aquí una descripción clara del trabajo realizado"
+                                aria-describedby="descripcionHelp"></trix-editor>
+                        </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Guardar</button>
