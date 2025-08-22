@@ -1,7 +1,7 @@
 <x-layout>
 
     <h1 class="mb-3">
-        Detalles técnicos {{ $trabajo->vehiculo->placa ?? ('Trabajo #' . $trabajo->id) }}
+        Detalles técnicos {{ $trabajo->vehiculo->placa ?? '-' }}
     </h1>
 
     <div class="d-flex justify-content-between mb-3">
@@ -15,25 +15,25 @@
         <li class="list-group-item">
             <div class="d-flex">
                 <span class="fw-bold" style="min-width: 100px;">Tipo</span>
-                <span>{{ $trabajo->vehiculo->tipoVehiculo->nombre }}</span>
+                <span>{{ $trabajo->vehiculo->tipoVehiculo->nombre ?? '-' }}</span>
             </div>
         </li>
         <li class="list-group-item">
             <div class="d-flex">
                 <span class="fw-bold" style="min-width: 100px;">Marca</span>
-                <span>{{ $trabajo->vehiculo->marca?->nombre }}</span>
+                <span>{{ $trabajo->vehiculo->marca?->nombre ?? '-' }}</span>
             </div>
         </li>
         <li class="list-group-item">
             <div class="d-flex">
                 <span class="fw-bold" style="min-width: 100px;">Modelo</span>
-                <span>{{ $trabajo->vehiculo->modelo?->nombre }}</span>
+                <span>{{ $trabajo->vehiculo->modelo?->nombre ?? '-' }}</span>
             </div>
         </li>
         <li class="list-group-item">
             <div class="d-flex">
                 <span class="fw-bold" style="min-width: 100px;">Color</span>
-                <span>{{ $trabajo->vehiculo->color }}</span>
+                <span>{{ $trabajo->vehiculo->color ?? '-' }}</span>
             </div>
         </li>
         <li class="list-group-item">

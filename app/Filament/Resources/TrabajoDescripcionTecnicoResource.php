@@ -2,67 +2,49 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\EvidenciaResource\Pages;
-use App\Filament\Resources\EvidenciaResource\RelationManagers;
-use App\Models\Evidencia;
+use App\Filament\Resources\TrabajoDescripcionTecnicoResource\Pages;
+use App\Filament\Resources\TrabajoDescripcionTecnicoResource\RelationManagers;
+use App\Models\TrabajoDescripcionTecnico;
 use Filament\Forms;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ColumnGroup;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
-class EvidenciaResource extends Resource
+class TrabajoDescripcionTecnicoResource extends Resource
 {
-    protected static ?string $model = Evidencia::class;
+    protected static ?string $model = TrabajoDescripcionTecnico::class;
 
     protected static ?string $navigationGroup = 'Histórico';
 
-    protected static ?int $navigationSort = 55;
+    protected static ?int $navigationSort = 50;
 
-    protected static ?string $navigationIcon = 'heroicon-o-camera';
+    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
-    protected static ?string $navigationLabel = 'Evidencias subidas';
+    protected static ?string $navigationLabel = 'Descripción de los Técnicos';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('trabajo_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('user_id')
-                    ->required()
-                    ->numeric(),
-                FileUpload::make('evidencia_url')
-                    ->directory('evidencia')
-                    ->required(),
-                Forms\Components\TextInput::make('tipo')
-                    ->required(),
-                Forms\Components\Textarea::make('observacion')
-                    ->columnSpanFull(),
+                //
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->searchOnBlur(true)
             ->columns([
                 ColumnGroup::make('Trabajo', [
                     TextColumn::make('trabajo.codigo')
                         ->label('Código')
                         ->searchable(isIndividual: true)
-                        ->url(function (Evidencia $record): ?string {
+                        ->url(function (TrabajoDescripcionTecnico $record): ?string {
                             if ($record->trabajo && auth()->user()->can('update_trabajo')) {
                                 return TrabajoResource::getUrl('edit', ['record' => $record->trabajo]);
                             } elseif ($record->trabajo && auth()->user()->can('view_trabajo')) {
@@ -108,26 +90,14 @@ class EvidenciaResource extends Resource
                         ->wrap()
                         ->toggleable(isToggledHiddenByDefault: true)
                 ]),
-                ColumnGroup::make('Evidencia', [
-                    ImageColumn::make('evidencia_url')
-                        ->size(150)
-                        ->label('Archivo')
-                        ->getStateUsing(function (Evidencia $record): string {
-                            if ($record->tipo === 'imagen') {
-                                return $record->evidencia_url;
-                            }
-                            return asset('images/video.png');
-                        })
-                        ->alignCenter()
-                        ->verticallyAlignCenter(),
+                ColumnGroup::make('Descripción', [
                     TextColumn::make('user.name')
-                        ->label('Subido por')
+                        ->label('Descrito por')
                         ->searchable(),
-                    TextColumn::make('observacion')
-                        ->label('Observación')
+                    TextColumn::make('descripcion')
+                        ->label('Descripción')
                         ->wrap()
-                        ->lineClamp(3)
-                        ->toggleable(isToggledHiddenByDefault: true),
+                        ->html(),
                 ]),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
@@ -140,17 +110,17 @@ class EvidenciaResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('created_at', 'desc')
             ->filters([
-                DateRangeFilter::make('created_at')
-                    ->label('Fecha de subida'),
+                //
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
-                ViewAction::make(),
             ])
             ->bulkActions([
                 ExportBulkAction::make()
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 
@@ -164,10 +134,9 @@ class EvidenciaResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEvidencias::route('/'),
-            // 'create' => Pages\CreateEvidencia::route('/create'),
-            'view' => Pages\ViewEvidencia::route('/{record}'),
-            // 'edit' => Pages\EditEvidencia::route('/{record}/edit'),
+            'index' => Pages\ListTrabajoDescripcionTecnicos::route('/'),
+            // 'create' => Pages\CreateTrabajoDescripcionTecnico::route('/create'),
+            // 'edit' => Pages\EditTrabajoDescripcionTecnico::route('/{record}/edit'),
         ];
     }
 }

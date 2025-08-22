@@ -67,12 +67,14 @@ class TrabajoArticulosRelationManager extends RelationManager
                 TextColumn::make('responsable.name')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('presupuesto')
+                    ->hidden(fn() => !auth()->user()->can('create_trabajo'))
                     ->label('Presupuesto')
                     ->formatStateUsing(fn($state) => $state ? 'Incluido' : 'Excluido')
                     ->badge()
                     ->color(fn($state) => $state ? 'success' : 'danger')
                     ->alignCenter(),
                 TextColumn::make('precio')
+                    ->hidden(fn() => !auth()->user()->can('create_trabajo'))
                     ->label('Precio')
                     ->prefix('S/ ')
                     ->alignRight()
@@ -83,6 +85,7 @@ class TrabajoArticulosRelationManager extends RelationManager
                         return FractionService::decimalToFraction((float) $state);
                     }),
                 TextColumn::make('subtotal')
+                    ->hidden(fn() => !auth()->user()->can('create_trabajo'))
                     ->label('Subtotal')
                     ->prefix('S/ ')
                     ->alignRight()
@@ -126,7 +129,8 @@ class TrabajoArticulosRelationManager extends RelationManager
                             });
                         })
                         ->deselectRecordsAfterCompletion(),
-                ]),
+                ])
+                ->authorize(fn() => auth()->user()->can('create_trabajo')),
             ]);
     }
 

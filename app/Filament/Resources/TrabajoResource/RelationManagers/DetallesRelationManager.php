@@ -66,7 +66,6 @@ class DetallesRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->modalWidth('screen')
-                    ->modalCloseButton(false)
                     ->closeModalByClickingAway(false)
                     ->modalActions([
                         // Tables\Actions\Action::make('cancel')

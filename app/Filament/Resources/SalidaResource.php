@@ -420,6 +420,7 @@ class SalidaResource extends Resource
                         ->alignCenter()
                         ->label('Confirmado')
                         ->onColor('success')
+                        ->hidden(fn() => !auth()->user()->can('create_trabajo'))
                         ->offColor('gray')
                         ->onIcon('heroicon-c-check')
                         ->offIcon('heroicon-c-x-mark'),
@@ -519,6 +520,7 @@ class SalidaResource extends Resource
                         ->label('Precio en Servicio')
                         ->prefix('S/ ')
                         ->alignRight()
+                        ->hidden(fn() => !auth()->user()->can('create_contabilidad'))
                         ->sortable(),
                     TextColumn::make('cantidad')
                         ->sortable()

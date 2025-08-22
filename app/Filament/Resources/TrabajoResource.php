@@ -522,6 +522,7 @@ class TrabajoResource extends Resource
                                     ->columnSpanFull(),
                             ])
                             ->heading('Trabajo')
+                            ->disabled(fn() => auth()->user()->cannot('create_trabajo'))
                             ->columnSpan(1),
                         Grid::make()
                             ->schema([
@@ -544,7 +545,10 @@ class TrabajoResource extends Resource
                                             )
                                     ])
                                     ->heading('Técnicos')
-                                    ->hiddenOn('edit'),
+                                    ->hidden(
+                                        fn(string $operation): bool =>
+                                        $operation === 'edit' || auth()->user()->cannot('create_trabajo')
+                                    ),
                                 Section::make()
                                     ->schema([
                                         Toggle::make('disponible')
@@ -591,7 +595,10 @@ class TrabajoResource extends Resource
                                             ->itemLabel(fn(array $state): ?string => $state['tecnico_id'] ? User::withTrashed()->find($state['tecnico_id'])->name : null)
                                     ])
                                     ->heading('Técnicos')
-                                    ->hiddenOn('create'),
+                                    ->hidden(
+                                        fn(string $operation): bool =>
+                                        $operation === 'create' || auth()->user()->cannot('create_trabajo')
+                                    ),
                                 Section::make()
                                     ->schema([
                                         Repeater::make('archivos')
@@ -605,8 +612,11 @@ class TrabajoResource extends Resource
                                                     ->required()
                                             )
                                     ])
-                                    ->heading('Archivos')
-                                    ->hiddenOn('create'),
+                                    ->hidden(
+                                        fn(string $operation): bool =>
+                                        $operation === 'create' || auth()->user()->cannot('create_trabajo')
+                                    )
+                                    ->heading('Archivos'),
                             ])
                             ->columnspan(1)
                             ->columns(1),
@@ -864,6 +874,7 @@ class TrabajoResource extends Resource
                                 ->success()
                                 ->send();
                         })
+                        ->authorize(fn() => auth()->user()->can('create_trabajo'))
                         ->color('danger')
                         ->icon('heroicon-o-arrow-path'),
 
@@ -880,6 +891,7 @@ class TrabajoResource extends Resource
                                 ->success()
                                 ->send();
                         })
+                        ->authorize(fn() => auth()->user()->can('create_trabajo'))
                         ->color('warning')
                         ->icon('heroicon-o-clock')
                 ])
@@ -893,10 +905,10 @@ class TrabajoResource extends Resource
     {
         return [
             DescripcionTecnicosRelationManager::class,
+            EvidenciasRelationManager::class,
             DetallesRelationManager::class,
             TrabajoArticulosRelationManager::class,
             InformesRelationManager::class,
-            EvidenciasRelationManager::class,
         ];
     }
 

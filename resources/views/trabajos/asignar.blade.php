@@ -17,28 +17,45 @@
                     </thead>
                     <tbody id="tablaVehiculos">
                         @forelse ($trabajos as $trabajo)
-                            <tr class="vehiculo">
-                                <td class="px-0" style="max-width: 150px">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
-                                            <b>{{ $trabajo->vehiculo->placa ?? 'SIN PLACA' }}</b></li>
-                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
-                                            {{ $trabajo->vehiculo->tipoVehiculo->nombre }}</li>
-                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
-                                            {{ $trabajo->vehiculo->marca?->nombre }}</li>
-                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
-                                            {{ $trabajo->vehiculo->modelo?->nombre }}</li>
-                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
-                                            {{ $trabajo->vehiculo->color }}</li>
-                                    </ul>
-                                </td>
-                                <td style="max-width: 100px;">
-                                    <form action="{{ route('trabajos.asignar.post', $trabajo) }}" method="POST">
-                                        @csrf
-                                        <button class="btn btn-success w-100 py-2" type="submit">Asignar</button>
-                                    </form>
-                                </td>
-                            </tr>
+                        <tr class="vehiculo">
+                            <td class="px-0" style="max-width: 150px">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item px-2 py-3" style="background-color: transparent">
+                                        @if ($trabajo->vehiculo->placa)
+                                            <b>{{ $trabajo->vehiculo->placa }}</b>
+                                        @else
+                                            <b><span class="text-secondary">SIN PLACA</span></b>
+                                        @endif
+                                    </li>
+                                    <li class="list-group-item px-2 py-2" style="background-color: transparent">
+                                        {!! $trabajo->vehiculo->tipoVehiculo?->nombre
+                                            ? e($trabajo->vehiculo->tipoVehiculo->nombre)
+                                            : '<span class="text-secondary">Sin tipo de vehículo</span>' !!}
+                                    </li>
+                                    <li class="list-group-item px-2 py-2" style="background-color: transparent">
+                                        {!! $trabajo->vehiculo->marca?->nombre
+                                            ? e($trabajo->vehiculo->marca->nombre)
+                                            : '<span class="text-secondary">Sin marca</span>' !!}
+                                    </li>
+                                    <li class="list-group-item px-2 py-2" style="background-color: transparent">
+                                        {!! $trabajo->vehiculo->modelo?->nombre
+                                            ? e($trabajo->vehiculo->modelo->nombre)
+                                            : '<span class="text-secondary">Sin modelo</span>' !!}
+                                    </li>
+                                    <li class="list-group-item px-2 py-2" style="background-color: transparent">
+                                        {!! $trabajo->vehiculo->color
+                                            ? e($trabajo->vehiculo->color)
+                                            : '<span class="text-secondary">Sin color</span>' !!}
+                                    </li>
+                                </ul>
+                            </td>
+                            <td style="max-width: 100px;">
+                                <form action="{{ route('trabajos.asignar.post', $trabajo) }}" method="POST">
+                                    @csrf
+                                    <button class="btn btn-success w-100 py-2" type="submit">Asignar</button>
+                                </form>
+                            </td>
+                        </tr>
                         @empty
                             <tr id="sinVehiculos">
                                 <td class="text-center text-secondary py-5" colspan="2">

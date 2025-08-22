@@ -20,11 +20,11 @@
                         </tr>
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Marca</th>
-                            <td class="px-4 py-2">{{ $trabajo->vehiculo->marca?->nombre }}</td>
+                            <td class="px-4 py-2">{{ $trabajo->vehiculo->marca->nombre ?? '-' }}</td>
                         </tr>
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Modelo</th>
-                            <td class="px-4 py-2">{{ $trabajo->vehiculo->modelo?->nombre }}</td>
+                            <td class="px-4 py-2">{{ $trabajo->vehiculo->modelo->nombre ?? '-' }}</td>
                         </tr>
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Color</th>
@@ -121,7 +121,7 @@
             </ul>
         </x-filament::section>
 
-        @can('update_trabajo')
+        @can('create_trabajo')
             <x-filament::section>
                 <x-slot name="heading">
                     Archivos
@@ -169,14 +169,72 @@
         </x-filament::card>
     @endforelse
 
+    <h2 class="text-xl font-bold">Salidas</h2>
+
+    <x-filament::section>
+        <x-slot name="heading">
+            Artículos
+        </x-slot>
+
+        @php
+            $items = $articulosSalidosResumen ?? collect();
+        @endphp
+
+        @if(($items instanceof \Illuminate\Support\Collection ? $items->count() : count($items ?? [])) > 0)
+            <ul class="list-disc">
+                @foreach(($items instanceof \Illuminate\Support\Collection) ? $items : collect($items) as $item)
+                    <li class="text-gray-800 dark:text-gray-300" style="margin-left: 18px;">
+                        <span class="font-medium">
+                            {{ \App\Services\FractionService::decimalToFraction((float) (data_get($item, 'cantidad') ?? 0)) }}
+                        </span> × {{ data_get($item, 'nombre') ?? 'Artículo' }}
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <p class="text-gray-500 dark:text-gray-400">Sin artículos salidos.</p>
+        @endif
+    </x-filament::section>
+
     <h2 class="text-xl font-bold">Descripción de los técnicos</h2>
 
     <x-filament::section>
         <x-slot name="heading">
-            Detalles
+            Detalles de los técnicos
         </x-slot>
 
-        <ul class="list-disc list-inside space-y-1">
+        @php
+            $descs = $trabajoDescripcionTecnicos ?? collect();
+        @endphp
+
+        @if(($descs instanceof \Illuminate\Support\Collection ? $descs->count() : count($descs ?? [])) > 0)
+            <div class="space-y-6">
+                @foreach(($descs instanceof \Illuminate\Support\Collection) ? $descs : collect($descs) as $tdt)
+                    <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                        <div class="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                            {{ $tdt->user->name ?? 'Usuario no disponible' }}
+                            @if(!empty($tdt?->created_at))
+                                • {{ optional($tdt->created_at)->format('d/m/Y H:i') }}
+                            @endif
+                        </div>
+
+                        {{-- Importante: descripcion es HTML (puede tener ul/ol/li), no envolver en <li> --}}
+                            <div class="prose max-w-none dark:prose-invert">
+                                {!! $tdt->descripcion ?? '<em>Sin descripción.</em>' !!}
+                            </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-gray-500 dark:text-gray-400">Sin descripciones de técnicos.</p>
+        @endif
+    </x-filament::section>
+
+    <x-filament::section>
+        <x-slot name="heading">
+            Resumen de las evidencias
+        </x-slot>
+
+        <ul>
             @forelse($observaciones as $obs)
                 <li class="text-gray-800 dark:text-gray-300">{{ $obs }}</li>
             @empty
