@@ -87,6 +87,7 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
 
     // Detalles de trabajos
     Route::get('/trabajos/{trabajo}/detalles', [TrabajoDescripcionTecnicoController::class, 'index'])->name('gestion.detalles.index');
+    Route::get('/trabajos/{trabajo}/detalles/todos', [TrabajoDescripcionTecnicoController::class, 'all'])->name('gestion.detalles.all');
     Route::post('/trabajos/{trabajo}/detalles', [TrabajoDescripcionTecnicoController::class, 'store'])->name('gestion.detalles.store');
     Route::put('/trabajos/{trabajo}/detalles/{detalle}', [TrabajoDescripcionTecnicoController::class, 'update'])->name('gestion.detalles.update');
     Route::delete('/trabajos/{trabajo}/detalles/{detalle}', [TrabajoDescripcionTecnicoController::class, 'destroy'])->name('gestion.detalles.destroy');

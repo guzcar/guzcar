@@ -33,6 +33,26 @@ class TrabajoDescripcionTecnicoController extends Controller
     }
 
     /**
+     * Mostrar todos los detalles (HTML) del trabajo actual (de todos los técnicos).
+     *
+     * @param \App\Models\Trabajo $trabajo
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function all(Trabajo $trabajo)
+    {
+        // Cargar cabecera para placa y datos del vehículo
+        $trabajo->load(['vehiculo.tipoVehiculo', 'vehiculo.marca', 'vehiculo.modelo']);
+
+        // Traer todos los detalles del trabajo, más reciente primero
+        $detalles = TrabajoDescripcionTecnico::where('trabajo_id', $trabajo->id)
+            ->with('user') // para mostrar el autor sin N+1
+            ->orderByDesc('created_at')
+            ->paginate(10);
+
+        return view('detalles.all', compact('trabajo', 'detalles'));
+    }
+
+    /**
      * Crea un nuevo detalle del técnico autenticado.
      */
     public function store(Request $request, Trabajo $trabajo)
@@ -48,8 +68,8 @@ class TrabajoDescripcionTecnicoController extends Controller
         ]);
 
         TrabajoDescripcionTecnico::create([
-            'trabajo_id'  => $trabajo->id,
-            'user_id'     => $user->id,
+            'trabajo_id' => $trabajo->id,
+            'user_id' => $user->id,
             'descripcion' => $validated['descripcion'],
         ]);
 

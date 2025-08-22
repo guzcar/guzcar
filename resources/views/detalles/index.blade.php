@@ -130,7 +130,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <label class="form-label">Descripción</label>
+                        <label class="form-label">Descripción del trabajo</label>
 
                         <!-- Trix usa este input oculto como “source of truth” -->
                         <input id="descripcion" type="hidden" name="descripcion" value="{{ old('descripcion') }}">

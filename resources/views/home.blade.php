@@ -14,7 +14,7 @@
 
     <div class="card">
         <div class="card-body p-0">
-            <div class="table-responsive">
+            <div class="table-responsive tabla-vehiculos">
                 <table class="table mb-0 table-striped table-hover">
                     <thead>
                         <tr>
@@ -24,89 +24,97 @@
                     </thead>
                     <tbody id="tablaVehiculos">
                         @forelse ($trabajos as $trabajo)
-                            <tr class="vehiculo">
-                                <td class="px-0" style="max-width: 150px">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item px-2 py-3" style="background-color: transparent">
-                                            @if ($trabajo->vehiculo->placa)
-                                                <b>{{ $trabajo->vehiculo->placa }}</b>
-                                            @else
-                                                <b><span class="text-secondary">SIN PLACA</span></b>
-                                            @endif
-                                        </li>
-                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
-                                            {!! $trabajo->vehiculo->tipoVehiculo?->nombre
-                                                ? e($trabajo->vehiculo->tipoVehiculo->nombre)
-                                                : '<span class="text-secondary">Sin tipo de vehículo</span>' !!}
-                                        </li>
-                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
-                                            {!! $trabajo->vehiculo->marca?->nombre
-                                                ? e($trabajo->vehiculo->marca->nombre)
-                                                : '<span class="text-secondary">Sin marca</span>' !!}
-                                        </li>
-                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
-                                            {!! $trabajo->vehiculo->modelo?->nombre
-                                                ? e($trabajo->vehiculo->modelo->nombre)
-                                                : '<span class="text-secondary">Sin modelo</span>' !!}
-                                        </li>
-                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
-                                            {!! $trabajo->vehiculo->color
-                                                ? e($trabajo->vehiculo->color)
-                                                : '<span class="text-secondary">Sin color</span>' !!}
-                                        </li>
-                                    </ul>
-                                </td>
-                                <td style="max-width: 100px;">
-                                    <div class="d-grid gap-2">
-                                        <div class="dropdown">
-                                            <button class="btn btn-primary dropdown-toggle w-100 py-2" type="button"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                Gestionar
-                                            </button>
-                                            <ul class="dropdown-menu py-2">
-                                                <li>
-                                                    <a class="dropdown-item py-2"
-                                                        href="{{ route('gestion.evidencias.index', $trabajo) }}">
-                                                        <i class="text-secondary fa-fw me-2 fa-regular fa-image"></i>
-                                                        Mis evidencias
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item py-2"
-                                                        href="{{ route('gestion.detalles.index', $trabajo) }}">
-                                                        <i class="text-secondary fa-fw me-2 fa-solid fa-file-lines"></i>
-                                                        Trabajo realizado
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item py-2"
-                                                        href="{{ route('gestion.evidencias.all', $trabajo) }}">
-                                                        <i class="text-secondary fa-fw me-2 fa-solid fa-images"></i>
-                                                        Todas las evidencias
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item py-2"
-                                                        href="{{ route('gestion.trabajos.articulos', $trabajo) }}">
-                                                        <i class="text-secondary fa-fw me-2 fa-solid fa-box-archive"></i>
-                                                        Artículos
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <button class="btn btn-success w-100 py-2 btn-finalizar" 
-                                            data-id="{{ $trabajo->id }}" 
-                                            data-url="{{ route('trabajos.finalizar', $trabajo) }}">
-                                            Finalizar
-                                        </button>
-                                        <button class="btn btn-danger w-100 py-2 btn-abandonar" 
-                                            data-id="{{ $trabajo->id }}" 
-                                            data-url="{{ route('trabajos.abandonar', $trabajo) }}">
-                                            Abandonar
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                            <tr class="vehiculo">
+                                                <td class="px-0" style="max-width: 150px">
+                                                    <ul class="list-group list-group-flush">
+                                                        <li class="list-group-item px-2 py-3" style="background-color: transparent">
+                                                            @if ($trabajo->vehiculo->placa)
+                                                                <b>{{ $trabajo->vehiculo->placa }}</b>
+                                                            @else
+                                                                <b><span class="text-secondary">SIN PLACA</span></b>
+                                                            @endif
+                                                        </li>
+                                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
+                                                            {!! $trabajo->vehiculo->tipoVehiculo?->nombre
+                            ? e($trabajo->vehiculo->tipoVehiculo->nombre)
+                            : '<span class="text-secondary">Sin tipo de vehículo</span>' !!}
+                                                        </li>
+                                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
+                                                            {!! $trabajo->vehiculo->marca?->nombre
+                            ? e($trabajo->vehiculo->marca->nombre)
+                            : '<span class="text-secondary">Sin marca</span>' !!}
+                                                        </li>
+                                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
+                                                            {!! $trabajo->vehiculo->modelo?->nombre
+                            ? e($trabajo->vehiculo->modelo->nombre)
+                            : '<span class="text-secondary">Sin modelo</span>' !!}
+                                                        </li>
+                                                        <li class="list-group-item px-2 py-2" style="background-color: transparent">
+                                                            {!! $trabajo->vehiculo->color
+                            ? e($trabajo->vehiculo->color)
+                            : '<span class="text-secondary">Sin color</span>' !!}
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                                <td style="max-width: 100px;">
+                                                    <div class="d-grid gap-2">
+                                                        <div class="dropdown position-static">
+                                                            <button class="btn btn-primary dropdown-toggle w-100 py-2" type="button"
+                                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                                Gestionar
+                                                            </button>
+                                                            <ul class="dropdown-menu py-2">
+                                                                <li>
+                                                                    <a class="dropdown-item py-2"
+                                                                        href="{{ route('gestion.evidencias.index', $trabajo) }}">
+                                                                        <i class="text-secondary fa-fw me-2 fa-regular fa-image"></i>
+                                                                        Mis evidencias
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a class="dropdown-item py-2"
+                                                                        href="{{ route('gestion.detalles.index', $trabajo) }}">
+                                                                        <i class="text-secondary fa-fw me-2 fa-regular fa-file"></i>
+                                                                        Mis trabajos
+                                                                    </a>
+                                                                </li>
+                                                                <hr>
+                                                                <li>
+                                                                    <a class="dropdown-item py-2"
+                                                                        href="{{ route('gestion.evidencias.all', $trabajo) }}">
+                                                                        <i class="text-secondary fa-fw me-2 fa-solid fa-images"></i>
+                                                                        Todas las evidencias
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a class="dropdown-item py-2"
+                                                                        href="{{ route('gestion.detalles.all', $trabajo) }}">
+                                                                        <i class="text-secondary fa-fw me-2 fa-solid fa-file-lines"></i>
+                                                                        Todos los trabajos
+                                                                    </a>
+                                                                </li>
+                                                                <hr>
+                                                                <li>
+                                                                    <a class="dropdown-item py-2"
+                                                                        href="{{ route('gestion.trabajos.articulos', $trabajo) }}">
+                                                                        <i class="text-secondary fa-fw me-2 fa-solid fa-box-archive"></i>
+                                                                        Artículos
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <button class="btn btn-success w-100 py-2 btn-finalizar"
+                                                            data-id="{{ $trabajo->id }}"
+                                                            data-url="{{ route('trabajos.finalizar', $trabajo) }}">
+                                                            Finalizar
+                                                        </button>
+                                                        <button class="btn btn-danger w-100 py-2 btn-abandonar" data-id="{{ $trabajo->id }}"
+                                                            data-url="{{ route('trabajos.abandonar', $trabajo) }}">
+                                                            Abandonar
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
                         @empty
                             <tr id="sinVehiculos">
                                 <td class="text-center text-secondary py-5" colspan="2">
@@ -134,7 +142,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ¿Estás seguro de que deseas finalizar este trabajo? Una vez finalizado ya no podrás tener acceso, solo un administrador del sistema puede revertir esta acción.
+                    ¿Estás seguro de que deseas finalizar este trabajo? Una vez finalizado ya no podrás tener acceso,
+                    solo un administrador del sistema puede revertir esta acción.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
@@ -169,6 +178,14 @@
             </div>
         </div>
     </div>
+
+    @push('styles')
+        <style>
+            .tabla-vehiculos {
+                overflow-y: visible;
+            }
+        </style>
+    @endpush
 
     @push('scripts')
         <script>
