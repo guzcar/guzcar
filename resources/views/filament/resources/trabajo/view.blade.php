@@ -427,7 +427,7 @@
                     await navigator.share({
                         files,
                         title: 'Evidencias del trabajo',
-                        text: '{{ $trabajo->vehiculo->placa }} {{ $trabajo->vehiculo->tipoVehiculo->nombre }} {{ $trabajo->vehiculo->marca->nombre }} {{ $trabajo->vehiculo->modelo->nombre }}'
+                        text: '{{ $trabajo->vehiculo->placa ?? '' }} {{ $trabajo->vehiculo->tipoVehiculo->nombre ?? '' }} {{ $trabajo->vehiculo->marca->nombre ?? '' }} {{ $trabajo->vehiculo->modelo->nombre ?? '' }}'
                     });
                 } else {
                     // Alternativa para navegadores que no soportan compartir archivos
@@ -437,7 +437,7 @@
                 }
             } catch (error) {
                 console.error('Error al compartir:', error);
-                alert("Ocurrió un error al intentar compartir las evidencias.");
+                // alert("Ocurrió un error al intentar compartir las evidencias.");
             }
         });
     </script>
