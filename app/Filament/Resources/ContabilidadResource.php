@@ -805,18 +805,6 @@ class ContabilidadResource extends Resource
                     ->toggleable(true)
                     ->toggleable(isToggledHiddenByDefault: false),
 
-                TextColumn::make('importe_neto')
-                    ->label('Importe neto')
-                    ->alignRight()
-                    ->prefix('S/ ')
-                    ->formatStateUsing(fn($state) => number_format($state, 2, '.', ''))
-                    ->numeric(
-                        decimalPlaces: 2,
-                        decimalSeparator: '.',
-                        thousandsSeparator: ''
-                    )
-                    ->toggleable(isToggledHiddenByDefault: false),
-
                 Tables\Columns\ViewColumn::make('comprobantes_badges')
                     ->label('Comprobantes')
                     ->disableClick()
@@ -841,6 +829,18 @@ class ContabilidadResource extends Resource
                             ];
                         })->values()->all();
                     }),
+
+                TextColumn::make('importe_neto')
+                    ->label('Importe neto')
+                    ->alignRight()
+                    ->prefix('S/ ')
+                    ->formatStateUsing(fn($state) => number_format($state, 2, '.', ''))
+                    ->numeric(
+                        decimalPlaces: 2,
+                        decimalSeparator: '.',
+                        thousandsSeparator: ''
+                    )
+                    ->toggleable(isToggledHiddenByDefault: false),
 
                 TextColumn::make('a_cuenta')
                     ->sortable()
