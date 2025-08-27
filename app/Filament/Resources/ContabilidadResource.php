@@ -664,6 +664,20 @@ class ContabilidadResource extends Resource
                                             }),
                                     ])
                                     ->heading('Comprobantes'),
+                                Section::make('archivos')
+                                    ->schema([
+                                        Repeater::make('archivos')
+                                            ->label('')
+                                            ->createItemButtonLabel('Añadir archivo')
+                                            ->defaultItems(0)
+                                            ->relationship()
+                                            ->simple(
+                                                FileUpload::make('archivo_url')
+                                                    ->directory('trabajo_archivo')
+                                                    ->required()
+                                            )
+                                    ])
+                                    ->heading('Archivos'),
                             ])
                             ->columnspan(1)
                             ->columns(1),
