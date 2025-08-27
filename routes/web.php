@@ -80,6 +80,8 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
 
     // Evidencias
     Route::get('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'index'])->name('gestion.evidencias.index');
+    Route::put('/trabajos/{trabajo}/evidencias/bulk', [EvidenciaController::class, 'bulkUpdate'])->name('gestion.evidencias.bulkUpdate');
+    Route::delete('/trabajos/{trabajo}/evidencias/bulk', [EvidenciaController::class, 'bulkDestroy'])->name('gestion.evidencias.bulkDestroy');
     Route::get('/trabajos/{trabajo}/evidencias/todas', [EvidenciaController::class, 'all'])->name('gestion.evidencias.all');
     Route::post('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'store'])->name('gestion.evidencias.store');
     Route::put('/trabajos/{trabajo}/evidencias/{evidencia}', [EvidenciaController::class, 'update'])->name('gestion.evidencias.update');

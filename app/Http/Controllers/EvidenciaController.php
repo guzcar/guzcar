@@ -26,7 +26,7 @@ class EvidenciaController extends Controller
         $evidencias = Evidencia::where('trabajo_id', $trabajo->id)
             ->where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->get();
 
         return view('evidencias.index', compact('evidencias', 'trabajo'));
     }
@@ -63,11 +63,6 @@ class EvidenciaController extends Controller
 
         foreach ($files as $index => $file) {
             $path = $file->store('evidencia', 'public');
-
-            // Optimizar imágenes con GD
-            // if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
-            //     $this->optimizeImage(Storage::disk('public')->path($path), $file->getMimeType());
-            // }
 
             Evidencia::create([
                 'trabajo_id' => $trabajo->id,
@@ -175,5 +170,76 @@ class EvidenciaController extends Controller
         // Liberar memoria
         imagedestroy($image);
         imagedestroy($resizedImage);
+    }
+
+    public function bulkUpdate(Request $request, Trabajo $trabajo)
+    {
+        $user = auth()->user();
+
+        // Seguridad: que el usuario pertenezca a este trabajo
+        if (!$trabajo->usuarios->contains($user)) {
+            abort(403, 'Forbidden');
+        }
+
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:evidencias,id',
+            'observacion' => 'nullable|string',
+        ]);
+
+        $ids = $validated['ids'];
+        // Si textarea viene vacío -> null
+        $observacion = ($request->has('observacion') && $request->input('observacion') !== '')
+            ? $request->input('observacion')
+            : null;
+
+        // Filtramos solo las evidencias del trabajo y del usuario
+        $query = Evidencia::where('trabajo_id', $trabajo->id)
+            ->where('user_id', $user->id)
+            ->whereIn('id', $ids);
+
+        $totalEncontradas = (clone $query)->count();
+
+        $actualizadas = $query->update(['observacion' => $observacion]);
+
+        return redirect()
+            ->route('gestion.evidencias.index', $trabajo)
+            ->with('success', "Se actualizaron {$actualizadas} de {$totalEncontradas} evidencias seleccionadas.");
+    }
+
+    public function bulkDestroy(Request $request, Trabajo $trabajo)
+    {
+        $user = auth()->user();
+
+        if (!$trabajo->usuarios->contains($user)) {
+            abort(403, 'Forbidden');
+        }
+
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:evidencias,id',
+        ]);
+
+        $ids = $validated['ids'];
+
+        // Solo del trabajo y del usuario
+        $evidencias = Evidencia::where('trabajo_id', $trabajo->id)
+            ->where('user_id', $user->id)
+            ->whereIn('id', $ids)
+            ->get();
+
+        $totalEncontradas = $evidencias->count();
+
+        // Eliminamos registros y (opcional) los archivos.
+        // Como pediste "solo editamos el texto", la edición no toca archivos.
+        // Para eliminar en grupo, mantenemos el mismo criterio que destroy individual: borrar archivo + registro.
+        foreach ($evidencias as $ev) {
+            Storage::disk('public')->delete($ev->evidencia_url);
+            $ev->delete();
+        }
+
+        return redirect()
+            ->route('gestion.evidencias.index', $trabajo)
+            ->with('success', "Se eliminaron {$totalEncontradas} evidencias seleccionadas.");
     }
 }

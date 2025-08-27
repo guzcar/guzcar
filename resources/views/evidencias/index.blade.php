@@ -4,9 +4,31 @@
 
     <div class="d-flex justify-content-between mb-3">
         <a class="btn btn-light border py-2" href="{{ route('home') }}">Volver</a>
-        <button type="button" class="btn btn-primary py-2" data-bs-toggle="modal" data-bs-target="#nuevaEvidencia">
-            Subir Evidencias
-        </button>
+
+        <div class="d-flex gap-2">
+            <div id="bulkActionsContainer" class="dropdown d-none">
+                <button id="bulkDropdownBtn" class="btn btn-light border py-2 dropdown-toggle" type="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    Opciones
+                    <span id="bulkCount" class="position-absolute top-0 start-90 translate-middle badge rounded-pill bg-danger">
+                        0
+                    </span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button class="dropdown-item" type="button" id="bulkEditBtn">Editar descripción</button>
+                    </li>
+                    <li>
+                        <button class="dropdown-item text-danger" type="button" id="bulkDeleteBtn">Eliminar</button>
+                    </li>
+                </ul>
+            </div>
+
+
+            <button type="button" class="btn btn-primary py-2" data-bs-toggle="modal" data-bs-target="#nuevaEvidencia">
+                Subir Evidencia
+            </button>
+        </div>
     </div>
 
     <ul class="list-group mb-3">
@@ -59,12 +81,41 @@
         </div>
     @enderror
 
+    {{-- Mensajes flash --}}
+    @php
+        $flashMap = ['success' => 'success', 'warning' => 'warning', 'error' => 'danger'];
+    @endphp
+    @foreach ($flashMap as $key => $bsClass)
+        @if (session($key))
+            <div class="alert alert-{{ $bsClass }} alert-dismissible fade show auto-dismiss" role="alert">
+                {!! nl2br(e(session($key))) !!}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+    @endforeach
+
+    {{-- Errores de validación generales (incluye bulk) --}}
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show auto-dismiss" role="alert">
+            <strong>Revisa los siguientes errores:</strong>
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-body p-0 border-bottom-0">
             <div class="table-responsive">
                 <table class="table mb-0 table-striped table-hover">
                     <thead>
                         <tr>
+                            <th class="py-3" style="width: 60px; text-align: center;">
+                                <input type="checkbox" id="checkAll" class="form-check-input" style="width: 1.4em; height: 1.4em;">
+                            </th>
                             <th class="py-3">Evidencia</th>
                             <th class="py-3">Acciones</th>
                         </tr>
@@ -72,6 +123,10 @@
                     <tbody>
                         @forelse ($evidencias as $evidencia)
                             <tr>
+                                <td style="width: 60px; text-align: center;">
+                                    <input type="checkbox" class="form-check-input select-evidencia" style="width: 1.4em; height: 1.4em; vertical-align: middle;"
+                                        value="{{ $evidencia->id }}">
+                                </td>
                                 <td>
                                     @if ($evidencia->tipo === 'imagen')
                                         <img src="{{ Storage::url($evidencia->evidencia_url) }}" alt="Evidencia"
@@ -100,7 +155,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td class="text-center text-secondary py-5" colspan="2">
+                                <td class="text-center text-secondary py-5" colspan="3">
                                     <i class="fa-regular fa-circle-xmark fs-1 mb-3"></i>
                                     <p class="mb-0">No hay evidencias registradas.</p>
                                 </td>
@@ -110,6 +165,7 @@
                 </table>
             </div>
         </div>
+        {{--
         @if ($evidencias->hasPages())
             <div class="card-footer border-top-0">
                 <div class="d-flex justify-content-center mt-3">
@@ -117,6 +173,7 @@
                 </div>
             </div>
         @endif
+        --}}
     </div>
 
     {{-- Modal para crear nueva evidencia --}}
@@ -149,7 +206,6 @@
 
                     </div>
                     <div class="modal-footer">
-                        <!-- <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button> -->
                         <button type="submit" class="btn btn-primary">Subir Evidencias</button>
                     </div>
                 </form>
@@ -157,7 +213,7 @@
         </div>
     </div>
 
-    {{-- Modal para editar evidencia --}}
+    {{-- Modal para editar evidencia (individual) --}}
     <div class="modal fade" id="editarEvidenciaModal" tabindex="-1" aria-labelledby="editarEvidenciaModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -185,7 +241,7 @@
         </div>
     </div>
 
-    {{-- Modal para eliminar evidencia --}}
+    {{-- Modal para eliminar evidencia (individual) --}}
     <div class="modal fade" id="eliminarEvidenciaModal" tabindex="-1" aria-labelledby="eliminarEvidenciaModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -209,29 +265,86 @@
         </div>
     </div>
 
+    {{-- --- NUEVOS --- Modales para operaciones en grupo --}}
+    {{-- Modal editar en grupo --}}
+    <div class="modal fade" id="editarEvidenciasGrupoModal" tabindex="-1"
+        aria-labelledby="editarEvidenciasGrupoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="bulkEditForm" action="{{ route('gestion.evidencias.bulkUpdate', $trabajo) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editarEvidenciasGrupoModalLabel">Editar descripción</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="observacionBulk" class="form-label">Descripción</label>
+                            <textarea name="observacion" id="observacionBulk" class="form-control" rows="4"
+                                placeholder="Nuevo texto"></textarea>
+                        </div>
+                        <p class="text-muted small mb-0">
+                            Escribe la nueva descripción que reemplazará a todas las evidencias seleccionadas.
+                        </p>
+                        <div id="bulkEditIdsContainer"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Reemplazar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Modal eliminar en grupo --}}
+    <div class="modal fade" id="eliminarEvidenciasGrupoModal" tabindex="-1"
+        aria-labelledby="eliminarEvidenciasGrupoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="bulkDeleteForm" action="{{ route('gestion.evidencias.bulkDestroy', $trabajo) }}"
+                    method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="eliminarEvidenciasGrupoModalLabel">Eliminar evidencias</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">¿Deseas eliminar <strong id="bulkDeleteCount">0</strong> evidencias
+                            seleccionadas de forma permanente?</p>
+                        <div id="bulkDeleteIdsContainer"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 // 1. Función para comprimir imágenes manteniendo formatos válidos
                 async function compressImage(file) {
                     try {
-                        // Formatos aceptados por el servidor
                         const validFormats = {
                             'image/jpeg': 'jpg',
                             'image/jpg': 'jpg',
                             'image/png': 'png',
-                            'image/webp': 'webp', // Aunque no esté en la validación, lo convertiremos a jpg
+                            'image/webp': 'webp',
                             'video/mp4': 'mp4',
                             'video/quicktime': 'mov'
                         };
 
-                        // Si no es un formato comprimible, devolver original
                         if (!validFormats[file.type]) {
                             console.log(`Archivo ${file.name} no requiere compresión. Tipo: ${file.type}`);
                             return file;
                         }
 
-                        // Si es video, devolver original
                         if (file.type.startsWith('video/')) {
                             console.log(`Video ${file.name} no se comprime. Tipo: ${file.type}`);
                             return file;
@@ -274,7 +387,6 @@
                                         ctx.imageSmoothingQuality = 'high';
                                         ctx.drawImage(img, 0, 0, width, height);
 
-                                        // Convertir siempre a jpeg para cumplir con la validación del servidor
                                         const mimeType = 'image/jpeg';
                                         const newFileName = file.name.replace(/\.[^/.]+$/, '') + '.jpg';
 
@@ -314,7 +426,7 @@
                     }
                 }
 
-                // 2. Interceptar envío del formulario - VERSIÓN CORREGIDA
+                // 2. Interceptar envío del formulario de subida
                 const form = document.querySelector('#nuevaEvidencia form');
                 if (form) {
                     form.addEventListener('submit', async function (e) {
@@ -333,14 +445,12 @@
 
                             const formData = new FormData();
 
-                            // Copiar todos los campos excepto archivos
                             for (const [key, value] of new FormData(this)) {
                                 if (key !== 'evidencias[]') {
                                     formData.append(key, value);
                                 }
                             }
 
-                            // Procesar archivos
                             const files = Array.from(fileInput.files);
                             console.log(`Procesando ${files.length} archivos...`);
 
@@ -355,7 +465,6 @@
                                 })
                             );
 
-                            // Verificar que todos los archivos sean válidos
                             const validExtensions = ['.jpg', '.jpeg', '.png', '.mp4', '.mov'];
                             processedFiles.forEach(file => {
                                 const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
@@ -366,7 +475,6 @@
                                 formData.append('evidencias[]', file, file.name);
                             });
 
-                            // Configurar headers
                             const headers = {
                                 'Accept': 'application/json'
                             };
@@ -375,7 +483,6 @@
                                 headers['X-CSRF-TOKEN'] = csrfToken;
                             }
 
-                            // Enviar al servidor
                             const response = await fetch(this.action, {
                                 method: 'POST',
                                 body: formData,
@@ -399,22 +506,18 @@
                                 errorMessage = error.message;
                             }
 
-                            // Mostrar error en un div específico (por ejemplo, con id "error-container")
-                            const errorContainer = document.getElementById('error-container'); // Reemplaza con tu ID real
+                            const errorContainer = document.getElementById('error-container');
 
-                            // Limpiar errores previos
                             const existingAlert = errorContainer.querySelector('.alert');
                             if (existingAlert) existingAlert.remove();
 
-                            // Crear nuevo mensaje de error
                             const alertDiv = document.createElement('div');
                             alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3 mb-0';
                             alertDiv.innerHTML = `
-                                    <strong>Error:</strong> ${errorMessage}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                `;
+                                                    <strong>Error:</strong> ${errorMessage}
+                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                `;
 
-                            // Agregar el mensaje al contenedor específico
                             errorContainer.appendChild(alertDiv);
 
                         } finally {
@@ -424,7 +527,7 @@
                     });
                 }
 
-                // Resto del código para modales...
+                // --- Modales individuales (ya existentes) ---
                 const modals = document.querySelectorAll('.modal');
                 modals.forEach(modal => {
                     modal.addEventListener('hidden.bs.modal', function () {
@@ -435,11 +538,10 @@
 
                 document.querySelectorAll('.btn-editar').forEach(button => {
                     button.addEventListener('click', function () {
-                        const id = this.getAttribute('data-id');
                         const observacion = this.getAttribute('data-observacion');
                         const url = this.getAttribute('data-url');
 
-                        document.getElementById('observacionEditar').value = observacion;
+                        document.getElementById('observacionEditar').value = observacion ?? '';
                         document.getElementById('editarEvidenciaForm').action = url;
 
                         const modal = new bootstrap.Modal(document.getElementById('editarEvidenciaModal'));
@@ -457,6 +559,108 @@
                         modal.show();
                     });
                 });
+
+                // --- NUEVO: selección múltiple y modales en grupo ---
+                const checkAll = document.getElementById('checkAll');
+                const rowChecks = Array.from(document.querySelectorAll('.select-evidencia'));
+                const bulkBtn = document.getElementById('bulkDropdownBtn');
+                const bulkCount = document.getElementById('bulkCount');
+                const bulkEditBtn = document.getElementById('bulkEditBtn');
+                const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+                const bulkEditModal = new bootstrap.Modal(document.getElementById('editarEvidenciasGrupoModal'));
+                const bulkDeleteModal = new bootstrap.Modal(document.getElementById('eliminarEvidenciasGrupoModal'));
+
+                const selected = new Set();
+
+                function refreshBulkUI() {
+                    const n = selected.size;
+                    bulkCount.textContent = n;
+
+                    if (n > 0) {
+                        bulkActionsContainer.classList.remove('d-none');
+                    } else {
+                        bulkActionsContainer.classList.add('d-none');
+                    }
+
+                    if (n === 0) {
+                        checkAll.checked = false;
+                        checkAll.indeterminate = false;
+                    } else if (n === rowChecks.length) {
+                        checkAll.checked = true;
+                        checkAll.indeterminate = false;
+                    } else {
+                        checkAll.indeterminate = true;
+                    }
+                }
+
+                checkAll?.addEventListener('change', function () {
+                    if (this.checked) {
+                        rowChecks.forEach(cb => { cb.checked = true; selected.add(cb.value); });
+                    } else {
+                        rowChecks.forEach(cb => { cb.checked = false; });
+                        selected.clear();
+                    }
+                    refreshBulkUI();
+                });
+
+                rowChecks.forEach(cb => {
+                    cb.addEventListener('change', function () {
+                        if (this.checked) selected.add(this.value);
+                        else selected.delete(this.value);
+                        refreshBulkUI();
+                    });
+                });
+
+                // Abrir modal de edición en grupo
+                bulkEditBtn?.addEventListener('click', function () {
+                    if (selected.size === 0) return;
+
+                    document.getElementById('observacionBulk').value = '';
+                    const cont = document.getElementById('bulkEditIdsContainer');
+                    cont.innerHTML = '';
+
+                    selected.forEach(id => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ids[]';
+                        input.value = id;
+                        cont.appendChild(input);
+                    });
+
+                    bulkEditModal.show();
+                });
+
+                // Abrir modal de eliminación en grupo
+                bulkDeleteBtn?.addEventListener('click', function () {
+                    if (selected.size === 0) return;
+
+                    const cont = document.getElementById('bulkDeleteIdsContainer');
+                    cont.innerHTML = '';
+
+                    selected.forEach(id => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ids[]';
+                        input.value = id;
+                        cont.appendChild(input);
+                    });
+
+                    document.getElementById('bulkDeleteCount').textContent = selected.size;
+                    bulkDeleteModal.show();
+                });
+
+                document.getElementById('editarEvidenciasGrupoModal').addEventListener('hidden.bs.modal', () => bulkBtn.focus());
+                document.getElementById('eliminarEvidenciasGrupoModal').addEventListener('hidden.bs.modal', () => bulkBtn.focus());
+
+                document.querySelectorAll('.alert.auto-dismiss').forEach(el => {
+                    setTimeout(() => {
+                        const inst = bootstrap.Alert.getOrCreateInstance(el);
+                        inst.close();
+                    }, 4000);
+                });
+
+                refreshBulkUI();
             });
         </script>
     @endpush
