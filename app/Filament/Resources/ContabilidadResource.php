@@ -806,6 +806,15 @@ class ContabilidadResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: false),
 
                 Tables\Columns\ViewColumn::make('comprobantes_badges')
+                    ->searchable(
+                        isIndividual: true,
+                        isGlobal: true,
+                        query: function (Builder $query, string $search): Builder {
+                            return $query->whereHas('comprobantes', function (Builder $q) use ($search) {
+                                $q->where('codigo', 'like', "%{$search}%");
+                            });
+                        },
+                    )
                     ->label('Comprobantes')
                     ->disableClick()
                     ->view('filament.tables.columns.comprobantes-badges')
