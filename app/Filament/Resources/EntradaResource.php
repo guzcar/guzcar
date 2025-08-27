@@ -89,6 +89,8 @@ class EntradaResource extends Resource
                             ->schema([
                                 FileUpload::make('evidencia_url')
                                     ->label('Evidencia')
+                                    ->image()
+                                    ->imageEditor()
                                     ->directory('entrada')
                                     ->columnSpan(1)
                                     ->maxSize(500 * 1024),
