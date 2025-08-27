@@ -1102,7 +1102,11 @@ class ContabilidadResource extends Resource
                 'POR COBRAR' => 'desembolso-por-cobrar',
                 'SIN COBRO' => 'desembolso-cobrado',
                 default => null,
-            });
+            })
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession();
     }
 
     public static function getRelations(): array

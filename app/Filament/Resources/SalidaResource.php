@@ -615,7 +615,11 @@ class SalidaResource extends Resource
             ])
             ->bulkActions([
                 ExportBulkAction::make(),
-            ]);
+            ])
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession();
     }
 
     public static function getRelations(): array

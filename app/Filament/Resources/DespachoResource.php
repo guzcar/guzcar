@@ -217,7 +217,11 @@ class DespachoResource extends Resource
             ])
             ->bulkActions([
                 ExportBulkAction::make(),
-            ]);
+            ])
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession();
     }
 
     public static function getEloquentQuery(): Builder

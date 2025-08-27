@@ -78,7 +78,11 @@ class ArticuloMarcaResource extends Resource
                 // Tables\Actions\BulkActionGroup::make([
                 //     Tables\Actions\DeleteBulkAction::make(),
                 // ]),
-            ]);
+            ])
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession();
     }
 
     public static function getRelations(): array

@@ -92,7 +92,11 @@ class TipoVehiculoResource extends Resource
                 //     ForceDeleteBulkAction::make(),
                 //     RestoreBulkAction::make(),
                 // ]),
-            ]);
+            ])
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession();
     }
 
     public static function getRelations(): array

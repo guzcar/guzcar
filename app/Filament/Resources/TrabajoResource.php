@@ -898,9 +898,9 @@ class TrabajoResource extends Resource
                     ->button()
                     ->color('gray'),
             ])
-            ->persistColumnSearchesInSession()   // 👈 guarda búsquedas individuales
-            ->persistSearchInSession()           // opcional: guarda el buscador global
-            ->persistFiltersInSession()          // opcional: filtros
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
             ->persistSortInSession()
             ->recordClasses(fn(Trabajo $record) => ($record->control && $record->fecha_salida !== null) ? 'desembolso-por-cobrar' : null);
     }
