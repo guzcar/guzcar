@@ -8,6 +8,8 @@ class Contabilidad extends Trabajo
 {
     protected $table = "trabajos";
 
+    protected $with = ['comprobantes'];
+
     public function comprobantes(): BelongsToMany
     {
         return $this->belongsToMany(Comprobante::class, 'trabajo_comprobantes', 'trabajo_id', 'comprobante_id')
@@ -20,10 +22,21 @@ class Contabilidad extends Trabajo
             return (float) $this->importe;
         }
 
-        return $this->comprobantes->sum(function ($comprobante) {
+        return (float) $this->comprobantes->sum(function ($comprobante) {
             return $comprobante->aplica_detraccion
                 ? $comprobante->total * 0.88
                 : $comprobante->total;
         });
+    }
+
+    /**
+     * Por cobrar correcto: importe_neto - a_cuenta (nunca negativo)
+     */
+    public function getPorCobrar(): float
+    {
+        $neto    = (float) $this->importe_neto; // usa el accessor ya calculado
+        $aCuenta = (float) $this->a_cuenta;
+
+        return max($neto - $aCuenta, 0);
     }
 }

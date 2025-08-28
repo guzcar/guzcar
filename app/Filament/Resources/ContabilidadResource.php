@@ -865,12 +865,6 @@ class ContabilidadResource extends Resource
                     )
                     ->toggleable(isToggledHiddenByDefault: false),
 
-                TextColumn::make('a_cuenta')
-                    ->sortable()
-                    ->alignRight()
-                    ->prefix('S/ ')
-                    ->toggleable(isToggledHiddenByDefault: false),
-
                 Tables\Columns\ViewColumn::make('pagos_badges')
                     ->label('Pagos')
                     ->disableClick()
@@ -889,6 +883,12 @@ class ContabilidadResource extends Resource
                             ->values()
                             ->all();
                     }),
+
+                TextColumn::make('a_cuenta')
+                    ->sortable()
+                    ->alignRight()
+                    ->prefix('S/ ')
+                    ->toggleable(isToggledHiddenByDefault: false),
 
                 TextColumn::make('.getPorCobrar')
                     ->alignRight()
