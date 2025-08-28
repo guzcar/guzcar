@@ -405,7 +405,7 @@
     <script>
         // Enlazado inicial de Fancybox
         function bindFancybox() {
-            Fancybox.bind('[data-fancybox="evidencias"]', { Thumbs: false });
+            Fancybox.bind('[data-fancybox="evidencias"]');
         }
         bindFancybox();
 
