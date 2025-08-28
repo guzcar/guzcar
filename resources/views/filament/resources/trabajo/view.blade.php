@@ -1,5 +1,9 @@
 <x-filament::page>
 
+    {{-- Fancybox CSS/JS (CDN) --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {{-- Información del Vehículo --}}
         <x-filament::section>
@@ -255,47 +259,16 @@
     </x-filament::section>
 
     <style>
-        .evidence-container {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-
-        .share-btn-container {
-            margin-bottom: 1rem;
-        }
-
-        .share-btn {
-            padding: 0.5rem 1rem;
-            background-color: #3b82f6;
-            color: white;
-            border-radius: 0.375rem;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.2s;
-        }
-
-        .share-btn:hover {
-            background-color: #2563eb;
-        }
+        .evidence-container { position: relative; margin-bottom: 1.5rem; }
+        .share-btn-container { margin-bottom: 1rem; }
 
         .evidence-grid {
             display: grid;
             grid-template-columns: repeat(1, 1fr);
             gap: 1.5rem;
         }
-
-        @media (min-width: 640px) {
-            .evidence-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (min-width: 768px) {
-            .evidence-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
+        @media (min-width: 640px) { .evidence-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 768px) { .evidence-grid { grid-template-columns: repeat(3, 1fr); } }
 
         .evidence-card {
             position: relative;
@@ -303,138 +276,110 @@
             border-radius: 0.5rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s;
-            cursor: pointer;
         }
+        .evidence-card:hover { transform: scale(1.02); }
 
-        .evidence-card:hover {
-            transform: scale(1.02);
-        }
-
+        /* Checkboxes ocultos por defecto */
         .evidence-checkbox {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 20px;
-            height: 20px;
+            top: 10px; right: 10px;
+            width: 22px; height: 22px;
             z-index: 10;
             cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
+            appearance: none; -webkit-appearance: none;
             background-color: white;
             border-radius: 4px;
             padding: 8px;
+            display: none;           /* oculto por defecto */
+            pointer-events: none;    /* no clicables fuera de selección */
+            box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset;
         }
+        /* En modo selección se muestran y habilitan */
+        .selection-mode .evidence-checkbox { display: block; pointer-events: auto; }
 
         .evidence-checkbox:checked {
             background-color: #1e66daff;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 16px;
+            background-repeat: no-repeat; background-position: center; background-size: 16px;
         }
 
         .evidence-media {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 0.5rem 0.5rem 0 0;
+            width: 100%; height: 200px; object-fit: cover;
+            border-radius: 0.5rem 0.5rem 0 0; display: block;
         }
 
-        .evidence-info {
-            padding: 1rem;
-            background-color: white;
-        }
+        .evidence-info { padding: 1rem; background-color: white; }
+        .dark .evidence-info { background-color: #1f2937; }
 
-        .dark .evidence-info {
-            background-color: #1f2937;
+        .evidence-user, .evidence-date {
+            display: flex; align-items: center; font-size: 0.875rem;
+            color: #6b7280; margin-bottom: 0.25rem;
         }
+        .dark .evidence-user, .dark .evidence-date { color: #9ca3af; }
 
-        .evidence-user,
-        .evidence-date {
-            display: flex;
-            align-items: center;
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-bottom: 0.25rem;
-        }
+        .evidence-icon { width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: #6b7280; }
+        .dark .evidence-icon { color: #9ca3af; }
 
-        .dark .evidence-user,
-        .dark .evidence-date {
-            color: #9ca3af;
-        }
+        .evidence-observation { margin-top: 0.5rem; font-size: 0.875rem; color: #374151; }
+        .dark .evidence-observation { color: #e5e7eb; }
 
-        .evidence-icon {
-            width: 1.25rem;
-            height: 1.25rem;
-            margin-right: 0.5rem;
-            color: #6b7280;
-        }
-
-        .dark .evidence-icon {
-            color: #9ca3af;
-        }
-
-        .evidence-observation {
-            margin-top: 0.5rem;
-            font-size: 0.875rem;
-            color: #374151;
-        }
-
-        .dark .evidence-observation {
-            color: #e5e7eb;
-        }
+        /* Indicador de modo selección */
+        .select-hint { display: none; font-size: .875rem; color: #6b7280; }
+        .selection-mode .select-hint { display: inline-block; }
     </style>
 
     <div class="flex justify-between items-center mb-1.5">
-        <h2 class="text-xl font-bold">Evidencias</h2>
+        <div>
+            <h2 class="text-xl font-bold">Evidencias</h2>
+            <span class="select-hint">Modo selección activo.</span>
+        </div>
         <button id="shareBtn" style="--c-400:var(--primary-400);--c-500:var(--primary-500);--c-600:var(--primary-600);"
             class="fi-btn relative grid-flow-col items-center justify-center font-semibold outline-none transition duration-75 focus-visible:ring-2 rounded-lg fi-color-custom fi-btn-color-primary fi-color-primary fi-size-md fi-btn-size-md gap-1.5 px-3 py-2 text-sm inline-grid shadow-sm bg-custom-600 text-white hover:bg-custom-500 focus-visible:ring-custom-500/50 dark:bg-custom-500 dark:hover:bg-custom-400 dark:focus-visible:ring-custom-400/50 fi-ac-action fi-ac-btn-action">
-            <span class="fi-btn-label">
-                Compartir
-            </span>
+            <span class="fi-btn-label">Compartir</span>
         </button>
     </div>
 
     @if ($evidencias->isNotEmpty())
         <div class="evidence-container">
-
             <div class="evidence-grid">
                 @foreach ($evidencias as $evidencia)
+                    @php $src = Storage::url($evidencia->evidencia_url); @endphp
                     <div class="evidence-card">
                         <input type="checkbox" class="evidence-checkbox"
-                            data-src="{{ Storage::url($evidencia->evidencia_url) }}" id="evidence-{{ $evidencia->id }}">
+                               data-src="{{ $src }}" id="evidence-{{ $evidencia->id }}">
 
+                        {{-- Anchor para Fancybox (deshabilitable en modo selección) --}}
                         @if ($evidencia->tipo === 'imagen')
-                            <img src="{{ Storage::url($evidencia->evidencia_url) }}" alt="Evidencia" class="evidence-media">
+                            <a class="evidence-link" data-fancybox="evidencias" data-type="image" href="{{ $src }}">
+                                <img src="{{ $src }}" alt="Evidencia" class="evidence-media">
+                            </a>
                         @elseif ($evidencia->tipo === 'video')
-                            <video controls class="evidence-media" preload="metadata">
-                                <source src="{{ Storage::url($evidencia->evidencia_url) }}" type="video/mp4">
-                            </video>
+                            <a class="evidence-link" data-fancybox="evidencias" data-type="video" href="{{ $src }}">
+                                <video class="evidence-media" preload="metadata" muted playsinline>
+                                    <source src="{{ $src }}" type="video/mp4">
+                                </video>
+                            </a>
                         @endif
 
                         <div class="evidence-info">
                             <p class="evidence-user">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                    class="evidence-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="evidence-icon">
                                     <path fill-rule="evenodd"
-                                        d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-                                        clip-rule="evenodd" />
+                                          d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+                                          clip-rule="evenodd" />
                                 </svg>
                                 <span>{{ $evidencia->user->name }}</span>
                             </p>
                             <p class="evidence-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                    class="evidence-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="evidence-icon">
                                     <path fill-rule="evenodd"
-                                        d="M6 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6Zm12 2H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1ZM8 8V7h2v1H8Zm6 0V7h2v1h-2ZM7 11h10v2H7v-2Zm0 4h10v2H7v-2Z"
-                                        clip-rule="evenodd" />
+                                          d="M6 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6Zm12 2H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1ZM8 8V7h2v1H8Zm6 0V7h2v1h-2ZM7 11h10v2H7v-2Zm0 4h10v2H7v-2Z"
+                                          clip-rule="evenodd" />
                                 </svg>
                                 <span>{{ $evidencia->created_at->format('d/m/Y') }}
                                     ({{ $evidencia->created_at->diffForHumans() }})</span>
                             </p>
-                            <p class="evidence-observation">
-                                {{ $evidencia->observacion ?? 'Sin observaciones' }}
-                            </p>
+                            <p class="evidence-observation">{{ $evidencia->observacion ?? 'Sin observaciones' }}</p>
                         </div>
                     </div>
                 @endforeach
@@ -458,55 +403,154 @@
     @endif
 
     <script>
-        // Manejar el clic en las tarjetas
+        // Enlazado inicial de Fancybox
+        function bindFancybox() {
+            Fancybox.bind('[data-fancybox="evidencias"]', { Thumbs: false });
+        }
+        bindFancybox();
+
+        let selectionMode = false;
+        const shareBtn = document.getElementById('shareBtn');
+        const btnLabel = shareBtn.querySelector('.fi-btn-label');
+
+        function updateShareLabel() {
+            if (!selectionMode) {
+                btnLabel.textContent = 'Compartir';
+                return;
+            }
+            const count = document.querySelectorAll('.evidence-checkbox:checked').length;
+            btnLabel.textContent = count > 0 ? `Compartir (${count})` : 'Dejar de compartir';
+        }
+
+        // Deshabilitar totalmente Fancybox en modo selección
+        function disableFancybox() {
+            try { Fancybox.destroy(); } catch(e) {}
+            document.querySelectorAll('.evidence-link').forEach(a => {
+                if (!a.dataset.hrefOriginal) a.dataset.hrefOriginal = a.getAttribute('href') || '';
+                a.setAttribute('href', 'javascript:void(0)');
+                // Remover atributo para que no re-binde automáticamente
+                if (a.hasAttribute('data-fancybox')) {
+                    a.dataset.fancyboxOriginal = a.getAttribute('data-fancybox');
+                    a.removeAttribute('data-fancybox');
+                }
+                a.setAttribute('aria-disabled', 'true');
+            });
+        }
+
+        // Restaurar Fancybox al salir de selección
+        function enableFancybox() {
+            document.querySelectorAll('.evidence-link').forEach(a => {
+                if (a.dataset.hrefOriginal !== undefined) {
+                    a.setAttribute('href', a.dataset.hrefOriginal);
+                }
+                if (a.dataset.fancyboxOriginal) {
+                    a.setAttribute('data-fancybox', a.dataset.fancyboxOriginal);
+                } else {
+                    a.setAttribute('data-fancybox', 'evidencias');
+                }
+                a.removeAttribute('aria-disabled');
+            });
+            bindFancybox();
+        }
+
+        function enterSelectionMode() {
+            selectionMode = true;
+            document.body.classList.add('selection-mode');
+            disableFancybox();
+            updateShareLabel();
+        }
+
+        function exitSelectionMode(clearChecked = true) {
+            selectionMode = false;
+            document.body.classList.remove('selection-mode');
+            if (clearChecked) {
+                document.querySelectorAll('.evidence-checkbox').forEach(cb => cb.checked = false);
+            }
+            enableFancybox();
+            updateShareLabel();
+        }
+
+        // Clicks sobre anchors: en modo selección no deben abrir nada, sólo alternar checkbox
+        document.addEventListener('click', (e) => {
+            const a = e.target.closest('.evidence-link');
+            if (!a) return;
+
+            if (selectionMode || a.getAttribute('aria-disabled') === 'true') {
+                e.preventDefault();
+                const card = a.closest('.evidence-card');
+                const checkbox = card?.querySelector('.evidence-checkbox');
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    updateShareLabel();
+                }
+            }
+        });
+
+        // Click en tarjeta (fuera del anchor/checkbox) para alternar en modo selección
         document.querySelectorAll('.evidence-card').forEach(card => {
             card.addEventListener('click', function (e) {
-                // Si el clic fue directamente en el checkbox, no hacer nada adicional
-                if (e.target.classList.contains('evidence-checkbox')) {
-                    return;
-                }
+                if (!selectionMode) return;
+                if (e.target.closest('.evidence-link')) return;
+                if (e.target.classList.contains('evidence-checkbox')) return;
 
-                // Buscar el checkbox dentro de esta tarjeta
                 const checkbox = this.querySelector('.evidence-checkbox');
                 if (checkbox) {
                     checkbox.checked = !checkbox.checked;
+                    updateShareLabel();
                 }
             });
         });
 
-        // Manejar el botón de compartir
-        document.getElementById('shareBtn').addEventListener('click', async () => {
-            const selected = document.querySelectorAll('.evidence-checkbox:checked');
+        // Cuando el usuario marca/desmarca un checkbox, actualiza el label
+        document.querySelectorAll('.evidence-checkbox').forEach(cb => {
+            cb.addEventListener('change', updateShareLabel);
+        });
 
-            if (selected.length === 0) {
-                alert("¡Selecciona al menos una evidencia!");
+        // Botón Compartir
+        shareBtn.addEventListener('click', async () => {
+            if (!selectionMode) {
+                // Activar modo selección (y desactivar Fancybox)
+                enterSelectionMode();
                 return;
             }
 
+            // Ya estamos en modo selección
+            const selected = document.querySelectorAll('.evidence-checkbox:checked');
+
+            if (selected.length === 0) {
+                // Salir de modo selección si no hay nada elegido
+                exitSelectionMode(true);
+                return;
+            }
+
+            // Compartir (no cerramos el modo tras compartir)
             try {
                 const files = await Promise.all(
-                    Array.from(selected).map(async (checkbox) => {
+                    Array.from(selected).map(async (checkbox, idx) => {
                         const response = await fetch(checkbox.dataset.src);
                         const blob = await response.blob();
-                        return new File([blob], `evidencia-${Date.now()}.${blob.type.split('/')[1]}`, { type: blob.type });
+                        const ext = (blob.type?.split('/')?.[1] || 'bin').split(';')[0];
+                        return new File([blob], `evidencia-${Date.now()}-${idx}.${ext}`, { type: blob.type });
                     })
                 );
 
-                if (navigator.share && navigator.canShare({ files })) {
+                if (navigator.share && navigator.canShare && navigator.canShare({ files })) {
                     await navigator.share({
                         files,
                         title: 'Evidencias del trabajo',
                         text: '{{ $trabajo->vehiculo->placa ?? '' }} {{ $trabajo->vehiculo->tipoVehiculo->nombre ?? '' }} {{ $trabajo->vehiculo->marca->nombre ?? '' }} {{ $trabajo->vehiculo->modelo->nombre ?? '' }}'
                     });
                 } else {
-                    // Alternativa para navegadores que no soportan compartir archivos
                     const urls = Array.from(selected).map(checkbox => checkbox.dataset.src);
                     const message = `Evidencias seleccionadas:\n${urls.join('\n')}`;
                     alert(message);
                 }
             } catch (error) {
                 console.error('Error al compartir:', error);
-                // alert("Ocurrió un error al intentar compartir las evidencias.");
+            } finally {
+                // Mantener en modo selección, pero limpiar checks para permitir nueva selección
+                document.querySelectorAll('.evidence-checkbox').forEach(cb => cb.checked = false);
+                updateShareLabel();
             }
         });
     </script>
