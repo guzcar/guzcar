@@ -138,7 +138,7 @@ class TrabajoArticulosRelationManager extends RelationManager
                         foreach ($trabajoArticulos as $trabajoArticulo) {
                             // Calcular el nuevo precio basado en el costo y el margen
                             $costo = $trabajoArticulo->articulo->costo;
-                            $nuevoPrecio = $costo * (1 + ($porcentaje / 100));
+                            $nuevoPrecio = $costo / (1 - ($porcentaje / 100));
 
                             // Redondear a número entero
                             $nuevoPrecioEntero = round($nuevoPrecio);
