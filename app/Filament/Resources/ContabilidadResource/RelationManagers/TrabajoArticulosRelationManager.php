@@ -8,6 +8,7 @@ use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -65,7 +66,8 @@ class TrabajoArticulosRelationManager extends RelationManager
                         return $this->buildArticuloLabel($articulo);
                     })
                     ->wrap(),
-                TextColumn::make('tecnico.name'),
+                TextColumn::make('tecnico.name')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('responsable.name')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('presupuesto')
@@ -74,7 +76,17 @@ class TrabajoArticulosRelationManager extends RelationManager
                     ->badge()
                     ->color(fn($state) => $state ? 'success' : 'danger')
                     ->alignCenter(),
-                TextColumn::make('precio')
+                // Columna para mostrar el costo original del artículo
+                TextColumn::make('articulo.costo')
+                    ->label('Costo')
+                    ->prefix('S/ ')
+                    ->alignRight()
+                    ->sortable()
+                    ->state(function (TrabajoArticulo $record) {
+                        return number_format($record->articulo->costo, 2, '.', '');
+                    }),
+                TextColumn::make('precio') // Este se actualiza según el porcentaje de margen
+                    ->extraAttributes(['class' => 'bg-gray-100 dark:bg-gray-700'])
                     ->label('Precio')
                     ->prefix('S/ ')
                     ->alignRight()
@@ -101,11 +113,51 @@ class TrabajoArticulosRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                // Tables\Actions\CreateAction::make(),
+
+                // Action para aplicar margen de ganancia
+                Tables\Actions\Action::make('aplicarMargenGanancia')
+                    ->modalWidth(MaxWidth::Medium)
+                    ->label('Margen de Ganancia')
+                    ->icon('heroicon-o-calculator')
+                    ->form([
+                        TextInput::make('porcentaje_margen')
+                            ->label('Porcentaje de Margen de Ganancia')
+                            ->default(30)
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->suffix('%')
+                    ])
+                    ->action(function (array $data) {
+                        $porcentaje = $data['porcentaje_margen'];
+
+                        // Obtener todos los artículos del trabajo actual
+                        $trabajoArticulos = $this->getOwnerRecord()->trabajoArticulos;
+
+                        foreach ($trabajoArticulos as $trabajoArticulo) {
+                            // Calcular el nuevo precio basado en el costo y el margen
+                            $costo = $trabajoArticulo->articulo->costo;
+                            $nuevoPrecio = $costo * (1 + ($porcentaje / 100));
+
+                            // Redondear a número entero
+                            $nuevoPrecioEntero = round($nuevoPrecio);
+
+                            // Actualizar el precio del artículo en el trabajo
+                            $trabajoArticulo->precio = $nuevoPrecioEntero;
+                            $trabajoArticulo->save();
+                        }
+
+                        // Mostrar mensaje de éxito
+                        \Filament\Notifications\Notification::make()
+                            ->title('Margen aplicado exitosamente')
+                            ->body("Se aplicó un margen de {$porcentaje}% a todos los artículos (precios redondeados)")
+                            ->success()
+                            ->send();
+                    })
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 ExportBulkAction::make(),

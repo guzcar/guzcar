@@ -282,7 +282,7 @@
                         <div class="mb-3">
                             <label for="observacionBulk" class="form-label">Descripción</label>
                             <textarea name="observacion" id="observacionBulk" class="form-control" rows="4"
-                                placeholder="Nuevo texto"></textarea>
+                                placeholder="Nueva descripción"></textarea>
                         </div>
                         <p class="text-muted small mb-0">
                             Escribe la nueva descripción que reemplazará a todas las evidencias seleccionadas.
