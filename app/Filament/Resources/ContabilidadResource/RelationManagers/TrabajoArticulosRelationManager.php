@@ -126,32 +126,36 @@ class TrabajoArticulosRelationManager extends RelationManager
                             ->required()
                             ->numeric()
                             ->minValue(0)
-                            ->maxValue(100)
+                            ->maxValue(99.99) // Evitar 100%
+                            ->step(0.01)
                             ->suffix('%')
                     ])
                     ->action(function (array $data) {
                         $porcentaje = $data['porcentaje_margen'];
 
-                        // Obtener todos los artículos del trabajo actual
+                        // Validar que no sea 100% (aunque el input lo previene)
+                        if ($porcentaje >= 100) {
+                            throw new \Exception('El porcentaje no puede ser 100% o mayor');
+                        }
+
                         $trabajoArticulos = $this->getOwnerRecord()->trabajoArticulos;
 
                         foreach ($trabajoArticulos as $trabajoArticulo) {
-                            // Calcular el nuevo precio basado en el costo y el margen
                             $costo = $trabajoArticulo->articulo->costo;
+
+                            // Fórmula corregida para evitar división por cero
                             $nuevoPrecio = $costo / (1 - ($porcentaje / 100));
 
-                            // Redondear a número entero
-                            $nuevoPrecioEntero = round($nuevoPrecio);
+                            // Redondeo especial para precios bajos
+                            $nuevoPrecioRedondeado = $this->redondearPrecioEspecial($nuevoPrecio);
 
-                            // Actualizar el precio del artículo en el trabajo
-                            $trabajoArticulo->precio = $nuevoPrecioEntero;
+                            $trabajoArticulo->precio = $nuevoPrecioRedondeado;
                             $trabajoArticulo->save();
                         }
 
-                        // Mostrar mensaje de éxito
                         \Filament\Notifications\Notification::make()
                             ->title('Margen aplicado exitosamente')
-                            ->body("Se aplicó un margen de {$porcentaje}% a todos los artículos (precios redondeados)")
+                            ->body("Se aplicó un margen de {$porcentaje}% a todos los artículos")
                             ->success()
                             ->send();
                     })
@@ -160,9 +164,47 @@ class TrabajoArticulosRelationManager extends RelationManager
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                ExportBulkAction::make(),
                 BulkActionGroup::make([
+                    BulkAction::make('aplicarMargenSeleccionados')
+                        ->modalWidth(MaxWidth::Medium)
+                        ->label('Aplicar Margen')
+                        ->icon('heroicon-o-calculator')
+                        ->form([
+                            TextInput::make('porcentaje_margen')
+                                ->label('Porcentaje de Margen de Ganancia')
+                                ->default(30)
+                                ->required()
+                                ->numeric()
+                                ->minValue(0)
+                                ->maxValue(99.99)
+                                ->step(0.01)
+                                ->suffix('%')
+                        ])
+                        ->action(function (Collection $records, array $data) {
+                            $porcentaje = $data['porcentaje_margen'];
+
+                            if ($porcentaje >= 100) {
+                                throw new \Exception('El porcentaje no puede ser 100% o mayor');
+                            }
+
+                            foreach ($records as $record) {
+                                $costo = $record->articulo->costo;
+                                $nuevoPrecio = $costo / (1 - ($porcentaje / 100));
+                                $nuevoPrecioRedondeado = $this->redondearPrecioEspecial($nuevoPrecio);
+
+                                $record->precio = $nuevoPrecioRedondeado;
+                                $record->save();
+                            }
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Margen aplicado exitosamente')
+                                ->body("Se aplicó un margen de {$porcentaje}% a los artículos seleccionados")
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
                     BulkAction::make('marcarComoSi')
+                        ->icon('heroicon-o-x-mark')
                         ->label('Incluir en el Presupuesto')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
@@ -172,6 +214,7 @@ class TrabajoArticulosRelationManager extends RelationManager
                         })
                         ->deselectRecordsAfterCompletion(),
                     BulkAction::make('marcarComoNo')
+                        ->icon('heroicon-o-check')
                         ->label('Excluir del Presupuesto')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
@@ -180,8 +223,21 @@ class TrabajoArticulosRelationManager extends RelationManager
                             });
                         })
                         ->deselectRecordsAfterCompletion(),
+                    ExportBulkAction::make(),
                 ]),
             ]);
+    }
+
+    private function redondearPrecioEspecial(float $precio): float
+    {
+        $redondeado = round($precio);
+
+        // Si el redondeo resulta en 0 pero el precio original es mayor que 0
+        if ($redondeado == 0 && $precio > 0) {
+            return 0.5; // Forzar a 0.5 en lugar de 0
+        }
+
+        return $redondeado;
     }
 
     /**
