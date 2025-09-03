@@ -74,7 +74,7 @@
                 <th style="width: 30px">N°</th>
                 <th>Descripción</th>
                 <th style="width: 60px">Cant.</th>
-                <th style="width: 80px">Costo</th>
+                <th style="width: 80px">Costo U.</th>
                 <th style="width: 80px">Sub-Total</th>
             </tr>
         </thead>
@@ -114,7 +114,7 @@
                 <th style="width: 30px">N°</th>
                 <th>Descripción</th>
                 <th style="width: 60px">Cant.</th>
-                <th style="width: 80px">Costo</th>
+                <th style="width: 80px">Costo U.</th>
                 <th style="width: 80px">Sub-Total</th>
             </tr>
         </thead>
