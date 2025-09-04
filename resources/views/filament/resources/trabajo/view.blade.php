@@ -1,15 +1,19 @@
 <x-filament::page>
 
     {{-- Fancybox CSS/JS (CDN) --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
     <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+
+    <style>
+        .fi-section-content-p2 .fi-section-content {
+            padding: 0.5rem !important;
+        }
+    </style>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {{-- Información del Vehículo --}}
-        <x-filament::section>
-            <x-slot name="heading">
-                Vehículo
-            </x-slot>
+        <x-filament::section class="fi-section-content-p2">
+            <x-slot name="heading">Vehículo</x-slot>
 
             <div class="overflow-x-auto">
                 <table
@@ -19,34 +23,72 @@
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300 w-40"
                                 style="width: 120px;">Placa</th>
                             <td class="px-4 py-2 text-gray-900 dark:text-white">
-                                {{ $trabajo->vehiculo->placa ?? 'SIN PLACA' }}
+                                @php $placa = $trabajo->vehiculo->placa ?? null; @endphp
+                                @if(!empty($placa))
+                                    {{ $placa }}
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">SIN PLACA</span>
+                                @endif
                             </td>
                         </tr>
+
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Marca</th>
-                            <td class="px-4 py-2">{{ $trabajo->vehiculo->marca->nombre ?? '-' }}</td>
+                            <td class="px-4 py-2">
+                                @php $marca = $trabajo->vehiculo->marca->nombre ?? null; @endphp
+                                @if(!empty($marca))
+                                    {{ $marca }}
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">Sin marca</span>
+                                @endif
+                            </td>
                         </tr>
+
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Modelo</th>
-                            <td class="px-4 py-2">{{ $trabajo->vehiculo->modelo->nombre ?? '-' }}</td>
+                            <td class="px-4 py-2">
+                                @php $modelo = $trabajo->vehiculo->modelo->nombre ?? null; @endphp
+                                @if(!empty($modelo))
+                                    {{ $modelo }}
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">Sin modelo</span>
+                                @endif
+                            </td>
                         </tr>
+
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Color</th>
-                            <td class="px-4 py-2">{{ $trabajo->vehiculo->color }}</td>
+                            <td class="px-4 py-2">
+                                @php $color = $trabajo->vehiculo->color ?? null; @endphp
+                                @if(!empty($color))
+                                    {{ $color }}
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">Sin color</span>
+                                @endif
+                            </td>
                         </tr>
+
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Tipo</th>
-                            <td class="px-4 py-2">{{ $trabajo->vehiculo->tipoVehiculo->nombre }}</td>
+                            <td class="px-4 py-2">
+                                @php $tipo = $trabajo->vehiculo->tipoVehiculo->nombre ?? null; @endphp
+                                @if(!empty($tipo))
+                                    {{ $tipo }}
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">Sin tipo</span>
+                                @endif
+                            </td>
                         </tr>
+
                         <tr>
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300 align-top">Propietarios
                             </th>
                             <td class="px-4 py-2">
                                 <ul class="list-disc list-inside space-y-1">
-                                    @forelse($trabajo->vehiculo->clientes as $cliente)
+                                    @forelse($trabajo->vehiculo->clientes ?? [] as $cliente)
                                         <li>{{ $cliente->nombre }}</li>
                                     @empty
-                                        <span class="text-gray-500 dark:text-gray-400">No hay propietarios asignados.</span>
+                                        <span class="text-gray-500 dark:text-gray-400">Sin propietarios</span>
                                     @endforelse
                                 </ul>
                             </td>
@@ -57,10 +99,8 @@
         </x-filament::section>
 
         {{-- Información del Trabajo --}}
-        <x-filament::section>
-            <x-slot name="heading">
-                Trabajo
-            </x-slot>
+        <x-filament::section class="fi-section-content-p2">
+            <x-slot name="heading">Trabajo</x-slot>
 
             <div class="overflow-x-auto">
                 <table
@@ -69,42 +109,75 @@
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300 w-40"
                                 style="width: 120px;">Código</th>
-                            <td class="px-4 py-2">{{ $trabajo->codigo }}</td>
+                            <td class="px-4 py-2">
+                                @php $codigo = $trabajo->codigo ?? null; @endphp
+                                @if(!empty($codigo))
+                                    {{ $codigo }}
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">Sin código</span>
+                                @endif
+                            </td>
                         </tr>
+
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Taller</th>
-                            <td class="px-4 py-2">{{ $trabajo->taller->nombre ?? 'N/A' }}</td>
+                            <td class="px-4 py-2">
+                                @php $taller = $trabajo->taller->nombre ?? null; @endphp
+                                @if(!empty($taller))
+                                    {{ $taller }}
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">Sin taller</span>
+                                @endif
+                            </td>
                         </tr>
+
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Ingreso</th>
                             <td class="px-4 py-2">
-                                {{ $trabajo->fecha_ingreso->format('d/m/y - h:m A') }}
+                                @php $ingreso = $trabajo->fecha_ingreso ?? null; @endphp
+                                @if(!empty($ingreso))
+                                    {{ $ingreso->format('d/m/y - h:i A') }}
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">Sin fecha de ingreso</span>
+                                @endif
                             </td>
                         </tr>
+
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Salida</th>
                             <td class="px-4 py-2">
-                                @if($trabajo->fecha_salida)
-                                    {{ $trabajo->fecha_salida->format('d/m/y - h:i A') }}
+                                @php $salida = $trabajo->fecha_salida ?? null; @endphp
+                                @if(!empty($salida))
+                                    {{ $salida->format('d/m/y - h:i A') }}
                                 @else
-                                    <span class="text-gray-400">Sin fecha de salida</span>
+                                    <span class="text-gray-500 dark:text-gray-400">Sin fecha de salida</span>
                                 @endif
                             </td>
                         </tr>
+
                         <tr class="border-b border-gray-200 dark:border-gray-700">
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Kilometraje</th>
                             <td class="px-4 py-2">
-                                @if(!empty($trabajo->kilometraje))
-                                    {{ $trabajo->kilometraje }}
+                                @php $km = $trabajo->kilometraje ?? null; @endphp
+                                @if(!empty($km) || $km === 0)
+                                    {{ $km }}
                                 @else
-                                    <span class="text-gray-400">Sin kilometraje</span>
+                                    <span class="text-gray-500 dark:text-gray-400">Sin kilometraje</span>
                                 @endif
                             </td>
                         </tr>
+
                         <tr>
                             <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300 align-top">Descripción
                             </th>
-                            <td class="px-4 py-2">{{ $trabajo->descripcion_servicio }}</td>
+                            <td class="px-4 py-2">
+                                @php $desc = $trabajo->descripcion_servicio ?? null; @endphp
+                                @if(!empty($desc))
+                                    {{ $desc }}
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">Sin descripción</span>
+                                @endif
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -113,41 +186,40 @@
 
         {{-- Técnicos Asignados --}}
         <x-filament::section>
-            <x-slot name="heading">
-                Técnicos Asignados
-            </x-slot>
+            <x-slot name="heading">Técnicos Asignados</x-slot>
             <ul class="list-disc list-inside space-y-1">
-                @forelse($trabajo->usuarios as $usuario)
+                @forelse(($trabajo->usuarios ?? []) as $usuario)
                     <li class="text-gray-800 dark:text-gray-300">{{ $usuario->name }}</li>
                 @empty
-                    <p class="text-gray-500 dark:text-gray-400">No hay técnicos asignados.</p>
+                    <p class="text-gray-500 dark:text-gray-400">Sin técnicos asignados</p>
                 @endforelse
             </ul>
         </x-filament::section>
 
-        @can('create_trabajo')
-            <x-filament::section>
-                <x-slot name="heading">
-                    Archivos
-                </x-slot>
-                <ul class="list-disc list-inside">
-                    @forelse ($trabajo->archivos as $archivo)
+        {{-- Archivos 
+        <x-filament::section>
+            <x-slot name="heading">Archivos</x-slot>
+            <ul class="list-disc list-inside">
+                @forelse(($trabajo->archivos ?? []) as $archivo)
+                    @php $ruta = $archivo->archivo_url ?? null; @endphp
+                    @if(!empty($ruta))
                         <li>
                             <a class="font-medium text-primary-600 dark:text-primary-500 max-w-full truncate"
                                 style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; text-decoration: none;"
                                 onmouseover="this.style.textDecoration='underline';"
-                                onmouseout="this.style.textDecoration='none';"
-                                href="{{ asset('storage/' . $archivo->archivo_url) }}" target="_blank"
-                                title="{{ basename($archivo->archivo_url) }}">
-                                {{ basename($archivo->archivo_url) }}
+                                onmouseout="this.style.textDecoration='none';" href="{{ asset('storage/' . $ruta) }}"
+                                target="_blank" title="{{ basename($ruta) }}">
+                                {{ basename($ruta) }}
                             </a>
                         </li>
-                    @empty
-                        <p class="text-gray-500 dark:text-gray-400">No hay archivos.</p>
-                    @endforelse
-                </ul>
-            </x-filament::section>
-        @endcan
+                    @else
+                        <li><span class="text-gray-500 dark:text-gray-400">Archivo inválido</span></li>
+                    @endif
+                @empty
+                    <p class="text-gray-500 dark:text-gray-400">Sin archivos</p>
+                @endforelse
+            </ul>
+        </x-filament::section>--}}
     </div>
 
     <h2 class="text-xl font-bold">Detalles del trabajo</h2>
@@ -158,18 +230,7 @@
         </x-filament::section>
     @empty
         <x-filament::card>
-            <div class="fi-ta-empty-state-content mx-auto grid max-w-lg justify-items-center text-center">
-                <div class="fi-ta-empty-state-icon-ctn mb-4 rounded-full bg-gray-100 p-3 dark:bg-gray-500/20">
-                    <svg class="fi-ta-empty-state-icon h-6 w-6 text-gray-500 dark:text-gray-400"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" aria-hidden="true" data-slot="icon">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
-                    </svg>
-                </div>
-                <h4 class="fi-ta-empty-state-heading text-base font-semibold leading-6 text-gray-950 dark:text-white">
-                    No se encontraron detalles
-                </h4>
-            </div>
+            <p class="text-gray-500 dark:text-gray-400">Sin detalles</p>
         </x-filament::card>
     @endforelse
 
@@ -214,7 +275,7 @@
             <div class="space-y-6">
                 @foreach(($descs instanceof \Illuminate\Support\Collection) ? $descs : collect($descs) as $tdt)
                     <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                        <div class="mb-2 text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                        <div class="mb-2 text-sm text-gray-600 dark:text-gray-400 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                 class="evidence-icon w-4 h-4 shrink-0">
                                 <path fill-rule="evenodd"
@@ -259,16 +320,32 @@
     </x-filament::section>
 
     <style>
-        .evidence-container { position: relative; margin-bottom: 1.5rem; }
-        .share-btn-container { margin-bottom: 1rem; }
+        .evidence-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .share-btn-container {
+            margin-bottom: 1rem;
+        }
 
         .evidence-grid {
             display: grid;
             grid-template-columns: repeat(1, 1fr);
             gap: 1.5rem;
         }
-        @media (min-width: 640px) { .evidence-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 768px) { .evidence-grid { grid-template-columns: repeat(3, 1fr); } }
+
+        @media (min-width: 640px) {
+            .evidence-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .evidence-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
 
         .evidence-card {
             position: relative;
@@ -277,55 +354,108 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s;
         }
-        .evidence-card:hover { transform: scale(1.02); }
+
+        .evidence-card:hover {
+            transform: scale(1.02);
+        }
 
         /* Checkboxes ocultos por defecto */
         .evidence-checkbox {
             position: absolute;
-            top: 10px; right: 10px;
-            width: 22px; height: 22px;
+            top: 10px;
+            right: 10px;
+            width: 22px;
+            height: 22px;
             z-index: 10;
             cursor: pointer;
-            appearance: none; -webkit-appearance: none;
+            appearance: none;
+            -webkit-appearance: none;
             background-color: white;
             border-radius: 4px;
             padding: 8px;
-            display: none;           /* oculto por defecto */
-            pointer-events: none;    /* no clicables fuera de selección */
-            box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset;
+            display: none;
+            /* oculto por defecto */
+            pointer-events: none;
+            /* no clicables fuera de selección */
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .15) inset;
         }
+
         /* En modo selección se muestran y habilitan */
-        .selection-mode .evidence-checkbox { display: block; pointer-events: auto; }
+        .selection-mode .evidence-checkbox {
+            display: block;
+            pointer-events: auto;
+        }
 
         .evidence-checkbox:checked {
             background-color: #1e66daff;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: center; background-size: 16px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 16px;
         }
 
         .evidence-media {
-            width: 100%; height: 200px; object-fit: cover;
-            border-radius: 0.5rem 0.5rem 0 0; display: block;
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 0.5rem 0.5rem 0 0;
+            display: block;
         }
 
-        .evidence-info { padding: 1rem; background-color: white; }
-        .dark .evidence-info { background-color: #1f2937; }
-
-        .evidence-user, .evidence-date {
-            display: flex; align-items: center; font-size: 0.875rem;
-            color: #6b7280; margin-bottom: 0.25rem;
+        .evidence-info {
+            padding: 1rem;
+            background-color: white;
         }
-        .dark .evidence-user, .dark .evidence-date { color: #9ca3af; }
 
-        .evidence-icon { width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: #6b7280; }
-        .dark .evidence-icon { color: #9ca3af; }
+        .dark .evidence-info {
+            background-color: #1f2937;
+        }
 
-        .evidence-observation { margin-top: 0.5rem; font-size: 0.875rem; color: #374151; }
-        .dark .evidence-observation { color: #e5e7eb; }
+        .evidence-user,
+        .evidence-date {
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+        }
+
+        .dark .evidence-user,
+        .dark .evidence-date {
+            color: #9ca3af;
+        }
+
+        .evidence-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.5rem;
+            color: #6b7280;
+        }
+
+        .dark .evidence-icon {
+            color: #9ca3af;
+        }
+
+        .evidence-observation {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+        .dark .evidence-observation {
+            color: #e5e7eb;
+        }
 
         /* Indicador de modo selección */
-        .select-hint { display: none; font-size: .875rem; color: #6b7280; }
-        .selection-mode .select-hint { display: inline-block; }
+        .select-hint {
+            display: none;
+            font-size: .875rem;
+            color: #6b7280;
+        }
+
+        .selection-mode .select-hint {
+            display: inline-block;
+        }
     </style>
 
     <div class="flex justify-between items-center mb-1.5">
@@ -345,8 +475,8 @@
                 @foreach ($evidencias as $evidencia)
                     @php $src = Storage::url($evidencia->evidencia_url); @endphp
                     <div class="evidence-card">
-                        <input type="checkbox" class="evidence-checkbox"
-                               data-src="{{ $src }}" id="evidence-{{ $evidencia->id }}">
+                        <input type="checkbox" class="evidence-checkbox" data-src="{{ $src }}"
+                            id="evidence-{{ $evidencia->id }}">
 
                         {{-- Anchor para Fancybox (deshabilitable en modo selección) --}}
                         @if ($evidencia->tipo === 'imagen')
@@ -363,18 +493,20 @@
 
                         <div class="evidence-info">
                             <p class="evidence-user">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="evidence-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                    class="evidence-icon">
                                     <path fill-rule="evenodd"
-                                          d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-                                          clip-rule="evenodd" />
+                                        d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+                                        clip-rule="evenodd" />
                                 </svg>
                                 <span>{{ $evidencia->user->name }}</span>
                             </p>
                             <p class="evidence-date">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="evidence-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                    class="evidence-icon">
                                     <path fill-rule="evenodd"
-                                          d="M6 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6Zm12 2H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1ZM8 8V7h2v1H8Zm6 0V7h2v1h-2ZM7 11h10v2H7v-2Zm0 4h10v2H7v-2Z"
-                                          clip-rule="evenodd" />
+                                        d="M6 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6Zm12 2H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1ZM8 8V7h2v1H8Zm6 0V7h2v1h-2ZM7 11h10v2H7v-2Zm0 4h10v2H7v-2Z"
+                                        clip-rule="evenodd" />
                                 </svg>
                                 <span>{{ $evidencia->created_at->format('d/m/Y') }}
                                     ({{ $evidencia->created_at->diffForHumans() }})</span>
@@ -424,7 +556,7 @@
 
         // Deshabilitar totalmente Fancybox en modo selección
         function disableFancybox() {
-            try { Fancybox.destroy(); } catch(e) {}
+            try { Fancybox.destroy(); } catch (e) { }
             document.querySelectorAll('.evidence-link').forEach(a => {
                 if (!a.dataset.hrefOriginal) a.dataset.hrefOriginal = a.getAttribute('href') || '';
                 a.setAttribute('href', 'javascript:void(0)');

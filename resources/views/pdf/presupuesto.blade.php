@@ -228,11 +228,11 @@
                                 </tr>
                             @endif
 
-                            @if (request('igv'))
+                            @if ($trabajo->igv)
                                 <tr>
-                                    <td>IGV ({{ request('igv_porcentaje')}}%)</td>
+                                    <td>IGV (18%)</td>
                                     <td class="text-right">S/
-                                        {{ number_format($total_con_descuentos * request('igv_porcentaje') / 100, 2) }}
+                                        {{ number_format($total_con_descuentos * 0.18, 2) }}
                                     </td>
                                 </tr>
                             @endif
@@ -240,7 +240,7 @@
                         <tfoot>
                             <tr>
                                 <td class="border-top bold">
-                                    @if (!request('igv'))
+                                    @if (!$trabajo->igv)
                                         No incluye IGV
                                     @else
                                         Total
@@ -248,7 +248,7 @@
                                 </td>
                                 <td class="text-right border-top bold">
                                     S/
-                                    {{ number_format($total_con_igv = $total_con_descuentos * (1 + (request('igv') ? request('igv_porcentaje') / 100 : 0)), 2) }}
+                                    {{ number_format($total_con_igv = $total_con_descuentos * (1 + ($trabajo->igv ? 0.18 : 0)), 2) }}
                                 </td>
                             </tr>
                         </tfoot>

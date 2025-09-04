@@ -6,6 +6,7 @@ use App\Filament\Resources\TrabajoResource;
 use App\Models\Trabajo;
 use App\Models\TrabajoDescripcionTecnico;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Collection;
@@ -116,13 +117,27 @@ class ViewTrabajo extends ViewRecord
                 ->label('Regresar')
                 ->url(TrabajoResource::getUrl())
                 ->color('gray'),
-            // Action::make('Descargar')
-            //     ->icon('heroicon-s-arrow-down-tray')
-            //     ->url(
-            //         fn(Trabajo $trabajo): string => route('trabajo.pdf.presupuesto', ['trabajo' => $trabajo]),
-            //         shouldOpenInNewTab: true
-            //     )
-            //     ->color('gray'),
+            ActionGroup::make([
+                Action::make('Descargar informe')
+                    ->icon('heroicon-s-document-text')
+                    ->url(
+                        fn(Trabajo $trabajo): string => route('trabajo.pdf.informe', ['trabajo' => $trabajo]),
+                        shouldOpenInNewTab: true
+                    )
+                    ->hidden(fn() => !auth()->user()->can('view_trabajo::informe')),
+
+                Action::make('Descargar evidencias')
+                    ->icon('heroicon-s-photo')
+                    ->url(
+                        fn(Trabajo $trabajo): string => route('trabajo.pdf.evidencia', ['trabajo' => $trabajo]),
+                        shouldOpenInNewTab: true
+                    )
+                    ->hidden(fn() => !auth()->user()->can('view_evidencia')),
+            ])
+                ->button()
+                ->color('gray')
+                ->label('Descargar')
+                ->icon('heroicon-s-arrow-down-tray'),
             EditAction::make(),
         ];
     }

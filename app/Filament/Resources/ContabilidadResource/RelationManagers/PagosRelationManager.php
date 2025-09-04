@@ -57,9 +57,10 @@ class PagosRelationManager extends RelationManager
                     ->prefix('S/ '),
                 TextColumn::make('fecha_pago')
                     ->date('d/m/Y'),
-                TextColumn::make('observacion')
-                    ->wrap(),
                 TextColumn::make('detalle.nombre'),
+                TextColumn::make('observacion')
+                    ->placeholder('Sin observación')
+                    ->wrap(),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')
