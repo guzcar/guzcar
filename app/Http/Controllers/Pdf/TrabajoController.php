@@ -215,7 +215,11 @@ class TrabajoController extends Controller
         ])->setPaper('A4', 'portrait');
 
         $fileName = "Informe {$trabajo->codigo}.pdf";
-
+// return view('pdf.informe', [
+//             'trabajo' => $trabajo,
+//             'informes' => $trabajo->informes,
+//             'titulo' => $titulo
+//         ]);
         return $pdf->stream($fileName);
     }
 }

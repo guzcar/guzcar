@@ -227,7 +227,7 @@
 
     <footer>
         <div class="border-top" style="margin-bottom: 10px;"></div>
-        <div>GRACIAS POR SU PREFERENCIA</div>
+        <div>{{ $footer ?? 'GRACIAS POR SU PREFERENCIA' }}</div>
         <!-- <div>AUTOMOTORES GUZCAR S.A.C.</div> -->
     </footer>
 

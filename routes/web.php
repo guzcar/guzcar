@@ -9,6 +9,7 @@ use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\Pdf\DespachoController as PdfDespachoController;
+use App\Http\Controllers\Pdf\MaletaController;
 use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
 use App\Http\Controllers\Pdf\VentaController as PdfVentaController;
 use App\Http\Controllers\TrabajoController;
@@ -77,6 +78,7 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     Route::get('/admin/evidencias/pdf/{trabajo}', [PdfTrabajoController::class, 'evidencia'])->name('trabajo.pdf.evidencia');
     Route::get('/admin/despachos/pdf/{despacho}', [PdfDespachoController::class, 'downloadPdf'])->name('despachos.pdf');
     Route::get('/admin/ventas/pdf/{venta}', [PdfVentaController::class, 'downloadPdf'])->name('ventas.pdf');
+    Route::get('/pdf/maletas/{maleta}', [MaletaController::class, 'show'])->name('pdf.maleta');
 
     // Evidencias
     Route::get('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'index'])->name('gestion.evidencias.index');

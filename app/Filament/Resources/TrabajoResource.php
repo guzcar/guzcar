@@ -599,24 +599,24 @@ class TrabajoResource extends Resource
                                         fn(string $operation): bool =>
                                         $operation === 'create' || auth()->user()->cannot('create_trabajo')
                                     ),
-                                Section::make()
-                                    ->schema([
-                                        Repeater::make('archivos')
-                                            ->label('')
-                                            ->createItemButtonLabel('Añadir archivo')
-                                            ->defaultItems(0)
-                                            ->relationship()
-                                            ->simple(
-                                                FileUpload::make('archivo_url')
-                                                    ->directory('trabajo_archivo')
-                                                    ->required()
-                                            )
-                                    ])
-                                    ->hidden(
-                                        fn(string $operation): bool =>
-                                        $operation === 'create' || auth()->user()->cannot('create_trabajo')
-                                    )
-                                    ->heading('Archivos'),
+                                // Section::make()
+                                //     ->schema([
+                                //         Repeater::make('archivos')
+                                //             ->label('')
+                                //             ->createItemButtonLabel('Añadir archivo')
+                                //             ->defaultItems(0)
+                                //             ->relationship()
+                                //             ->simple(
+                                //                 FileUpload::make('archivo_url')
+                                //                     ->directory('trabajo_archivo')
+                                //                     ->required()
+                                //             )
+                                //     ])
+                                //     ->hidden(
+                                //         fn(string $operation): bool =>
+                                //         $operation === 'create' || auth()->user()->cannot('create_trabajo')
+                                //     )
+                                //     ->heading('Archivos'),
                             ])
                             ->columnspan(1)
                             ->columns(1),

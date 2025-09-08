@@ -677,7 +677,7 @@ class ContabilidadResource extends Resource
                                                     ->required()
                                             )
                                     ])
-                                    ->heading('Archivos'),
+                                    ->heading('Otros Archivos'),
                             ])
                             ->columnspan(1)
                             ->columns(1),
