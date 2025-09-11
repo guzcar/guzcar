@@ -195,31 +195,6 @@
                 @endforelse
             </ul>
         </x-filament::section>
-
-        {{-- Archivos 
-        <x-filament::section>
-            <x-slot name="heading">Archivos</x-slot>
-            <ul class="list-disc list-inside">
-                @forelse(($trabajo->archivos ?? []) as $archivo)
-                    @php $ruta = $archivo->archivo_url ?? null; @endphp
-                    @if(!empty($ruta))
-                        <li>
-                            <a class="font-medium text-primary-600 dark:text-primary-500 max-w-full truncate"
-                                style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; text-decoration: none;"
-                                onmouseover="this.style.textDecoration='underline';"
-                                onmouseout="this.style.textDecoration='none';" href="{{ asset('storage/' . $ruta) }}"
-                                target="_blank" title="{{ basename($ruta) }}">
-                                {{ basename($ruta) }}
-                            </a>
-                        </li>
-                    @else
-                        <li><span class="text-gray-500 dark:text-gray-400">Archivo inválido</span></li>
-                    @endif
-                @empty
-                    <p class="text-gray-500 dark:text-gray-400">Sin archivos</p>
-                @endforelse
-            </ul>
-        </x-filament::section>--}}
     </div>
 
     <h2 class="text-xl font-bold">Detalles del trabajo</h2>
@@ -478,17 +453,15 @@
                         <input type="checkbox" class="evidence-checkbox" data-src="{{ $src }}"
                             id="evidence-{{ $evidencia->id }}">
 
-                        {{-- Anchor para Fancybox (deshabilitable en modo selección) --}}
                         @if ($evidencia->tipo === 'imagen')
                             <a class="evidence-link" data-fancybox="evidencias" data-type="image" href="{{ $src }}">
                                 <img src="{{ $src }}" alt="Evidencia" class="evidence-media">
                             </a>
                         @elseif ($evidencia->tipo === 'video')
-                            <a class="evidence-link" data-fancybox="evidencias" data-type="video" href="{{ $src }}">
-                                <video class="evidence-media" preload="metadata" muted playsinline>
-                                    <source src="{{ $src }}" type="video/mp4">
-                                </video>
-                            </a>
+                            <video controls="controls" preload="auto" class="w-full h-48 rounded-lg evidence-link" name="media"
+                                src="{{ Storage::url($evidencia->evidencia_url) }}"
+                                type="video/mp4">
+                            </video>
                         @endif
 
                         <div class="evidence-info">
