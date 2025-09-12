@@ -24,6 +24,7 @@ return new class extends Migration {
             $table->decimal('precio');
             $table->unsignedInteger('cantidad')->default(1);
             $table->unsignedBigInteger('sort')->default(0);
+            $table->boolean('presupuesto')->default(true);
             $table->timestamps();
         });
     }

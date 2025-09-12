@@ -9,10 +9,13 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class OtrosRelationManager extends RelationManager
 {
@@ -45,6 +48,13 @@ class OtrosRelationManager extends RelationManager
             ->defaultSort('sort', 'asc')
             ->columns([
                 TextColumn::make('descripcion'),
+                TextColumn::make('presupuesto')
+                    ->sortable()
+                    ->label('Presupuesto')
+                    ->formatStateUsing(fn($state) => $state ? 'Incluido' : 'Excluido')
+                    ->badge()
+                    ->color(fn($state) => $state ? 'success' : 'danger')
+                    ->alignCenter(),
                 TextColumn::make('precio')
                     ->label('Precio')
                     ->prefix('S/ ')
@@ -73,6 +83,27 @@ class OtrosRelationManager extends RelationManager
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    BulkAction::make('marcarComoSi')
+                        ->icon('heroicon-o-check')
+                        ->label('Incluir en el Presupuesto')
+                        ->action(function (Collection $records) {
+                            $records->each(function ($record) {
+                                $record->presupuesto = true; // Cambiar a "SI"
+                                $record->save();
+                            });
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                    BulkAction::make('marcarComoNo')
+                        ->icon('heroicon-o-x-mark')
+                        ->label('Excluir del Presupuesto')
+                        ->action(function (Collection $records) {
+                            $records->each(function ($record) {
+                                $record->presupuesto = false; // Cambiar a "NO"
+                                $record->save();
+                            });
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                    ExportBulkAction::make(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

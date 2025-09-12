@@ -71,6 +71,7 @@ class TrabajoArticulosRelationManager extends RelationManager
                 TextColumn::make('responsable.name')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('presupuesto')
+                    ->sortable()
                     ->label('Presupuesto')
                     ->formatStateUsing(fn($state) => $state ? 'Incluido' : 'Excluido')
                     ->badge()
@@ -204,7 +205,7 @@ class TrabajoArticulosRelationManager extends RelationManager
                         })
                         ->deselectRecordsAfterCompletion(),
                     BulkAction::make('marcarComoSi')
-                        ->icon('heroicon-o-x-mark')
+                        ->icon('heroicon-o-check')
                         ->label('Incluir en el Presupuesto')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {
@@ -214,7 +215,7 @@ class TrabajoArticulosRelationManager extends RelationManager
                         })
                         ->deselectRecordsAfterCompletion(),
                     BulkAction::make('marcarComoNo')
-                        ->icon('heroicon-o-check')
+                        ->icon('heroicon-o-x-mark')
                         ->label('Excluir del Presupuesto')
                         ->action(function (Collection $records) {
                             $records->each(function ($record) {

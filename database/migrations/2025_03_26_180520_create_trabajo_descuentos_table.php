@@ -52,12 +52,12 @@ return new class extends Migration {
                 -- Calcular el total de servicios para el trabajo
                 SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_servicios
                 FROM trabajo_servicios
-                WHERE trabajo_id = NEW.trabajo_id;
+                WHERE trabajo_id = NEW.trabajo_id AND presupuesto = true;
 
                 -- Calcular el total de otros para el trabajo
                 SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_otros
                 FROM trabajo_otros
-                WHERE trabajo_id = NEW.trabajo_id;
+                WHERE trabajo_id = NEW.trabajo_id AND presupuesto = true;
 
                 -- Calcular el total sin descuento
                 SET total_sin_descuento = total_articulos + total_servicios + total_otros;
@@ -99,12 +99,12 @@ return new class extends Migration {
                 -- Calcular el total de servicios para el trabajo
                 SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_servicios
                 FROM trabajo_servicios
-                WHERE trabajo_id = NEW.trabajo_id;
+                WHERE trabajo_id = NEW.trabajo_id AND presupuesto = true;
 
                 -- Calcular el total de otros para el trabajo
                 SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_otros
                 FROM trabajo_otros
-                WHERE trabajo_id = NEW.trabajo_id;
+                WHERE trabajo_id = NEW.trabajo_id AND presupuesto = true;
 
                 -- Calcular el total sin descuento
                 SET total_sin_descuento = total_articulos + total_servicios + total_otros;
@@ -146,12 +146,12 @@ return new class extends Migration {
                 -- Calcular el total de servicios para el trabajo
                 SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_servicios
                 FROM trabajo_servicios
-                WHERE trabajo_id = OLD.trabajo_id;
+                WHERE trabajo_id = OLD.trabajo_id AND presupuesto = true;
 
                 -- Calcular el total de otros para el trabajo
                 SELECT COALESCE(SUM(precio * cantidad), 0) INTO total_otros
                 FROM trabajo_otros
-                WHERE trabajo_id = OLD.trabajo_id;
+                WHERE trabajo_id = OLD.trabajo_id AND presupuesto = true;
 
                 -- Calcular el total sin descuento
                 SET total_sin_descuento = total_articulos + total_servicios + total_otros;
