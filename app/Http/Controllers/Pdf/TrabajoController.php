@@ -27,10 +27,12 @@ class TrabajoController extends Controller
             'trabajoArticulos.articulo.unidad',
             'trabajoArticulos.articulo.presentacion',
             'servicios' => function ($query) {
-                $query->orderBy('sort'); // Ordenar servicios por sort
+                $query->where('presupuesto', true)
+                    ->orderBy('sort'); // Ordenar servicios por sort
             },
             'otros' => function ($query) {
-                $query->orderBy('sort'); // Ordenar otros por sort
+                $query->where('presupuesto', true)
+                    ->orderBy('sort'); // Ordenar otros por sort
             },
             'descuentos',
             'cliente',
@@ -130,8 +132,13 @@ class TrabajoController extends Controller
             'trabajoArticulos.articulo.marca',
             'trabajoArticulos.articulo.unidad',
             'trabajoArticulos.articulo.presentacion',
+            'servicios' => function ($query) {
+                $query->where('presupuesto', true)
+                    ->orderBy('sort'); // Ordenar servicios por sort
+            },
             'otros' => function ($query) {
-                $query->orderBy('sort'); // Ordenar otros por sort
+                $query->where('presupuesto', true)
+                    ->orderBy('sort'); // Ordenar otros por sort
             },
             'cliente',
             'vehiculo.clientes',
