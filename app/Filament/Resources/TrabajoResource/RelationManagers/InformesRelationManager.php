@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TrabajoResource\RelationManagers;
 
+use App\Models\TrabajoInformePlantilla;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -18,6 +19,25 @@ class InformesRelationManager extends RelationManager
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('plantilla_id')
+                    ->label('Seleccionar plantilla')
+                    ->options(TrabajoInformePlantilla::pluck('nombre', 'id'))
+                    ->searchable()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        if ($state) {
+                            $plantilla = TrabajoInformePlantilla::find($state);
+                            if ($plantilla) {
+                                $set('contenido', $plantilla->contenido);
+                            }
+                        } else {
+                            $set('contenido', '');
+                        }
+                    })
+                    ->placeholder('Elige una plantilla...')
+                    ->columnSpanFull()
+                    ->hiddenOn('edit'),
+
                 Forms\Components\RichEditor::make('contenido')
                     ->columnSpanFull()
                     ->toolbarButtons([
@@ -33,7 +53,7 @@ class InformesRelationManager extends RelationManager
                         'table',
                         'undo',
                     ])
-                    ->extraInputAttributes(['style' => 'min-height: 60vh; max-height: 70vh;'])
+                    ->extraInputAttributes(['class' => 'max-h-96', 'style' => 'overflow-y: scroll;'])
                     ->required(),
             ]);
     }
@@ -44,7 +64,8 @@ class InformesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('contenido')
                     ->wrap()
-                    ->html(),
+                    ->html()
+                    ->limit(100),
             ])
             ->filters([
                 //
@@ -54,7 +75,8 @@ class InformesRelationManager extends RelationManager
                     ->modalWidth('screen'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->modalWidth('screen'),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
