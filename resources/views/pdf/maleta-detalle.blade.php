@@ -24,7 +24,7 @@
 
         <li>
             <p><b>Información de herramientas</b></p>
-            <p>Total de herramientas: {{ $maleta->detalles->count() }}</p>
+            <p>Total de herramientas: {{ $totalHerramientas }}</p>
 
             @if($herramientasAgrupadas->isEmpty())
                 <p>No hay herramientas registradas.</p>

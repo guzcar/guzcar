@@ -33,13 +33,13 @@ class Herramienta extends Model
         return $this->hasMany(MaletaDetalle::class, 'herramienta_id');
     }
 
-    // public function entradaDetalles()
-    // {
-    //     return $this->hasMany(HerramientaEntradaDetalle::class, 'herramienta_id');
-    // }
+    public function entradaDetalles()
+    {
+        return $this->hasMany(HerramientaEntradaDetalle::class, 'herramienta_id');
+    }
 
-    // public function controlDetalles()
-    // {
-    //     return $this->hasMany(ControlMaletaDetalle::class, 'herramienta_id');
-    // }
+    public function controlDetalles()
+    {
+        return $this->hasMany(ControlMaletaDetalle::class, 'herramienta_id');
+    }
 }

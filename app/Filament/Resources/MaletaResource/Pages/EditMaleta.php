@@ -19,7 +19,12 @@ class EditMaleta extends EditRecord
                 ->icon('heroicon-o-document-text')
                 ->url(fn(Maleta $record) => route('pdf.maleta', $record))
                 ->openUrlInNewTab(),
-            // Actions\DeleteAction::make(),
+            Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->previousUrl ?? $this->getResource()::getUrl('index');
     }
 }

@@ -15,17 +15,34 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\HtmlString;
 
 class DetallesRelationManager extends RelationManager
 {
     protected static string $relationship = 'detalles';
+
+    protected static ?string $recordTitleAttribute = 'a';
+
+    protected static ?string $inverseRelationship = 'b';
+
+    protected static ?string $label = 'c';
+
+    protected static ?string $pluralLabel = 'd';
+
+    protected static ?string $modelLabel = 'Herramienta';
+
+    protected static ?string $pluralModelLabel = 'f';
+
+    protected static ?string $title = 'Herramientas';
 
     public function form(Form $form): Form
     {
@@ -78,6 +95,7 @@ class DetallesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('herramienta.nombre')
                     ->searchable(isIndividual: true)
@@ -104,15 +122,39 @@ class DetallesRelationManager extends RelationManager
                     ->label('Agregar herramienta'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->button(),
+                Tables\Actions\Action::make('viewImage')
+                    ->button()
+                    ->label('Ver')
+                    ->icon('heroicon-s-eye')
+                    ->color('gray')
+                    ->disabled(fn ($record) => empty($record->evidencia_url))
+                    ->url(fn ($record) => Storage::url($record->evidencia_url))
+                    ->openUrlInNewTab(),
                 Tables\Actions\DeleteAction::make()
+                    ->button()
                     ->label('Quitar'),
-                Tables\Actions\RestoreAction::make(),
-                // Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make()
+                    ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('generarActaEntrega')
+                        ->label('Generar acta de entrega')
+                        ->icon('heroicon-o-document-text')
+                        ->action(function ($records) {
+                            $ids = $records->pluck('id')->toArray();
+                            $maletaId = $this->getOwnerRecord()->id;
+
+                            $url = URL::route('pdf.maleta.detalles', [
+                                'maleta' => $maletaId,
+                                'detalles' => implode(',', $ids)
+                            ]);
+
+                            // Abrir en nueva pestaña usando JavaScript
+                            $this->js("window.open('{$url}', '_blank')");
+                        }),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

@@ -8,6 +8,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\Pdf\ControlMaletaAsignacionController;
 use App\Http\Controllers\Pdf\DespachoController as PdfDespachoController;
 use App\Http\Controllers\Pdf\MaletaController;
 use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
@@ -72,13 +73,15 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     Route::get('/vehiculo/{id}/servicios', [VehiculoController::class, 'serviciosEjecutados'])->name('consulta.vehiculo.servicios');
 
     // PDF
-    Route::get('/admin/trabajos/pdf/{trabajo}/presupuesto', [PdfTrabajoController::class, 'presupuesto'])->name('trabajo.pdf.presupuesto');
-    Route::get('/admin/trabajos/pdf/{trabajo}/proforma', [PdfTrabajoController::class, 'proforma'])->name('trabajo.pdf.proforma');
-    Route::get('/admin/trabajos/pdf/{trabajo}/informe', [PdfTrabajoController::class, 'informe'])->name('trabajo.pdf.informe');
-    Route::get('/admin/evidencias/pdf/{trabajo}', [PdfTrabajoController::class, 'evidencia'])->name('trabajo.pdf.evidencia');
-    Route::get('/admin/despachos/pdf/{despacho}', [PdfDespachoController::class, 'downloadPdf'])->name('despachos.pdf');
-    Route::get('/admin/ventas/pdf/{venta}', [PdfVentaController::class, 'downloadPdf'])->name('ventas.pdf');
+    Route::get('/pdf/admin/trabajos/{trabajo}/presupuesto', [PdfTrabajoController::class, 'presupuesto'])->name('trabajo.pdf.presupuesto');
+    Route::get('/pdf/admin/trabajos/{trabajo}/proforma', [PdfTrabajoController::class, 'proforma'])->name('trabajo.pdf.proforma');
+    Route::get('/pdf/admin/trabajos/{trabajo}/informe', [PdfTrabajoController::class, 'informe'])->name('trabajo.pdf.informe');
+    Route::get('/pdf/admin/evidencias/{trabajo}', [PdfTrabajoController::class, 'evidencia'])->name('trabajo.pdf.evidencia');
+    Route::get('/pdf/admin/despachos/{despacho}', [PdfDespachoController::class, 'downloadPdf'])->name('despachos.pdf');
+    Route::get('/pdf/admin/ventas/{venta}', [PdfVentaController::class, 'downloadPdf'])->name('ventas.pdf');
     Route::get('/pdf/maletas/{maleta}', [MaletaController::class, 'show'])->name('pdf.maleta');
+    Route::get('/pdf/maletas/{maleta}/detalles/{detalles}', [MaletaController::class, 'detallesSeleccionados'])->name('pdf.maleta.detalles');
+    Route::get('/pdf/control-maletas/{control}', [ControlMaletaAsignacionController::class, 'show'])->name('pdf.control_maleta.asignacion');
 
     // Evidencias
     Route::get('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'index'])->name('gestion.evidencias.index');

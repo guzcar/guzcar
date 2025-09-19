@@ -21,6 +21,12 @@ class TrabajoInformePlantillaResource extends Resource
 
     protected static ?string $navigationGroup = 'Configuración de taller';
 
+    protected static ?string $modelLabel = 'Plantillas de informe';
+
+    protected static ?string $pluralModelLabel = 'Plantillas de informes';
+
+    protected static ?string $navigationLabel = 'Plantillas de informes';
+
     protected static ?int $navigationSort = 250;
 
     public static function form(Form $form): Form
@@ -54,6 +60,7 @@ class TrabajoInformePlantillaResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')
                     ->searchable()

@@ -23,8 +23,8 @@ class Maleta extends Model
         return $this->hasMany(MaletaDetalle::class, 'maleta_id');
     }
 
-    // public function controles()
-    // {
-    //     return $this->hasMany(ControlMaleta::class, 'maleta_id');
-    // }
+    public function controles()
+    {
+        return $this->hasMany(ControlMaleta::class, 'maleta_id');
+    }
 }

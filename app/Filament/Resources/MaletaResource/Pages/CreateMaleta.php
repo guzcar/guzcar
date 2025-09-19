@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateMaleta extends CreateRecord
 {
     protected static string $resource = MaletaResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->previousUrl ?? $this->getResource()::getUrl('index');
+    }
 }

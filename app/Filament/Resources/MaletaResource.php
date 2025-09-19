@@ -12,7 +12,12 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\ActionSize;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -50,6 +55,7 @@ class MaletaResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('codigo')
                     ->sortable()
@@ -68,12 +74,19 @@ class MaletaResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\Action::make('pdf')
+                Action::make('pdf')
                     ->label('Acta de entrega')
+                    ->button()
+                    ->size(ActionSize::Medium)
                     ->icon('heroicon-o-document-text')
                     ->url(fn(Maleta $record) => route('pdf.maleta', $record))
                     ->openUrlInNewTab(),
-                Tables\Actions\EditAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ])
+                    ->color('gray')
+                    ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

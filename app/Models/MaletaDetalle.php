@@ -35,13 +35,13 @@ class MaletaDetalle extends Model
         return $this->belongsTo(Herramienta::class, 'herramienta_id');
     }
 
-    // public function controlDetalles()
-    // {
-    //     return $this->hasMany(ControlMaletaDetalle::class, 'maleta_detalle_id');
-    // }
+    public function controlDetalles()
+    {
+        return $this->hasMany(ControlMaletaDetalle::class, 'maleta_detalle_id');
+    }
 
-    // public function incidencias()
-    // {
-    //     return $this->hasMany(HerramientaIncidencia::class, 'maleta_detalle_id');
-    // }
+    public function incidencias()
+    {
+        return $this->hasMany(HerramientaIncidencia::class, 'maleta_detalle_id');
+    }
 }

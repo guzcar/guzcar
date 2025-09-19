@@ -188,11 +188,11 @@
                     <td class="text-left" style="padding: 0px 0px 0px 0px; vertical-align: top;">
                         <img src="{{ public_path('images/logo-guzcar.jpg') }}" class="header-logo">
                     </td>
-                    <td class="text-center" style="vertical-align: middle; padding-right: 1rem;">
-                        <!-- <p class="header-title mt-0">AUTOMOTORES GUZCAR S.A.C.</p> -->
+                    <td class="text-left" style="vertical-align: middle; padding-right: 1rem;">
+                        <p class="header-title mt-0" style="margin-bottom: 4px;">AUTOMOTORES GUZCAR S.A.C.</p>
                         <p class="m-0">TELF: 919294602 - 998248543</p>
-                        <p class="m-0" style="text-transform: lowercase;">automotoresguzcar1@hotmail.com</p>
-                        <p class="mb-0">Prolog. Leoncio Prado N° 1575 - CHIMBOTE</p>
+                        <p class="m-0">CORREO: <span style="text-transform: lowercase;">automotoresguzcar1@hotmail.com</span></p>
+                        <p class="m-0">Prolog. Leoncio Prado N° 1575 - CHIMBOTE</p>
                     </td>
                     <td style="
                         border-radius: 10px;
@@ -213,10 +213,10 @@
                             width: calc(100% - 10px);
                             color: white;
                         ">
-                            <p class="bold mt-0">RUC: 20600613716</p>
+                            <p class="bold mt-0" style="margin-bottom: 4px;">RUC: 20600613716</p>
                             <p class="m-0">{{ $tipoReporte ?? 'REPORTE' }}</p>
                             <p class="m-0">N° {{ $code ?? 'CODIGO' }}</p>
-                            <!-- <p class="m-0">{{ date('d/m/Y h:i:s') }}</p> -->
+                            <p class="m-0">{{ date('d/m/Y h:i A') }}</p>
                         </div>
                     </td>
                 </tr>
