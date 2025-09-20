@@ -26,6 +26,7 @@ use DateTime;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
@@ -100,7 +101,7 @@ class TrabajoResource extends Resource
                     ->schema([
                         Section::make()
                             ->schema([
-                                
+
                                 TextInput::make('codigo')
                                     ->required()
                                     ->label('Código')
@@ -530,6 +531,38 @@ class TrabajoResource extends Resource
                             ->schema([
                                 Section::make()
                                     ->schema([
+                                        CheckboxList::make('checklist_ingreso')
+                                            ->searchable()
+                                            ->label('')
+                                            ->columns(2)
+                                            ->options([
+                                                't_propiedad' => 'T. Propiedad',
+                                                'soat' => 'SOAT',
+                                                'permiso_lunas' => 'Permiso Lunas',
+                                                'carnet_servicios' => 'Carnet de Servicios',
+                                                'manual_propietario' => 'Manual de Propietario',
+                                                'llavero' => 'Llavero',
+                                                'seg_ruedas' => 'Seg. Ruedas',
+                                                'seg_vasos' => 'Seg. Vasos',
+                                                'masc_radio' => 'Masc. Radio',
+                                                'encendedor' => 'Encendedor',
+                                                'pisos' => 'Pisos',
+                                                'funda_asiento' => 'Funda Asiento',
+                                                'plumillas' => 'Plumillas',
+                                                'antena' => 'Antena',
+                                                'vasos_ruedas' => 'Vasos Ruedas',
+                                                'emblemas' => 'Emblemas',
+                                                'llantas_repuesto' => 'Llantas Repuesto',
+                                                'tapas_fluido' => 'Tapas Fluido',
+                                                'kit_herramientas' => 'Kit Herramientas',
+                                                'gata_palancas' => 'Gata y Palancas',
+                                                'unidad_sucia' => 'Unidad Sucia',
+                                                'unidad_ok' => 'Unidad OK',
+                                            ])
+                                    ])
+                                    ->heading('Inventario de Vehículo'),
+                                Section::make()
+                                    ->schema([
                                         Repeater::make('tecnicos')
                                             ->label('')
                                             ->createItemButtonLabel('Añadir técnico')
@@ -781,11 +814,38 @@ class TrabajoResource extends Resource
                     ->label('Terminar')
                     ->color('success')
                     ->icon('heroicon-s-check')
-                    ->visible(fn(Trabajo $record) => is_null($record->fecha_salida)) // Visible solo si fecha_salida es null
-                    ->action(function (Trabajo $record) {
+                    ->visible(fn(Trabajo $record) => is_null($record->fecha_salida))
+                    ->form([
+                        Forms\Components\CheckboxList::make('checklist')
+                            ->label('Checklist de Verificación')
+                            ->options([
+                                'motor_fluido_1' => 'Nivel de aceite y fluidos en condiciones normales',
+                                'motor_fluido_2' => 'Sin fugas visibles en motor y sistema de refrigeración',
+                                'frenos_1' => 'Frenos funcionan correctamente (sin ruidos ni fallas)',
+                                'neumaticos_1' => 'Neumáticos en buen estado y bien inflados',
+                                'neumaticos_2' => 'Suspensión sin ruidos ni fallas',
+                                'electrico_1' => 'Luces y señales funcionan correctamente',
+                                'electrico_2' => 'Batería en buen estado',
+                                'prueba_1' => 'Vehículo arranca y funciona correctamente',
+                                'prueba_2' => 'No hay ruidos extraños ni problemas de manejo',
+                            ])
+                            ->required()
+                            ->columns(1)
+                            ->helperText('Debe marcar todas las opciones antes de terminar.'),
+                    ])
+                    ->requiresConfirmation() // Para abrir modal
+                    ->action(function (Trabajo $record, array $data) {
+                        $total = 9; // número total de checks
+                        if (count($data['checklist'] ?? []) < $total) {
+                            Notification::make()
+                                ->title('Debe completar todo el checklist antes de terminar.')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
 
                         $record->update([
-                            'fecha_salida' => now()
+                            'fecha_salida' => now(),
                         ]);
 
                         TrabajoService::actualizarTrabajoPorId($record);
