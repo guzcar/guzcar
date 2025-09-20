@@ -20,19 +20,19 @@ class InformesRelationManager extends RelationManager
             ->schema([
                 Forms\Components\RichEditor::make('contenido')
                     ->columnSpanFull()
-                    ->toolbarButtons([
-                        'blockquote',
-                        'bold',
-                        'bulletList',
-                        'heading',
-                        'italic',
-                        'link',
-                        'orderedList',
-                        'redo',
-                        'strike',
-                        'table',
-                        'undo',
-                    ])
+                    // ->toolbarButtons([
+                    //     'blockquote',
+                    //     'bold',
+                    //     'bulletList',
+                    //     'heading',
+                    //     'italic',
+                    //     'link',
+                    //     'orderedList',
+                    //     'redo',
+                    //     'strike',
+                    //     'table',
+                    //     'undo',
+                    // ])
                     ->extraInputAttributes(['style' => 'min-height: 60vh; max-height: 70vh;'])
                     ->required(),
             ]);

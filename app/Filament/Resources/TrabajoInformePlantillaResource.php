@@ -39,19 +39,19 @@ class TrabajoInformePlantillaResource extends Resource
 
                 Forms\Components\RichEditor::make('contenido')
                     ->columnSpanFull()
-                    ->toolbarButtons([
-                        'blockquote',
-                        'bold',
-                        'bulletList',
-                        'heading',
-                        'italic',
-                        'link',
-                        'orderedList',
-                        'redo',
-                        'strike',
-                        'table',
-                        'undo',
-                    ])
+                    // ->toolbarButtons([
+                    //     'blockquote',
+                    //     'bold',
+                    //     'bulletList',
+                    //     'heading',
+                    //     'italic',
+                    //     'link',
+                    //     'orderedList',
+                    //     'redo',
+                    //     'strike',
+                    //     'table',
+                    //     'undo',
+                    // ])
                     ->extraInputAttributes(['class' => 'max-h-96', 'style' => 'overflow-y: scroll;'])
                     ->required(),
             ]);

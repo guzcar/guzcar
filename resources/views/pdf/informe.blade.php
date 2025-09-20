@@ -5,7 +5,7 @@
     </div>
 
     @foreach($informes as $informe)
-        <div style="font-size: 13px; text-align: justify; text-justify: inter-word;">
+        <div style="font-size: 13px; text-align: justify; text-justify: inter-word; text-transform: none;">
             {!! $informe->contenido !!}
         </div>
     @endforeach

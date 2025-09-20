@@ -23,6 +23,7 @@ use App\Models\VehiculoModelo;
 use App\Services\TrabajoService;
 use Carbon\Carbon;
 use DateTime;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
@@ -99,6 +100,7 @@ class TrabajoResource extends Resource
                     ->schema([
                         Section::make()
                             ->schema([
+                                
                                 TextInput::make('codigo')
                                     ->required()
                                     ->label('Código')

@@ -33,19 +33,19 @@ class DescripcionTecnicosRelationManager extends RelationManager
                     ->preload(),
                 RichEditor::make('descripcion')
                     ->columnSpanFull()
-                    ->toolbarButtons([
-                        'blockquote',
-                        'bold',
-                        'bulletList',
-                        'heading',
-                        'italic',
-                        'link',
-                        'orderedList',
-                        'redo',
-                        'strike',
-                        'table',
-                        'undo',
-                    ])
+                    // ->toolbarButtons([
+                    //     'blockquote',
+                    //     'bold',
+                    //     'bulletList',
+                    //     'heading',
+                    //     'italic',
+                    //     'link',
+                    //     'orderedList',
+                    //     'redo',
+                    //     'strike',
+                    //     'table',
+                    //     'undo',
+                    // ])
                     ->required(),
             ]);
     }

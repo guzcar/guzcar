@@ -523,19 +523,19 @@ class ContabilidadResource extends Resource
                                             ->label('Garantía'),
                                         RichEditor::make('observaciones')
                                             ->label('Observaciones')
-                                            ->toolbarButtons([
-                                                'blockquote',
-                                                'bold',
-                                                'bulletList',
-                                                'heading',
-                                                'italic',
-                                                'link',
-                                                'orderedList',
-                                                'redo',
-                                                'strike',
-                                                'table',
-                                                'undo',
-                                            ]),
+                                            // ->toolbarButtons([
+                                            //     'blockquote',
+                                            //     'bold',
+                                            //     'bulletList',
+                                            //     'heading',
+                                            //     'italic',
+                                            //     'link',
+                                            //     'orderedList',
+                                            //     'redo',
+                                            //     'strike',
+                                            //     'table',
+                                            //     'undo',
+                                            // ]),
                                     ])
                                     ->heading('Detalles'),
                                 Section::make()

@@ -81,7 +81,7 @@
                     <tbody>
                         @forelse ($detalles as $detalle)
                             <tr>
-                                <td>{!! $detalle->descripcion !!}</td>
+                                <td>{!! nl2br(e($detalle->descripcion)) !!}</td>
                                 <td>
                                     <button type="button" class="btn btn-warning btn-editar me-2"
                                         data-id="{{ $detalle->id }}"
@@ -130,19 +130,11 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-
                         <div class="mb-3">
-                            <label for="descripcionEditor" class="form-label">Descripción del trabajo</label>
-
-                            <!-- Trix usa este input oculto como “source of truth” -->
-                            <input id="descripcion" type="hidden" name="descripcion" value="{{ old('descripcion') }}">
-
-                            <!-- Placeholder en el editor -->
-                            <trix-editor id="descripcionEditor" input="descripcion" class="trix-content"
-                                placeholder="Escribe aquí una descripción clara del trabajo realizado"
-                                aria-describedby="descripcionHelp"></trix-editor>
+                            <label for="descripcion" class="form-label">Descripción del trabajo</label>
+                            <textarea id="descripcion" name="descripcion" class="form-control" rows="10" 
+                                placeholder="Escribe aquí una descripción clara del trabajo realizado">{{ old('descripcion') }}</textarea>
                         </div>
-
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Guardar</button>
@@ -165,10 +157,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <label class="form-label">Descripción</label>
-
-                        <input id="descripcionEditar" type="hidden" name="descripcion">
-                        <trix-editor input="descripcionEditar" class="trix-content"></trix-editor>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea id="descripcionEditar" name="descripcion" class="form-control" rows="10"></textarea>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Guardar cambios</button>
@@ -201,108 +193,50 @@
         </div>
     </div>
 
-    @push('styles')
-        <link rel="stylesheet" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
-        <style>
-            /* === TOOLBAR: mostrar solo lo permitido === */
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // EDITAR
+            document.querySelectorAll('.btn-editar').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const url = btn.getAttribute('data-url');
+                    const raw = btn.getAttribute('data-descripcion');
 
-            /* Grupo de texto: ocultar todo... */
-            trix-toolbar [data-trix-button-group="text-tools"] .trix-button {
-                display: none !important;
-            }
+                    let descripcion = '';
+                    try { descripcion = raw ? JSON.parse(raw) : ''; }
+                    catch (e) { descripcion = raw ?? ''; }
 
-            /* ...y volver a mostrar B / I / strike */
-            trix-toolbar [data-trix-button-group="text-tools"] .trix-button[data-trix-attribute="bold"],
-            trix-toolbar [data-trix-button-group="text-tools"] .trix-button[data-trix-attribute="italic"],
-            trix-toolbar [data-trix-button-group="text-tools"] .trix-button[data-trix-attribute="strike"] {
-                display: inline-flex !important;
-            }
+                    const form = document.getElementById('editarDetalleForm');
+                    const textarea = document.getElementById('descripcionEditar');
 
-            /* Grupo de bloques: ocultar todo... */
-            trix-toolbar [data-trix-button-group="block-tools"] .trix-button {
-                display: none !important;
-            }
+                    form.action = url;
+                    textarea.value = descripcion || '';
 
-            /* ...y volver a mostrar bullets y numbers */
-            trix-toolbar [data-trix-button-group="block-tools"] .trix-button[data-trix-attribute="bullet"],
-            trix-toolbar [data-trix-button-group="block-tools"] .trix-button[data-trix-attribute="number"] {
-                display: inline-flex !important;
-            }
+                    const modal = new bootstrap.Modal(document.getElementById('editarDetalleModal'));
+                    modal.show();
 
-            /* Ocultar grupos que no usas */
-            trix-toolbar [data-trix-button-group="file-tools"],
-            trix-toolbar [data-trix-button-group="history-tools"],
-            trix-toolbar .trix-button-group-spacer {
-                display: none !important;
-            }
-
-            /* === EDITOR: más alto y con resize vertical === */
-            trix-editor {
-                min-height: 260px;
-                overflow: auto;
-                /* necesario para que funcione resize */
-                resize: vertical;
-                /* el usuario puede estirar/encoger en alto */
-            }
-        </style>
-    @endpush
-
-    @push('scripts')
-        <script src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
-        <script>
-            // Evita adjuntar archivos en Trix (opcional)
-            document.addEventListener('trix-file-accept', e => e.preventDefault());
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                // EDITAR
-                document.querySelectorAll('.btn-editar').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const url = btn.getAttribute('data-url');
-                        const raw = btn.getAttribute('data-descripcion');
-
-                        let descripcion = '';
-                        try { descripcion = raw ? JSON.parse(raw) : ''; }
-                        catch (e) { descripcion = raw ?? ''; }
-
-                        const form = document.getElementById('editarDetalleForm');
-                        const input = document.getElementById('descripcionEditar');
-                        const editor = document.querySelector('trix-editor[input="descripcionEditar"]');
-
-                        form.action = url;
-
-                        // Carga el HTML en el input y en el editor
-                        input.value = descripcion || '';
-                        // Trix necesita que le “inyectes” el HTML al editor:
-                        editor.editor.loadHTML(input.value);
-
-                        const modal = new bootstrap.Modal(document.getElementById('editarDetalleModal'));
-                        modal.show();
-
-                        // Enfoca el editor al abrir (pequeño delay para que monte bien)
-                        setTimeout(() => editor.focus(), 150);
-                    });
-                });
-
-                // ELIMINAR (igual que antes)
-                document.querySelectorAll('.btn-eliminar').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const url = btn.getAttribute('data-url');
-                        const form = document.getElementById('eliminarDetalleForm');
-                        form.action = url;
-                        new bootstrap.Modal(document.getElementById('eliminarDetalleModal')).show();
-                    });
-                });
-
-                // Accesibilidad: devolver focus al trigger
-                document.querySelectorAll('.modal').forEach(modal => {
-                    modal.addEventListener('hidden.bs.modal', function () {
-                        const trigger = document.querySelector(`[data-bs-target="#${modal.id}"]`);
-                        if (trigger) trigger.focus();
-                    });
+                    // Enfoca el textarea al abrir
+                    setTimeout(() => textarea.focus(), 150);
                 });
             });
-        </script>
-    @endpush
+
+            // ELIMINAR
+            document.querySelectorAll('.btn-eliminar').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const url = btn.getAttribute('data-url');
+                    const form = document.getElementById('eliminarDetalleForm');
+                    form.action = url;
+                    new bootstrap.Modal(document.getElementById('eliminarDetalleModal')).show();
+                });
+            });
+
+            // Accesibilidad: devolver focus al trigger
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('hidden.bs.modal', function () {
+                    const trigger = document.querySelector(`[data-bs-target="#${modal.id}"]`);
+                    if (trigger) trigger.focus();
+                });
+            });
+        });
+    </script>
 
 </x-layout>

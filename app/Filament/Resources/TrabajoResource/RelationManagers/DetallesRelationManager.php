@@ -23,19 +23,19 @@ class DetallesRelationManager extends RelationManager
             ->schema([
                 RichEditor::make('descripcion')
                     ->columnSpanFull()
-                    ->toolbarButtons([
-                        'blockquote',
-                        'bold',
-                        'bulletList',
-                        'heading',
-                        'italic',
-                        'link',
-                        'orderedList',
-                        'redo',
-                        'strike',
-                        'table',
-                        'undo',
-                    ])
+                    // ->toolbarButtons([
+                    //     'blockquote',
+                    //     'bold',
+                    //     'bulletList',
+                    //     'heading',
+                    //     'italic',
+                    //     'link',
+                    //     'orderedList',
+                    //     'redo',
+                    //     'strike',
+                    //     'table',
+                    //     'undo',
+                    // ])
                     ->extraInputAttributes(['style' => 'min-height: 60vh; max-height: 100vh; overflow-y: auto;'])
                     ->required(),
             ]);
