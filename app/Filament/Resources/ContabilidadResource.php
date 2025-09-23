@@ -523,19 +523,19 @@ class ContabilidadResource extends Resource
                                             ->label('Garantía'),
                                         RichEditor::make('observaciones')
                                             ->label('Observaciones')
-                                            // ->toolbarButtons([
-                                            //     'blockquote',
-                                            //     'bold',
-                                            //     'bulletList',
-                                            //     'heading',
-                                            //     'italic',
-                                            //     'link',
-                                            //     'orderedList',
-                                            //     'redo',
-                                            //     'strike',
-                                            //     'table',
-                                            //     'undo',
-                                            // ]),
+                                        // ->toolbarButtons([
+                                        //     'blockquote',
+                                        //     'bold',
+                                        //     'bulletList',
+                                        //     'heading',
+                                        //     'italic',
+                                        //     'link',
+                                        //     'orderedList',
+                                        //     'redo',
+                                        //     'strike',
+                                        //     'table',
+                                        //     'undo',
+                                        // ]),
                                     ])
                                     ->heading('Detalles'),
                                 Section::make()
@@ -1042,6 +1042,22 @@ class ContabilidadResource extends Resource
                             fn(Contabilidad $trabajo): string => route('trabajo.pdf.presupuesto', ['trabajo' => $trabajo]),
                             shouldOpenInNewTab: true
                         ),
+
+                    ActionGroup::make([
+                        Action::make('Presupuesto Servicios')
+                            ->icon('heroicon-o-document-currency-dollar')
+                            ->url(
+                                fn(Contabilidad $trabajo): string => route('trabajo.pdf.presupuesto-servicios', ['trabajo' => $trabajo]),
+                                shouldOpenInNewTab: true
+                            ),
+                        Action::make('Presupuesto Repuestos')
+                            ->icon('heroicon-o-document-currency-dollar')
+                            ->url(
+                                fn(Contabilidad $trabajo): string => route('trabajo.pdf.presupuesto-articulos-repuestos-otros', ['trabajo' => $trabajo]),
+                                shouldOpenInNewTab: true
+                            ),
+                    ])
+                        ->dropdown(false),
 
                     Action::make('Descargar proforma')
                         ->icon('heroicon-s-document')

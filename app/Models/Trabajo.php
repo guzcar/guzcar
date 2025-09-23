@@ -31,14 +31,12 @@ class Trabajo extends Model
         'igv',
         'garantia',
         'observaciones',
-        'checklist_ingreso',
     ];
 
     protected $casts = [
         'igv' => 'boolean',
         'fecha_ingreso' => 'datetime',
         'fecha_salida' => 'datetime',
-        'checklist_ingreso' => 'array',
     ];
 
     public function cliente()

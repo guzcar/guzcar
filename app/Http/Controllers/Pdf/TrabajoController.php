@@ -120,6 +120,169 @@ class TrabajoController extends Controller
         return $pdf->stream($fileName);
     }
 
+    public function presupuestoServicios($id)
+    {
+        $trabajo = Trabajo::with([
+            'servicios' => function ($query) {
+                $query->where('presupuesto', true)
+                    ->orderBy('sort');
+            },
+            'descuentos',
+            'cliente',
+            'vehiculo.clientes',
+        ])->find($id);
+
+        $clientePrincipal = $trabajo->cliente ?? $trabajo->vehiculo->clientes->first();
+        $vehiculo = $trabajo->vehiculo;
+
+        // Cálculo de tiempo (igual que en el original)
+        $fecha_ingreso = $trabajo->fecha_ingreso;
+        $fecha_salida = $trabajo->fecha_salida;
+
+        if (empty($fecha_salida)) {
+            $tiempo = "EN TALLER";
+        } else {
+            $fecha_ingreso = new DateTime($fecha_ingreso);
+            $fecha_salida = new DateTime($fecha_salida);
+            $diferencia = $fecha_ingreso->diff($fecha_salida);
+            $dias = $diferencia->days ?: 1;
+            $tiempo = $dias == 1 ? "{$dias} DÍA" : "{$dias} DÍAS";
+        }
+
+        // Subtotal solo de servicios
+        $subtotal_servicios = $trabajo->servicios->sum(function ($trabajoServicio) {
+            return $trabajoServicio->cantidad * $trabajoServicio->precio;
+        });
+
+        $total = $subtotal_servicios;
+
+        // Aplicar descuentos solo al total de servicios
+        $descuentos = $trabajo->descuentos;
+        $total_descuentos = 0;
+        $total_con_descuentos = $total;
+
+        if ($descuentos->isNotEmpty()) {
+            foreach ($descuentos as $descuento) {
+                $monto_descuento = $total * ($descuento->descuento / 100);
+                $total_descuentos += $monto_descuento;
+            }
+            $total_con_descuentos = $total - $total_descuentos;
+        }
+
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('pdf.presupuesto-servicios', compact(
+            'trabajo',
+            'vehiculo',
+            'tiempo',
+            'subtotal_servicios',
+            'total',
+            'descuentos',
+            'total_descuentos',
+            'total_con_descuentos',
+            'clientePrincipal'
+        ))->setPaper('A4', 'portrait');
+
+        $codenow = now()->format('ymdhis');
+        $fileName = "Presupuesto Servicios {$trabajo->codigo} - {$codenow}.pdf";
+
+        return $pdf->stream($fileName);
+    }
+
+    public function presupuestoArticulosRepuestosOtros($id)
+    {
+        $trabajo = Trabajo::with([
+            'trabajoArticulos' => function ($query) {
+                $query->where('presupuesto', true)
+                    ->orderBy('sort');
+            },
+            'trabajoArticulos.articulo.categoria',
+            'trabajoArticulos.articulo.subCategoria',
+            'trabajoArticulos.articulo.marca',
+            'trabajoArticulos.articulo.unidad',
+            'trabajoArticulos.articulo.presentacion',
+            'otros' => function ($query) {
+                $query->where('presupuesto', true)
+                    ->orderBy('sort');
+            },
+            'descuentos',
+            'cliente',
+            'vehiculo.clientes',
+        ])->find($id);
+
+        $clientePrincipal = $trabajo->cliente ?? $trabajo->vehiculo->clientes->first();
+        $vehiculo = $trabajo->vehiculo;
+
+        // Cálculo de tiempo (igual que en el original)
+        $fecha_ingreso = $trabajo->fecha_ingreso;
+        $fecha_salida = $trabajo->fecha_salida;
+
+        if (empty($fecha_salida)) {
+            $tiempo = "EN TALLER";
+        } else {
+            $fecha_ingreso = new DateTime($fecha_ingreso);
+            $fecha_salida = new DateTime($fecha_salida);
+            $diferencia = $fecha_ingreso->diff($fecha_salida);
+            $dias = $diferencia->days ?: 1;
+            $tiempo = $dias == 1 ? "{$dias} DÍA" : "{$dias} DÍAS";
+        }
+
+        // Agrupar artículos (igual que en el original)
+        $articulosAgrupados = $trabajo->trabajoArticulos->groupBy(function ($articulo) {
+            return $articulo->articulo_id . '-' . $articulo->precio;
+        })->map(function ($grupo) {
+            return [
+                'articulo' => $grupo->first()->articulo,
+                'precio' => $grupo->first()->precio,
+                'cantidad' => $grupo->sum('cantidad'),
+            ];
+        });
+
+        // Subtotal de artículos
+        $subtotal_articulos = $articulosAgrupados->sum(function ($articulo) {
+            return $articulo['cantidad'] * $articulo['precio'];
+        });
+
+        // Subtotal de otros
+        $subtotal_trabajo_otros = $trabajo->otros->sum(function ($trabajoOtro) {
+            return $trabajoOtro->cantidad * $trabajoOtro->precio;
+        });
+
+        $total = $subtotal_articulos + $subtotal_trabajo_otros;
+
+        // Aplicar descuentos
+        $descuentos = $trabajo->descuentos;
+        $total_descuentos = 0;
+        $total_con_descuentos = $total;
+
+        if ($descuentos->isNotEmpty()) {
+            foreach ($descuentos as $descuento) {
+                $monto_descuento = $total * ($descuento->descuento / 100);
+                $total_descuentos += $monto_descuento;
+            }
+            $total_con_descuentos = $total - $total_descuentos;
+        }
+
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->loadView('pdf.presupuesto-articulos-repuestos-otros', compact(
+            'trabajo',
+            'vehiculo',
+            'tiempo',
+            'subtotal_articulos',
+            'articulosAgrupados',
+            'subtotal_trabajo_otros',
+            'total',
+            'descuentos',
+            'total_descuentos',
+            'total_con_descuentos',
+            'clientePrincipal'
+        ))->setPaper('A4', 'portrait');
+
+        $codenow = now()->format('ymdhis');
+        $fileName = "Presupuesto Repuestos {$trabajo->codigo} - {$codenow}.pdf";
+
+        return $pdf->stream($fileName);
+    }
+
     public function proforma($id)
     {
         $trabajo = Trabajo::with([
@@ -222,7 +385,7 @@ class TrabajoController extends Controller
         ])->setPaper('A4', 'portrait');
 
         $fileName = "Informe {$trabajo->codigo}.pdf";
-// return view('pdf.informe', [
+        // return view('pdf.informe', [
 //             'trabajo' => $trabajo,
 //             'informes' => $trabajo->informes,
 //             'titulo' => $titulo

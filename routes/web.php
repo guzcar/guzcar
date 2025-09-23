@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\InventarioController;
 use App\Http\Controllers\ArticuloController;
 use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\Auth\AuthController;
@@ -58,6 +59,9 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     Route::post('/trabajos/finalizar/{trabajo}', [TrabajoController::class, 'finalizar'])->name('trabajos.finalizar');
     Route::delete('/trabajos/abandonar/{trabajo}', [TrabajoController::class, 'abandonar'])->name('trabajos.abandonar');
 
+    // Trabajos admin
+    // Route::get('admin/trabajos/{trabajo}/inventario', [InventarioController::class, ''])->name('admin.trabajos.inventario');
+
     // Articulos
     Route::get('/articulos', [ArticuloController::class, 'index'])->name('articulos');
     Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'trabajo'])->name('gestion.trabajos.articulos');
@@ -74,6 +78,10 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
 
     // PDF
     Route::get('/pdf/admin/trabajos/{trabajo}/presupuesto', [PdfTrabajoController::class, 'presupuesto'])->name('trabajo.pdf.presupuesto');
+    
+    Route::get('/pdf/admin/trabajos/{trabajo}/presupuesto-servicios', [PdfTrabajoController::class, 'presupuestoServicios'])->name('trabajo.pdf.presupuesto-servicios');
+    Route::get('/pdf/admin/trabajos/{trabajo}/presupuesto-articulos-repuestos-otros', [PdfTrabajoController::class, 'presupuestoArticulosRepuestosOtros'])->name('trabajo.pdf.presupuesto-articulos-repuestos-otros');
+    
     Route::get('/pdf/admin/trabajos/{trabajo}/proforma', [PdfTrabajoController::class, 'proforma'])->name('trabajo.pdf.proforma');
     Route::get('/pdf/admin/trabajos/{trabajo}/informe', [PdfTrabajoController::class, 'informe'])->name('trabajo.pdf.informe');
     Route::get('/pdf/admin/evidencias/{trabajo}', [PdfTrabajoController::class, 'evidencia'])->name('trabajo.pdf.evidencia');
