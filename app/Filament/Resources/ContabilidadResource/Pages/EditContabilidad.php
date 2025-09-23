@@ -37,6 +37,22 @@ class EditContabilidad extends EditRecord
                         shouldOpenInNewTab: true
                     ),
 
+                ActionGroup::make([
+                    Action::make('Presupuesto Servicios')
+                        ->icon('heroicon-o-document-currency-dollar')
+                        ->url(
+                            fn(Contabilidad $trabajo): string => route('trabajo.pdf.presupuesto-servicios', ['trabajo' => $trabajo]),
+                            shouldOpenInNewTab: true
+                        ),
+                    Action::make('Presupuesto Repuestos')
+                        ->icon('heroicon-o-document-currency-dollar')
+                        ->url(
+                            fn(Contabilidad $trabajo): string => route('trabajo.pdf.presupuesto-articulos-repuestos-otros', ['trabajo' => $trabajo]),
+                            shouldOpenInNewTab: true
+                        ),
+                ])
+                    ->dropdown(false),
+
                 Action::make('Descargar proforma')
                     ->icon('heroicon-s-document')
                     ->url(
