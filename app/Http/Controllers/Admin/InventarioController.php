@@ -22,6 +22,7 @@ class InventarioController extends Controller
             'aceite' => 'required|integer|min:0|max:100',
             'observaciones' => 'nullable|string',
             'symbols' => 'nullable|string',
+            'firma' => 'nullable|string', // Nuevo campo para la firma
         ]);
 
         // Preparar datos para guardar
@@ -31,6 +32,7 @@ class InventarioController extends Controller
             'aceite' => $request->aceite,
             'observaciones' => $request->observaciones,
             'symbols' => json_decode($request->symbols, true) ?? [],
+            'firma' => $request->firma, // Guardar la firma
         ];
 
         // Guardar en el campo correcto

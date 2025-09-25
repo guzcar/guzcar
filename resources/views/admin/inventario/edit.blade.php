@@ -3,6 +3,8 @@
 <head>
     <title>Inventario Vehículo - Trabajo #{{ $trabajo->id }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Incluir Signature Pad -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <style>
         .slider-vertical {
             writing-mode: bt-lr;
@@ -20,16 +22,34 @@
             font-weight: bold;
             font-size: 20px;
             user-select: none;
+            z-index: 10;
         }
         .symbol.O { color: blue; }
         .symbol.X { color: red; }
         .symbol.slash { color: orange; }
+        .symbol.selected {
+            border: 2px dashed #000;
+            border-radius: 4px;
+        }
+        
+        /* Estilos para la firma */
+        .signature-container {
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            background-color: white;
+        }
+        .signature-actions {
+            margin-top: 10px;
+        }
+        #signatureCanvas {
+            cursor: crosshair;
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-6">
     <div class="max-w-6xl mx-auto">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold">Inventario Vehículo - Trabajo #{{ $trabajo->id }}</h1>
+            <h1 class="text-2xl font-bold">Inventario Vehículo - {{ $trabajo->vehiculo->placa }}</h1>
             <a href="{{ route('filament.admin.resources.trabajos.edit', ['record' => $trabajo]) }}" 
                class="inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
                 ← Volver al Trabajo
@@ -154,6 +174,20 @@
                             </select>
                         </div>
 
+                        <div class="mb-4">
+                            <button type="button" 
+                                    id="delete-selected" 
+                                    class="inline-flex items-center px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 mr-2"
+                                    disabled>
+                                Eliminar Seleccionado
+                            </button>
+                            <button type="button" 
+                                    id="clear-symbols" 
+                                    class="inline-flex items-center px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">
+                                Limpiar Todos
+                            </button>
+                        </div>
+
                         <div class="canvas-container">
                             <img id="vehicle-image" 
                                  src="{{ asset('storage/' . $trabajo->vehiculo->tipoVehiculo->diagrama) }}" 
@@ -164,15 +198,27 @@
                             <!-- Aquí se agregarán los símbolos dinámicamente -->
                             <div id="symbols-container"></div>
                         </div>
-
-                        <button type="button" 
-                                id="clear-symbols" 
-                                class="mt-4 inline-flex items-center px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">
-                            Limpiar Símbolos
-                        </button>
                     @else
                         <p class="text-gray-500">No hay diagrama disponible para este vehículo</p>
                     @endif
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow">
+
+                    <!-- Firma -->
+                    <div class="mt-6">
+                        <label class="block font-medium mb-2">Firma</label>
+                        <div class="signature-container">
+                            <canvas id="signatureCanvas" width="300" height="150"></canvas>
+                        </div>
+                        <div class="signature-actions">
+                            <button type="button" id="clearSignature" class="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm">
+                                Limpiar Firma
+                            </button>
+                            <span id="signatureStatus" class="ml-2 text-sm text-gray-600">Firma no guardada</span>
+                        </div>
+                        <input type="hidden" name="firma" id="firmaInput" value="{{ $inventarioData['firma'] ?? '' }}">
+                    </div>
                 </div>
             </div>
 
@@ -195,9 +241,8 @@
             // Variables globales
             let checklistCount = {{ count($checklistItems) }};
             let symbols = {!! json_encode($inventarioData['symbols'] ?? []) !!};
-            let isDragging = false;
-            let currentSymbol = null;
-            let offsetX, offsetY;
+            let selectedSymbol = null;
+            let signaturePad = null;
 
             // 1. Funcionalidad del Checklist
             document.getElementById('add-checklist').addEventListener('click', function() {
@@ -242,6 +287,7 @@
             const symbolsContainer = document.getElementById('symbols-container');
             const symbolSelect = document.getElementById('symbol-select');
             const clearButton = document.getElementById('clear-symbols');
+            const deleteSelectedButton = document.getElementById('delete-selected');
 
             if (vehicleImage) {
                 // Cargar símbolos existentes
@@ -249,21 +295,38 @@
 
                 // Agregar nuevo símbolo al hacer clic en la imagen
                 vehicleImage.addEventListener('click', function(e) {
-                    const rect = vehicleImage.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    
-                    // Verificar que el clic esté dentro de la imagen
-                    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-                        addSymbol(x, y, symbolSelect.value);
+                    // Solo agregar símbolo si no se está arrastrando uno existente
+                    if (e.target === vehicleImage) {
+                        const rect = vehicleImage.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        
+                        // Verificar que el clic esté dentro de la imagen
+                        if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+                            addSymbol(x, y, symbolSelect.value);
+                        }
                     }
                 });
 
-                // Limpiar símbolos
+                // Limpiar todos los símbolos
                 if (clearButton) {
                     clearButton.addEventListener('click', function() {
                         symbols = [];
                         symbolsContainer.innerHTML = '';
+                        updateDeleteButtonState();
+                    });
+                }
+
+                // Eliminar símbolo seleccionado
+                if (deleteSelectedButton) {
+                    deleteSelectedButton.addEventListener('click', function() {
+                        if (selectedSymbol) {
+                            const symbolId = parseInt(selectedSymbol.dataset.id);
+                            symbols = symbols.filter(s => s.id !== symbolId);
+                            selectedSymbol.remove();
+                            selectedSymbol = null;
+                            updateDeleteButtonState();
+                        }
                     });
                 }
             }
@@ -279,6 +342,7 @@
                 
                 symbols.push(symbol);
                 renderSymbol(symbol);
+                updateDeleteButtonState();
             }
 
             function renderSymbol(symbol) {
@@ -292,51 +356,71 @@
                 // Hacer símbolo arrastrable
                 makeDraggable(symbolElement);
 
-                // Eliminar símbolo al hacer doble clic
-                symbolElement.addEventListener('dblclick', function() {
-                    symbols = symbols.filter(s => s.id != symbol.id);
-                    symbolElement.remove();
+                // Seleccionar símbolo al hacer clic
+                symbolElement.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Evitar que se active el clic en la imagen
+                    
+                    // Deseleccionar símbolo anterior
+                    if (selectedSymbol) {
+                        selectedSymbol.classList.remove('selected');
+                    }
+                    
+                    // Seleccionar nuevo símbolo
+                    selectedSymbol = symbolElement;
+                    selectedSymbol.classList.add('selected');
+                    updateDeleteButtonState();
                 });
 
                 symbolsContainer.appendChild(symbolElement);
             }
 
             function makeDraggable(element) {
+                let isDragging = false;
+                let offsetX, offsetY;
+
                 element.addEventListener('mousedown', function(e) {
                     isDragging = true;
-                    currentSymbol = element;
                     offsetX = e.offsetX;
                     offsetY = e.offsetY;
                     element.style.zIndex = 1000;
+                    
+                    // Seleccionar el símbolo al comenzar a arrastrar
+                    if (selectedSymbol) {
+                        selectedSymbol.classList.remove('selected');
+                    }
+                    selectedSymbol = element;
+                    selectedSymbol.classList.add('selected');
+                    updateDeleteButtonState();
+                    
+                    e.preventDefault(); // Prevenir selección de texto
                 });
 
                 document.addEventListener('mousemove', function(e) {
-                    if (!isDragging || !currentSymbol) return;
+                    if (!isDragging || !selectedSymbol) return;
 
                     const rect = vehicleImage.getBoundingClientRect();
                     let x = e.clientX - rect.left - offsetX;
                     let y = e.clientY - rect.top - offsetY;
 
                     // Mantener dentro de los límites de la imagen
-                    x = Math.max(0, Math.min(x, rect.width - currentSymbol.offsetWidth));
-                    y = Math.max(0, Math.min(y, rect.height - currentSymbol.offsetHeight));
+                    x = Math.max(0, Math.min(x, rect.width - selectedSymbol.offsetWidth));
+                    y = Math.max(0, Math.min(y, rect.height - selectedSymbol.offsetHeight));
 
-                    currentSymbol.style.left = (x / rect.width * 100) + '%';
-                    currentSymbol.style.top = (y / rect.height * 100) + '%';
+                    selectedSymbol.style.left = (x / rect.width * 100) + '%';
+                    selectedSymbol.style.top = (y / rect.height * 100) + '%';
                 });
 
                 document.addEventListener('mouseup', function() {
-                    if (isDragging && currentSymbol) {
+                    if (isDragging && selectedSymbol) {
                         // Actualizar posición en el array de símbolos
-                        const symbolId = parseInt(currentSymbol.dataset.id);
+                        const symbolId = parseInt(selectedSymbol.dataset.id);
                         const symbolIndex = symbols.findIndex(s => s.id === symbolId);
                         if (symbolIndex !== -1) {
-                            symbols[symbolIndex].x = currentSymbol.style.left;
-                            symbols[symbolIndex].y = currentSymbol.style.top;
+                            symbols[symbolIndex].x = selectedSymbol.style.left;
+                            symbols[symbolIndex].y = selectedSymbol.style.top;
                         }
                     }
                     isDragging = false;
-                    currentSymbol = null;
                 });
             }
 
@@ -346,7 +430,45 @@
                 });
             }
 
-            // 4. Preparar datos antes de enviar el formulario
+            function updateDeleteButtonState() {
+                if (deleteSelectedButton) {
+                    deleteSelectedButton.disabled = !selectedSymbol;
+                }
+            }
+
+            // 4. Funcionalidad de Firma
+            const canvas = document.getElementById('signatureCanvas');
+            if (canvas) {
+                signaturePad = new SignaturePad(canvas, {
+                    backgroundColor: 'rgb(255, 255, 255)',
+                    penColor: 'rgb(0, 0, 0)'
+                });
+
+                // Cargar firma existente si existe
+                const existingSignature = document.getElementById('firmaInput').value;
+                if (existingSignature) {
+                    signaturePad.fromDataURL(existingSignature);
+                    document.getElementById('signatureStatus').textContent = 'Firma guardada';
+                }
+
+                // Limpiar firma
+                document.getElementById('clearSignature').addEventListener('click', function() {
+                    signaturePad.clear();
+                    document.getElementById('firmaInput').value = '';
+                    document.getElementById('signatureStatus').textContent = 'Firma no guardada';
+                });
+
+                // Actualizar firma al dibujar
+                signaturePad.addEventListener('endStroke', function() {
+                    if (!signaturePad.isEmpty()) {
+                        const signatureData = signaturePad.toDataURL();
+                        document.getElementById('firmaInput').value = signatureData;
+                        document.getElementById('signatureStatus').textContent = 'Firma guardada';
+                    }
+                });
+            }
+
+            // 5. Preparar datos antes de enviar el formulario
             document.getElementById('inventarioForm').addEventListener('submit', function(e) {
                 // Serializar símbolos
                 const symbolsInput = document.createElement('input');
