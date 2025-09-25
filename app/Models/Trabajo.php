@@ -31,12 +31,14 @@ class Trabajo extends Model
         'igv',
         'garantia',
         'observaciones',
+        'inventario_vehiculo_ingreso',
     ];
 
     protected $casts = [
         'igv' => 'boolean',
         'fecha_ingreso' => 'datetime',
         'fecha_salida' => 'datetime',
+        'inventario_vehiculo_ingreso' =>'array'
     ];
 
     public function cliente()

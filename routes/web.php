@@ -60,7 +60,8 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     Route::delete('/trabajos/abandonar/{trabajo}', [TrabajoController::class, 'abandonar'])->name('trabajos.abandonar');
 
     // Trabajos admin
-    // Route::get('admin/trabajos/{trabajo}/inventario', [InventarioController::class, ''])->name('admin.trabajos.inventario');
+    Route::get('admin/trabajos/{trabajo}/inventario', [InventarioController::class, 'edit'])->name('admin.trabajos.inventario');
+    Route::post('admin/trabajos/{trabajo}/inventario', [InventarioController::class, 'update'])->name('admin.trabajos.inventario.update');
 
     // Articulos
     Route::get('/articulos', [ArticuloController::class, 'index'])->name('articulos');

@@ -12,6 +12,7 @@ class TipoVehiculo extends Model
 
     protected $fillable = [
         'nombre',
+        'diagrama',
     ];
 
     public function vehiculos()

@@ -6,6 +6,7 @@ use App\Filament\Resources\TipoVehiculoResource\Pages;
 use App\Filament\Resources\TipoVehiculoResource\RelationManagers;
 use App\Models\TipoVehiculo;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -18,6 +19,7 @@ use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -49,6 +51,9 @@ class TipoVehiculoResource extends Resource
                     ->unique(ignoreRecord: true)
                     ->required()
                     ->maxLength(50),
+                FileUpload::make('diagrama')
+                    ->directory('tipo_vehiculo')
+                    ->image(),
             ]);
     }
 
@@ -59,6 +64,9 @@ class TipoVehiculoResource extends Resource
             ->columns([
                 TextColumn::make('nombre')
                     ->searchable(),
+                ImageColumn::make('diagrama')
+                    ->height(100)
+                    ->placeholder('Sin diagrama'),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')

@@ -25,6 +25,14 @@ class EditTrabajo extends EditRecord
             // Actions\RestoreAction::make(),
             Actions\ViewAction::make()
                 ->icon('heroicon-o-eye'),
+
+            // TODO: Buscar una mejor terminologia
+            Action::make('Ver Inventario')
+                ->icon('heroicon-o-archive-box') // Puedes cambiar el ícono si quieres
+                ->url(fn(Trabajo $trabajo) => route('admin.trabajos.inventario', ['trabajo' => $trabajo]))
+                ->color('warning') // Opcional: para dar estilo
+                ->label('Inventario'),
+
             ActionGroup::make([
                 Action::make('Descargar informe')
                     ->icon('heroicon-s-document-text')

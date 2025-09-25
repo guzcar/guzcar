@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tipo_vehiculos', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 50)->unique();
+            $table->string('diagrama');
             $table->timestamps();
             $table->softDeletes();
         });
