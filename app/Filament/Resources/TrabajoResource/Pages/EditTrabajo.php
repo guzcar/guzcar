@@ -28,12 +28,18 @@ class EditTrabajo extends EditRecord
 
             // TODO: Buscar una mejor terminologia
             Action::make('Ver Inventario')
-                ->icon('heroicon-o-archive-box') // Puedes cambiar el ícono si quieres
+                ->icon('heroicon-o-truck')
                 ->url(fn(Trabajo $trabajo) => route('admin.trabajos.inventario', ['trabajo' => $trabajo]))
-                ->color('warning') // Opcional: para dar estilo
+                ->color('warning')
                 ->label('Inventario'),
 
             ActionGroup::make([
+                // Action::make('Descargar Check List')
+                //     ->url(
+                //         fn(Trabajo $trabajo): string => route('pdf.admin.inventario.ingreso', ['trabajo' => $trabajo]),
+                //         shouldOpenInNewTab: true
+                //     ),
+
                 Action::make('Descargar informe')
                     ->icon('heroicon-s-document-text')
                     ->url(

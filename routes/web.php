@@ -1,14 +1,13 @@
 <?php
 
 use App\Http\Controllers\Admin\InventarioController;
+use App\Http\Controllers\Admin\Pdf\InventarioController as PdfInventarioController;
 use App\Http\Controllers\ArticuloController;
 use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\ChatController;
 use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\MessageController;
 use App\Http\Controllers\Pdf\ControlMaletaAsignacionController;
 use App\Http\Controllers\Pdf\DespachoController as PdfDespachoController;
 use App\Http\Controllers\Pdf\MaletaController;
@@ -62,6 +61,9 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     // Trabajos admin
     Route::get('admin/trabajos/{trabajo}/inventario', [InventarioController::class, 'edit'])->name('admin.trabajos.inventario');
     Route::post('admin/trabajos/{trabajo}/inventario', [InventarioController::class, 'update'])->name('admin.trabajos.inventario.update');
+
+    // PDF Admin
+    Route::get('pdf/admin/trabajos/{trabajo}/inventario', [PdfInventarioController::class, 'ingreso'])->name('pdf.admin.inventario.ingreso');
 
     // Articulos
     Route::get('/articulos', [ArticuloController::class, 'index'])->name('articulos');

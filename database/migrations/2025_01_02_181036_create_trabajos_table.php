@@ -44,6 +44,7 @@ return new class extends Migration {
             $table->boolean('igv')->default(false);
             $table->string('garantia')->nullable();
             $table->text('observaciones')->nullable();
+            $table->jsonb('inventario_vehiculo_ingreso')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
