@@ -24,4 +24,15 @@ class CreateTrabajo extends CreateRecord
 
         return $resource::getUrl('index');
     }
+
+    /**
+     * Configura la acción del botón de cancelar para que redirija al index.
+     */
+    protected function getCancelFormAction(): Actions\Action
+    {
+        return Actions\Action::make('cancel')
+            ->label(__('filament-panels::resources/pages/create-record.form.actions.cancel.label'))
+            ->url($this->getResource()::getUrl('index'))
+            ->color('gray');
+    }
 }

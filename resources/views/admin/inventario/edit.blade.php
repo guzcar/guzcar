@@ -337,7 +337,7 @@
     <div class="max-w-7xl mx-auto">
         <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <div>
-                <h1 class="text-2xl text-gray-800"><b>{{ $trabajo->vehiculo->placa }}</b> {{ $trabajo->vehiculo->tipoVehiculo->nombre }} {{ $trabajo->vehiculo->marca->nombre }} {{ $trabajo->vehiculo->modelo->nombre }}</h1>
+                <h1 class="text-2xl text-gray-800"><b>{{ $trabajo->vehiculo?->placa }}</b> {{ $trabajo->vehiculo->tipoVehiculo?->nombre }} {{ $trabajo->vehiculo->marca?->nombre }} {{ $trabajo->vehiculo->modelo?->nombre }}</h1>
                 <h3 class="text-lg text-gray-600 mt-1">CHECK LIST - INGRESO DE VEHÍCULO</h3>
             </div>
             <a href="{{ route('filament.admin.resources.trabajos.edit', ['record' => $trabajo]) }}"

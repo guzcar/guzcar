@@ -64,7 +64,18 @@ class EditTrabajo extends EditRecord
 
     protected function getRedirectUrl(): string
     {
-        return $this->previousUrl ?? $this->getResource()::getUrl('index');
+        return $this->getResource()::getUrl('index');
+    }
+
+    /**
+     * Configura la acción del botón de cancelar para que redirija al index.
+     */
+    protected function getCancelFormAction(): Actions\Action
+    {
+        return Actions\Action::make('cancel')
+            ->label(__('filament-panels::resources/pages/edit-record.form.actions.cancel.label'))
+            ->url($this->getResource()::getUrl('index'))
+            ->color('gray');
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
