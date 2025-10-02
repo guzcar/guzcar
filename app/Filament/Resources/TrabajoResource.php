@@ -100,7 +100,7 @@ class TrabajoResource extends Resource
                     ->schema([
                         Section::make()
                             ->schema([
-                                
+
                                 TextInput::make('codigo')
                                     ->required()
                                     ->label('Código')
@@ -682,12 +682,34 @@ class TrabajoResource extends Resource
                     ->sortable()
                     ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('vehiculo.clientes.nombre')
-                    ->placeholder('Sin Clientes')
-                    ->searchable(isIndividual: true)
+                TextColumn::make('clientes_display')
+                    ->label('Clientes')
+                    ->searchable(
+                        isIndividual: true,
+                        query: function (Builder $query, string $search): Builder {
+                            return $query->whereHas('vehiculo.propietarios.cliente', function ($q) use ($search) {
+                                $q->where('nombre', 'like', "%{$search}%");
+                            });
+                        }
+                    )
                     ->badge()
                     ->wrap()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->placeholder('Sin Clientes')
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->getStateUsing(function ($record) {
+                        $clientes = $record->vehiculo->propietarios->map(function ($propietario) {
+                            $cliente = $propietario->cliente;
+
+                            if (!empty($cliente->telefono)) {
+                                $telefonoFormateado = self::formatearTelefono($cliente->telefono);
+                                return "{$cliente->nombre} ({$telefonoFormateado})";
+                            }
+
+                            return $cliente->nombre;
+                        });
+
+                        return $clientes->isNotEmpty() ? $clientes->toArray() : null;
+                    }),
                 TextColumn::make('descripcion_servicio')
                     ->searchable(isIndividual: true)
                     ->wrap()
@@ -934,5 +956,34 @@ class TrabajoResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    private static function formatearTelefono($telefono)
+    {
+        if (empty($telefono)) {
+            return $telefono;
+        }
+
+        // Limpiar el teléfono
+        $telefonoLimpio = preg_replace('/[^0-9+]/', '', $telefono);
+
+        // Extraer solo los números (sin el código de país)
+        $numero = null;
+
+        if (str_starts_with($telefonoLimpio, '+51') && strlen($telefonoLimpio) === 12) {
+            $numero = substr($telefonoLimpio, 3);
+        } elseif (str_starts_with($telefonoLimpio, '51') && strlen($telefonoLimpio) === 11) {
+            $numero = substr($telefonoLimpio, 2);
+        } elseif (str_starts_with($telefonoLimpio, '9') && strlen($telefonoLimpio) === 9) {
+            $numero = $telefonoLimpio;
+        }
+
+        // Si encontramos un número peruano, formatearlo
+        if ($numero && strlen($numero) === 9) {
+            return '+51 ' . substr($numero, 0, 3) . ' ' . substr($numero, 3, 3) . ' ' . substr($numero, 6, 3);
+        }
+
+        // Para otros formatos, devolver el original
+        return $telefono;
     }
 }
