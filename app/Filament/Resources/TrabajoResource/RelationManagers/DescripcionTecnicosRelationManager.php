@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TrabajoResource\RelationManagers;
 use Filament\Forms;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -24,15 +25,15 @@ class DescripcionTecnicosRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Select::make('user_id')
-                    ->label('Técnico')
-                    ->default(Auth::user()->id)
-                    ->relationship('user', 'name')
-                    ->searchable()
-                    ->disabledOn('edit')
-                    ->preload(),
-                RichEditor::make('descripcion')
+                // Select::make('user_id')
+                //     ->label('Técnico')
+                //     ->default(Auth::user()->id)
+                //     ->relationship('user', 'name')
+                //     ->searchable()
+                //     ->preload(),
+                Textarea::make('descripcion')
                     ->columnSpanFull()
+                    ->rows(8)
                     // ->toolbarButtons([
                     //     'blockquote',
                     //     'bold',
@@ -53,30 +54,42 @@ class DescripcionTecnicosRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('descripcion')
                     ->sortable()
+                    ->searchable()
                     ->copyable()
+                    ->wrap()
+                    ->lineClamp(5)
+                    ->extraAttributes(['style' => 'width: 15rem'])
                     ->html(),
                 TextColumn::make('user.name')
                     ->label('Técnico')
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i A')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                    ->label('Crear'),
+                    ->label('Nueva descripción')
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $data['user_id'] = auth()->id();
+                        return $data;
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->button(),
+                Tables\Actions\DeleteAction::make()
+                    ->button()
                 // ActionGroup::make([
                 //     Tables\Actions\EditAction::make(),
                 //     Tables\Actions\DeleteAction::make(),
