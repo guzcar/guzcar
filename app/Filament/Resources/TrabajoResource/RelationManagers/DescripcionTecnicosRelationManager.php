@@ -62,7 +62,7 @@ class DescripcionTecnicosRelationManager extends RelationManager
                     ->copyable()
                     ->wrap()
                     ->lineClamp(5)
-                    ->extraAttributes(['style' => 'width: 15rem'])
+                    ->extraAttributes(['style' => 'min-width: 15rem'])
                     ->html(),
                 TextColumn::make('user.name')
                     ->label('Técnico')
