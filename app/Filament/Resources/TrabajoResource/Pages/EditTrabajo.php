@@ -29,9 +29,17 @@ class EditTrabajo extends EditRecord
             // TODO: Buscar una mejor terminologia
             Action::make('Ver Inventario')
                 ->icon('heroicon-o-truck')
-                ->url(fn(Trabajo $trabajo) => route('admin.trabajos.inventario', ['trabajo' => $trabajo]))
                 ->color('warning')
-                ->label('Inventario'),
+                ->label('Inventario')
+                ->action(function () {
+                    // 1. Guarda los datos del formulario (esto no cambia).
+                    $this->save();
+
+                    // 2. ✅ Redirige a tu ruta nombrada de Laravel.
+                    return redirect()->route('admin.trabajos.inventario', [
+                        'trabajo' => $this->getRecord()
+                    ]);
+                }),
 
             ActionGroup::make([
                 // Action::make('Descargar Check List')

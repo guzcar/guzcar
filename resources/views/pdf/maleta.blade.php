@@ -2,7 +2,7 @@
 
     <h1>ACTA DE ENTREGA - MALETA DE HERRAMIENTAS</h1>
 
-    <ol>
+    <ol style="text-transform: none">
         <li>
             <p><b>Información general</b></p>
             <p>Por la presente se hace constancia de la entrega de maletas de herramientas para que cada trabajador

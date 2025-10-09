@@ -29,7 +29,7 @@ class HerramientaResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
 
-    protected static ?int $navigationSort = 50;
+    protected static ?int $navigationSort = 200;
 
     public static function form(Form $form): Form
     {
