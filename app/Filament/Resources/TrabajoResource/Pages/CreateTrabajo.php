@@ -37,7 +37,7 @@ class CreateTrabajo extends CreateRecord
         if ($trabajoExistente) {
             Notification::make()
                 ->title('Error')
-                ->body('Este vehículo ya tiene un trabajo en registrado en curso.')
+                ->body('Este vehículo ya tiene un trabajo registrado en curso.')
                 ->danger()
                 ->send();
 
