@@ -31,6 +31,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -426,6 +427,10 @@ class SalidaResource extends Resource
                         ->offIcon('heroicon-c-x-mark'),
                 ]),
                 ColumnGroup::make('Artículo', [
+                    ColorColumn::make('articulo.grupo.color')
+                        ->alignCenter()
+                        ->placeholder('S.G.')
+                        ->toggleable(isToggledHiddenByDefault: false),
                     TextColumn::make('articulo')
                         ->label('Descripción del artículo')
                         ->state(function (TrabajoArticulo $record) {

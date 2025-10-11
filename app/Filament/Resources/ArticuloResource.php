@@ -25,7 +25,9 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -34,6 +36,7 @@ use Filament\Tables\Actions\ForceDeleteAction;
 use Filament\Tables\Actions\ForceDeleteBulkAction;
 use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -193,6 +196,10 @@ class ArticuloResource extends Resource
                             ->schema([
                                 Section::make()
                                     ->schema([
+                                        Select::make('grupo')
+                                            ->relationship('grupo', 'nombre')
+                                            ->searchable()
+                                            ->preload(),
                                         Repeater::make('articuloUbicaciones')
                                             ->label('Ubicaciones')
                                             ->relationship('articuloUbicaciones')
@@ -256,6 +263,10 @@ class ArticuloResource extends Resource
         return $table
             ->searchOnBlur(true)
             ->columns([
+                ColorColumn::make('grupo.color')
+                    ->alignCenter()
+                    ->placeholder('S.G.')
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('categoria.nombre')
                     ->label('Artículo')
                     ->sortable()
@@ -367,6 +378,27 @@ class ArticuloResource extends Resource
                 ForceDeleteAction::make(),
             ])
             ->bulkActions([
+
+                BulkAction::make('cambiar_grupo')
+                    ->label('Cambiar Grupo')
+                    ->color('gray')
+                    ->form([
+                        Select::make('grupo_id')
+                            ->label('Grupo')
+                            ->options(\App\Models\ArticuloGrupo::pluck('nombre', 'id'))
+                            ->searchable()
+                            ->required()
+                            ->placeholder('Selecciona un grupo')
+                    ])
+                    ->action(function (array $data, \Illuminate\Database\Eloquent\Collection $records): void {
+                        foreach ($records as $record) {
+                            $record->update([
+                                'grupo_id' => $data['grupo_id']
+                            ]);
+                        }
+                    })
+                    ->deselectRecordsAfterCompletion()
+                    ->modalWidth(MaxWidth::Large),
                 ExportBulkAction::make(),
                 // BulkActionGroup::make([
                 //     DeleteBulkAction::make(),

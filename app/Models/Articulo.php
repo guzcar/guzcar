@@ -26,6 +26,7 @@ class Articulo extends Model
         'abiertos',
         'mermas',
         'fraccionable',
+        'grupo_id',
     ];
 
     public function categoria()
@@ -68,5 +69,10 @@ class Articulo extends Model
         return $this->belongsToMany(Trabajo::class, 'trabajo_articulos', 'articulo_id', 'trabajo_id')
             ->withPivot(['fecha', 'hora', 'precio', 'cantidad', 'tecnico_id', 'responsable_id', 'movimiento', 'observacion'])
             ->withTimestamps();
+    }
+
+    public function grupo()
+    {
+        return $this->belongsTo(ArticuloGrupo::class, 'grupo_id');
     }
 }

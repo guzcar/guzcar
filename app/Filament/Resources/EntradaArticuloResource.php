@@ -23,6 +23,12 @@ class EntradaArticuloResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-arrow-down-on-square-stack';
 
+    protected static ?string $modelLabel = 'Entrada de artículo';
+
+    protected static ?string $pluralModelLabel = 'Entradas de artículos';
+
+    protected static ?string $navigationLabel = 'Entradas de artículos';
+
     public static function form(Form $form): Form
     {
         // No solicitaste formulario de create/edit; lo dejamos vacío.

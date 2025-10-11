@@ -3,7 +3,9 @@
 namespace App\Filament\Resources\TrabajoResource\Pages;
 
 use App\Filament\Resources\TrabajoResource;
+use App\Models\Trabajo;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateTrabajo extends CreateRecord
@@ -25,9 +27,26 @@ class CreateTrabajo extends CreateRecord
         return $resource::getUrl('index');
     }
 
-    /**
-     * Configura la acción del botón de cancelar para que redirija al index.
-     */
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        // Verificar si ya existe un trabajo activo para este vehículo
+        $trabajoExistente = Trabajo::where('vehiculo_id', $data['vehiculo_id'])
+            ->whereNull('fecha_salida')
+            ->exists();
+
+        if ($trabajoExistente) {
+            Notification::make()
+                ->title('Error')
+                ->body('Este vehículo ya tiene un trabajo en registrado en curso.')
+                ->danger()
+                ->send();
+
+            $this->halt();
+        }
+
+        return $data;
+    }
+
     protected function getCancelFormAction(): Actions\Action
     {
         return Actions\Action::make('cancel')
