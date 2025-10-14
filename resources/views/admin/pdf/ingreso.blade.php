@@ -1,186 +1,223 @@
-<x-pdf-layout title="Chack List Ingreso de Vehículo" code="123" tipoReporte="CHECK LIST">
-    <div class="mb-6">
-        <!-- Header con información del vehículo -->
-        <div class="border-b border-gray-300 pb-4 mb-4">
-            <table class="w-full">
+<x-pdf-layout title="Check List Ingreso de Vehículo" code="{{ $codigo }}" tipoReporte="CHECK LIST">
+
+    <style>
+        .checklist-item {
+            margin-bottom: 3px;
+        }
+
+        .level-bar {
+            width: 80%;
+            height: 12px;
+            border: 1px solid #000;
+            background: #f0f0f0;
+            margin: 5px 0;
+        }
+
+        .level-fill {
+            height: 100%;
+            background: #333;
+        }
+
+        .diagram-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .diagram-image {
+            width: 100%;
+            height: 100%;
+        }
+
+        .symbol {
+            position: absolute;
+            font-weight: bold;
+            font-size: 16px;
+            transform: translate(-50%, -50%);
+        }
+
+        .symbol-O {
+            color: blue;
+        }
+
+        .symbol-X {
+            color: red;
+        }
+
+        .symbol-slash {
+            color: orange;
+        }
+
+        .signature-box {
+            width: 100%;
+            height: 60px;
+        }
+    </style>
+
+    <h3>CLIENTE</h3>
+
+    <table class="table-void">
+        <tbody>
+            <tr>
+                <td style="width: 14%;">DNI / RUC:</td>
+                <td style="width: 34%; border-bottom: dotted black 1px;">{{ $clientePrincipal?->identificador ?? '' }}
+                </td>
+                <td style="width: 18%; padding-left: 1rem;">TELÉFONO:</td>
+                <td style="width: 34%; border-bottom: dotted black 1px;">{{ $clientePrincipal?->telefono ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>CLIENTE:</td>
+                <td colspan="3" style="border-bottom: dotted black 1px;">{{ $clientePrincipal?->nombre ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>DIRECCIÓN:</td>
+                <td colspan="3" style="border-bottom: dotted black 1px;">{{ $clientePrincipal?->direccion ?? '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>DATOS DE LA UNIDAD</h3>
+
+    <table class="table-void">
+        <tbody>
+            <tr>
+                <td style="width: 14%;">PLACA:</td>
+                <td style="width: 34%; border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->placa ?? '' }}</td>
+                <td style="width: 18%; padding-left: 1rem;">VIN / CHASIS:</td>
+                <td style="width: 34%; border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->vin ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>TIPO:</td>
+                <td style="border-bottom: dotted black 1px;">{{ $trabajo->vehiculo->tipoVehiculo?->nombre ?? '' }}</td>
+                <td style="padding-left: 1rem;">MOTOR:</td>
+                <td style="border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->motor ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>MARCA:</td>
+                <td style="border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->marca?->nombre ?? '' }}</td>
+                <td style="padding-left: 1rem;">AÑO:</td>
+                <td style="border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->ano ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>MODELO:</td>
+                <td style="border-bottom: dotted black 1px;">{{ $trabajo->vehiculo?->modelo?->nombre ?? '' }}</td>
+                <td style="padding-left: 1rem;">KILOMETRAJE:</td>
+                <td style="border-bottom: dotted black 1px;">{{ $trabajo?->kilometraje ?? '' }}</td>
+            </tr>
+            @if ($trabajo->conductor)
                 <tr>
-                    <td class="w-1/2">
-                        <h1 class="text-lg font-bold">{{ $trabajo->vehiculo->placa ?? 'N/A' }}</h1>
-                        <p class="text-sm text-gray-600">
-                            {{ $trabajo->vehiculo->tipoVehiculo->nombre ?? '' }} 
-                            {{ $trabajo->vehiculo->marca->nombre ?? '' }} 
-                            {{ $trabajo->vehiculo->modelo->nombre ?? '' }}
-                        </p>
-                    </td>
-                    <td class="w-1/2 text-right">
-                        <p class="text-sm"><strong>Fecha:</strong> {{ $fecha }}</p>
-                        <p class="text-sm"><strong>Checklist:</strong> Ingreso de Vehículo</p>
-                    </td>
+                    <td>CONDUCTOR:</td>
+                    <td colspan="3" style="border-bottom: dotted black 1px;">{{ $trabajo->conductor?->nombre ?? '' }}</td>
                 </tr>
-            </table>
-        </div>
-
-        <!-- Lista de Items de Inventario -->
-        <div class="mb-6">
-            <h2 class="text-md font-bold bg-gray-100 p-2 mb-3">INVENTARIO DE VEHÍCULO</h2>
-            
-            <!-- Items por defecto -->
-            <div class="mb-4">
-                <h3 class="text-sm font-semibold mb-2">Items Predefinidos:</h3>
-                <div class="grid grid-cols-2 gap-2">
-                    @foreach($itemsDefault as $item)
-                        <div class="flex items-center text-sm">
-                            <span class="w-4 h-4 border border-gray-400 mr-2 flex items-center justify-center">
-                                @if($item['checked'])
-                                    ✓
-                                @endif
-                            </span>
-                            <span>{{ $item['nombre'] }}</span>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Items personalizados -->
-            @if($itemsCustom->count() > 0)
-            <div class="mb-4">
-                <h3 class="text-sm font-semibold mb-2">Items Adicionales:</h3>
-                <div class="grid grid-cols-2 gap-2">
-                    @foreach($itemsCustom as $item)
-                        <div class="flex items-center text-sm">
-                            <span class="w-4 h-4 border border-gray-400 mr-2 flex items-center justify-center">
-                                @if($item['checked'])
-                                    ✓
-                                @endif
-                            </span>
-                            <span>{{ $item['nombre'] }}</span>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
             @endif
-        </div>
+        </tbody>
+    </table>
 
-        <!-- Niveles y Observaciones -->
-        <div class="mb-6">
-            <h2 class="text-md font-bold bg-gray-100 p-2 mb-3">NIVELES Y OBSERVACIONES</h2>
-            
-            <div class="grid grid-cols-2 gap-6">
-                <!-- Niveles de Combustible y Aceite -->
-                <div>
-                    <div class="mb-4">
-                        <h3 class="text-sm font-semibold mb-2">Combustible: {{ $combustible }}%</h3>
-                        <div class="flex items-center h-6 bg-gray-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-blue-500" style="width: {{ $combustible }}%"></div>
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-600 mt-1">
-                            <span>E</span>
-                            <span>¼</span>
-                            <span>½</span>
-                            <span>¾</span>
-                            <span>F</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h3 class="text-sm font-semibold mb-2">Aceite: {{ $aceite }}%</h3>
-                        <div class="flex items-center h-6 bg-gray-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-green-500" style="width: {{ $aceite }}%"></div>
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-600 mt-1">
-                            <span>E</span>
-                            <span>¼</span>
-                            <span>½</span>
-                            <span>¾</span>
-                            <span>F</span>
-                        </div>
-                    </div>
-                </div>
+    <h3>INVENTARIO DE VEHICULO</h3>
 
-                <!-- Observaciones -->
-                <div>
-                    <h3 class="text-sm font-semibold mb-2">Observaciones:</h3>
-                    <div class="border border-gray-300 rounded p-3 min-h-32 text-sm">
-                        @if($observaciones)
-                            {!! nl2br(e($observaciones)) !!}
-                        @else
-                            <span class="text-gray-400">Sin observaciones</span>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
+    @php
+        $inventarioData = $trabajo->inventario_vehiculo_ingreso ?? [];
+        $checklistItems = $inventarioData['checklist'] ?? [];
+        $checkedItems = collect($checklistItems)->where('checked', true);
+        $symbols = $inventarioData['symbols'] ?? [];
+    @endphp
 
-        <!-- Diagrama del Vehículo -->
-        <div class="mb-6">
-            <h2 class="text-md font-bold bg-gray-100 p-2 mb-3">DIAGRAMA DEL VEHÍCULO</h2>
-            
-            @if($trabajo->vehiculo?->tipoVehiculo?->diagrama)
-                <div class="border border-gray-300 p-4 text-center">
-                    <!-- Aquí iría la imagen del diagrama con los símbolos -->
-                    <div style="position: relative; max-width: 400px; margin: 0 auto;">
-                        <!-- Nota: En un entorno real, necesitarías generar una imagen del diagrama con los símbolos -->
-                        <p class="text-sm text-gray-600 mb-2">Diagrama del vehículo con anotaciones</p>
-                        
-                        <!-- Mostrar símbolos utilizados -->
-                        @if(count($symbols) > 0)
-                        <div class="mt-3">
-                            <h4 class="text-sm font-semibold mb-2">Símbolos utilizados:</h4>
-                            <div class="flex justify-center gap-4 text-sm">
-                                @foreach($symbols as $symbol)
-                                    <div class="flex items-center">
-                                        <span class="font-bold mx-1 
-                                            @if($symbol['type'] == 'O') text-blue-600
-                                            @elseif($symbol['type'] == 'X') text-red-600
-                                            @elseif($symbol['type'] == '//') text-orange-600
-                                            @endif">
-                                            {{ $symbol['type'] }}
-                                        </span>
-                                        <span class="text-xs">
-                                            @if($symbol['type'] == 'O') Abolladura
-                                            @elseif($symbol['type'] == 'X') Quiñe
-                                            @elseif($symbol['type'] == '//') Rayadura
-                                            @endif
-                                        </span>
-                                    </div>
-                                @endforeach
-                            </div>
-                            <p class="text-xs text-gray-500 mt-2">
-                                Total de anotaciones: {{ count($symbols) }}
-                            </p>
-                        </div>
-                        @else
-                            <p class="text-sm text-gray-500">No se realizaron anotaciones en el diagrama</p>
-                        @endif
-                    </div>
-                </div>
-            @else
-                <p class="text-sm text-gray-500 text-center py-4">No hay diagrama disponible para este tipo de vehículo</p>
-            @endif
-        </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th width="50%">Inventario</th>
+                <th width="50%">Diagrama</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="vertical-align: top;">
+                    <!-- CHECKLIST -->
+                    <h4>Items encontrados</h4>
+                    @if($checkedItems->count() > 0)
+                        @foreach($checkedItems as $item)
+                            <div class="checklist-item">• {{ $item['nombre'] }}</div>
+                        @endforeach
+                    @else
+                        <div style="font-style: italic; color: #666;">No hay items marcados</div>
+                    @endif
 
-        <!-- Firma -->
-        <div>
-            <h2 class="text-md font-bold bg-gray-100 p-2 mb-3">FIRMA DE CONFORMIDAD</h2>
-            
-            <div class="text-center">
-                @if($firma)
-                    <div class="border border-gray-300 p-4 inline-block">
-                        <p class="text-sm font-semibold mb-2">Firma registrada:</p>
-                        <!-- En un entorno real, aquí mostrarías la imagen de la firma -->
-                        <div class="h-20 w-64 border border-gray-200 bg-gray-50 flex items-center justify-center mx-auto">
-                            <span class="text-gray-500 text-sm">[Firma del cliente]</span>
+                    <br>
+
+                    <!-- NIVELES -->
+                    <h4>COMBUSTIBLE</h4>
+                    <div class="level-bar">
+                        @php $combustible = $inventarioData['combustible'] ?? 0; @endphp
+                        <div class="level-fill" style="width: {{ $combustible }}%;"></div>
+                    </div>
+
+                    <h4>ACEITE</h4>
+                    <div class="level-bar" style="margin-bottom: 2rem;">
+                        @php $aceite = $inventarioData['aceite'] ?? 0; @endphp
+                        <div class="level-fill" style="width: {{ $aceite }}%;"></div>
+                    </div>
+                </td>
+                <td style="vertical-align: top;">
+                    @if($trabajo->vehiculo?->tipoVehiculo?->diagrama)
+                        <div class="diagram-container">
+                            <img src="{{ storage_path('app/public/' . $trabajo->vehiculo->tipoVehiculo->diagrama) }}"
+                                class="diagram-image" alt="Diagrama del vehículo">
+                            MISMO CONTENEDOR -->
+                            @foreach($symbols as $symbol)
+                                @php
+                                    // Usar los porcentajes directamente sobre el contenedor 200x150
+                                    $x = (float) str_replace('%', '', $symbol['x']);
+                                    $y = (float) str_replace('%', '', $symbol['y']);
+                                @endphp
+                                <div class="symbol symbol-{{ $symbol['type'] === '//' ? 'slash' : $symbol['type'] }}"
+                                    style="left: {{ $x }}%; top: {{ $y }}%;">
+                                    {{ $symbol['type'] }}
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div style="margin: 1rem 0;">
+                            <strong>Leyenda:</strong>
+                            <ul>
+                                <li>O - Abolladura</li>
+                                <li>X - Quiñe</li>
+                                <li>// - Rayadura</li>
+                            </ul>
+                        </div>
+                    @else
+                        <div style="font-style: italic; color: #666; margin-top: 20px;">Sin diagrama</div>
+                    @endif
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="table" style="margin-top: 1rem;">
+        <tbody>
+            <tr>
+                <td style="vertical-align: top;" width="50%">
+                    <h4>Observaciones</h4>
+                    <p>{{ $inventarioData['observaciones'] ?? 'Ninguna' }}</p>
+                </td>
+                <td style="vertical-align: bottom; text-align: center;" width="50%">
+                    <div
+                        style="border: 1px; height: 150px; display: flex; flex-direction: column; justify-content: flex-end;">
+                        <div class="signature-box"
+                            style="border-bottom: 1px solid #000; padding-bottom: 5px; margin-bottom: 5px;">
+                            @if(isset($inventarioData['firma']) && $inventarioData['firma'])
+                                <img src="{{ $inventarioData['firma'] }}" style="max-width: 100%; max-height: 100%;"
+                                    alt="Firma">
+                            @endif
+                        </div>
+                        <div style="margin-top: 5px; font-size: 11px;">
+                            {{ $clientePrincipal?->nombre ?? '' }}
                         </div>
                     </div>
-                @else
-                    <p class="text-sm text-gray-500 py-4">No se registró firma</p>
-                @endif
-                
-                <div class="mt-4 text-xs text-gray-600">
-                    <p>Fecha y hora de generación: {{ $fecha }}</p>
-                    <p>Checklist de Ingreso - {{ $trabajo->vehiculo->placa ?? 'N/A' }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
 </x-pdf-layout>

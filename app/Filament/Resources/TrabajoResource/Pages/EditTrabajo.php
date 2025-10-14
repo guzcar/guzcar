@@ -42,11 +42,11 @@ class EditTrabajo extends EditRecord
                 }),
 
             ActionGroup::make([
-                // Action::make('Descargar Check List')
-                //     ->url(
-                //         fn(Trabajo $trabajo): string => route('pdf.admin.inventario.ingreso', ['trabajo' => $trabajo]),
-                //         shouldOpenInNewTab: true
-                //     ),
+                Action::make('Descargar Check List')
+                    ->url(
+                        fn(Trabajo $trabajo): string => route('pdf.admin.inventario.ingreso', ['trabajo' => $trabajo]),
+                        shouldOpenInNewTab: true
+                    ),
 
                 Action::make('Descargar informe')
                     ->icon('heroicon-s-document-text')
