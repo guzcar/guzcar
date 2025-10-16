@@ -43,6 +43,7 @@ class EditTrabajo extends EditRecord
 
             ActionGroup::make([
                 Action::make('Descargar Check List')
+                    ->icon('heroicon-s-clipboard-document-check')
                     ->url(
                         fn(Trabajo $trabajo): string => route('pdf.admin.inventario.ingreso', ['trabajo' => $trabajo]),
                         shouldOpenInNewTab: true

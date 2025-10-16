@@ -138,7 +138,7 @@
                     <h4>Items encontrados</h4>
                     @if($checkedItems->count() > 0)
                         @foreach($checkedItems as $item)
-                            <div class="checklist-item">• {{ $item['nombre'] }}</div>
+                            <div class="checklist-item">• {{ $item['cantidad'] }} × {{ $item['nombre'] }}</div>
                         @endforeach
                     @else
                         <div style="font-style: italic; color: #666;">No hay items marcados</div>

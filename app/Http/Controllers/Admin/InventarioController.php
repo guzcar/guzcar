@@ -26,6 +26,7 @@ class InventarioController extends Controller
         $request->validate([
             'checklist' => 'nullable|array',
             'checklist.*.nombre' => 'nullable|string|max:255',
+            'checklist.*.cantidad' => 'nullable|integer|min:1',
             'combustible' => 'required|integer|min:0|max:100',
             'aceite' => 'required|integer|min:0|max:100',
             'observaciones' => 'nullable|string',
@@ -38,10 +39,11 @@ class InventarioController extends Controller
         // Procesar y limpiar el checklist para asegurar la consistencia de los datos
         $processedChecklist = collect($checklistData)
             ->map(function ($item) {
-                // Asegura que cada item tenga un valor booleano para 'checked'
+                // Asegura que cada item tenga valores correctos
                 return [
                     'nombre' => $item['nombre'] ?? null,
                     'checked' => isset($item['checked']) && $item['checked'] == '1',
+                    'cantidad' => isset($item['cantidad']) ? max(1, intval($item['cantidad'])) : 1,
                 ];
             })
             ->filter(function ($item) {
