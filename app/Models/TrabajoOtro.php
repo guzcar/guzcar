@@ -16,6 +16,7 @@ class TrabajoOtro extends Model
         'cantidad',
         'sort',
         'presupuesto',
+        'trabajo_id',
     ];
 
     public function trabajo()
