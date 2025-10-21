@@ -136,7 +136,11 @@ class SalidaResource extends Resource
                                         $articulo = Articulo::find($state);
                                         if ($articulo) {
                                             $set('stock', $articulo->stock);
-                                            $set('precio', $articulo->precio);
+
+                                            // Usar precio si existe y no es null/0, de lo contrario usar costo
+                                            $precio = $articulo->precio && $articulo->precio > 0 ? $articulo->precio : $articulo->costo;
+                                            $set('precio', $precio);
+
                                             $set('fraccionable', $articulo->fraccionable);
                                             $set('abiertos', $articulo->fraccionable ? $articulo->abiertos : null);
 
