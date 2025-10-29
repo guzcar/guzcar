@@ -8,8 +8,7 @@
     <style>
         @page {
             size: A4;
-            margin: 110px 80px -20px 80px;
-            /* Ajustado margen superior para el header */
+            margin: 110px 80px 25px 80px;
         }
 
         body {
@@ -24,13 +23,10 @@
         header {
             position: fixed;
             top: -95px;
-            /* Ajustado para coincidir con el margen superior de @page */
             left: 0;
             right: 0;
             height: 60px;
-            /* Aumentado para mejor espacio */
             margin-bottom: 20px;
-            /* Espacio adicional después del header */
         }
 
         .header-logo {
@@ -40,20 +36,28 @@
         .header-title {
             color: rgb(31, 62, 129);
             font-weight: bold;
+            font-size: 15px;
+        }
+
+        .header-image {
+            width: 80px;
+            height: auto;
         }
 
         footer {
             position: fixed;
-            bottom: 0px;
-            /* Ajustado para coincidir con el margen inferior */
+            bottom: -20px;
             left: 0;
             right: 0;
-            height: 55px;
-            text-align: center;
+            height: 50px;
             font-size: 11px;
         }
 
-        /* Resto de tus estilos permanecen igual */
+        .footer-image {
+            width: 150px;
+            height: auto;
+        }
+
         .border-top {
             border-top: 1px solid black;
         }
@@ -74,8 +78,6 @@
         }
 
         .table th {
-            /* border-bottom: 1px solid black;
-            border-top: 1px solid black; */
             color: white;
             background-color: rgb(31, 62, 129);
             border: solid white 1px;
@@ -98,10 +100,7 @@
         }
 
         .content {
-            /* margin-top: 10px; */
-            /* Espacio adicional después del header */
             margin-bottom: 50px;
-            /* Espacio adicional antes del footer */
         }
 
         .m-0 {
@@ -189,35 +188,14 @@
                         <img src="{{ public_path('images/logo-guzcar.jpg') }}" class="header-logo">
                     </td>
                     <td class="text-left" style="vertical-align: middle; padding-right: 1rem;">
-                        <p class="header-title mt-0" style="margin-bottom: 4px;">AUTOMOTORES GUZCAR S.A.C.</p>
-                        <p class="m-0">TELF: 919294602 - 998248543</p>
-                        <p class="m-0">CORREO: <span style="text-transform: lowercase;">automotoresguzcar1@hotmail.com</span></p>
-                        <p class="m-0">Prolog. Leoncio Prado N° 1575 - CHIMBOTE</p>
+                        <p class="header-title m-0">AUTOMOTORES GUZCAR S.A.C.</p>
+                        <p class="m-0" style="margin-bottom: 4px;">RUC: 20600613716 - <span style="text-transform: none;">Prolog. Leoncio Prado N° 1575 - CHIMBOTE</span></p>
+                        <p class="m-0"></p>
+                        <p class="m-0"><b>{{ $tipoReporte ?? 'REPORTE' }} N° {{ $code ?? 'CODIGO' }}</b></p>
+                        <p class="m-0">{{ date('d/m/Y h:i A') }}</p>
                     </td>
-                    <td style="
-                        border-radius: 10px;
-                        width: 150px;
-                        text-align: center;
-                        padding: 5px 0;
-                        height: 100%;
-                        display: table-cell;
-                        vertical-align: middle;
-                        position: relative;
-                        background-color:rgb(31, 62, 129);
-                    ">
-                        <div style="
-                            position: absolute;
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-50%, -50%);
-                            width: calc(100% - 10px);
-                            color: white;
-                        ">
-                            <p class="bold mt-0" style="margin-bottom: 4px;">RUC: 20600613716</p>
-                            <p class="m-0">{{ $tipoReporte ?? 'REPORTE' }}</p>
-                            <p class="m-0">N° {{ $code ?? 'CODIGO' }}</p>
-                            <p class="m-0">{{ date('d/m/Y h:i A') }}</p>
-                        </div>
+                    <td style="width: 80px; text-align: right; vertical-align: middle;">
+                        <img src="{{ public_path('images/mega_homologado_1.png') }}" class="header-image">
                     </td>
                 </tr>
             </tbody>
@@ -227,8 +205,19 @@
 
     <footer>
         <div class="border-top" style="margin-bottom: 10px;"></div>
-        <div>{{ $footer ?? 'GRACIAS POR SU PREFERENCIA' }}</div>
-        <!-- <div>AUTOMOTORES GUZCAR S.A.C.</div> -->
+        <table class="table-header" style="width: 100%;">
+            <tbody>
+                <tr>
+                    <td class="text-left" style="vertical-align: middle; width: 70%;">
+                        <p class="m-0">DIRECCIÓN: <span style="text-transform: none;">Prolog. Leoncio Prado N° 1575 - CHIMBOTE</span></p>
+                        <p class="m-0">CORREO: <span style="text-transform: lowercase;">automotoresguzcar1@hotmail.com</span> - TELF: 919294602 - 998248543</p>
+                    </td>
+                    <td style="width: 30%; text-align: right; vertical-align: middle;">
+                        <img src="{{ public_path('images/mega_homologado_2.png') }}" class="footer-image">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </footer>
 
     <img src="{{ public_path('images/logo-kia.jpg') }}" class="watermark">
