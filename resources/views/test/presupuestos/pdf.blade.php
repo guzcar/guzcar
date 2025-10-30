@@ -1,4 +1,4 @@
-<x-pdf-layout title="Presupuesto {{ $presupuesto->id }}" code="{{ $presupuesto->id }}" tipoReporte="PRESUPUESTO">
+<x-pdf-layout title="Cotización {{ $presupuesto->id }}" code="{{ $presupuesto->id }}" tipoReporte="COTIZACION">
 
     <h3 class="mt-0">CLIENTE</h3>
 
