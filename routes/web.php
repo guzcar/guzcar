@@ -13,6 +13,7 @@ use App\Http\Controllers\Pdf\DespachoController as PdfDespachoController;
 use App\Http\Controllers\Pdf\MaletaController;
 use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
 use App\Http\Controllers\Pdf\VentaController as PdfVentaController;
+use App\Http\Controllers\TestPresupuestoController;
 use App\Http\Controllers\TrabajoController;
 use App\Http\Controllers\TrabajoDescripcionTecnicoController;
 use App\Http\Controllers\UserController;
@@ -81,10 +82,10 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
 
     // PDF
     Route::get('/pdf/admin/trabajos/{trabajo}/presupuesto', [PdfTrabajoController::class, 'presupuesto'])->name('trabajo.pdf.presupuesto');
-    
+
     Route::get('/pdf/admin/trabajos/{trabajo}/presupuesto-servicios', [PdfTrabajoController::class, 'presupuestoServicios'])->name('trabajo.pdf.presupuesto-servicios');
     Route::get('/pdf/admin/trabajos/{trabajo}/presupuesto-articulos-repuestos-otros', [PdfTrabajoController::class, 'presupuestoArticulosRepuestosOtros'])->name('trabajo.pdf.presupuesto-articulos-repuestos-otros');
-    
+
     Route::get('/pdf/admin/trabajos/{trabajo}/proforma', [PdfTrabajoController::class, 'proforma'])->name('trabajo.pdf.proforma');
     Route::get('/pdf/admin/trabajos/{trabajo}/informe', [PdfTrabajoController::class, 'informe'])->name('trabajo.pdf.informe');
     Route::get('/pdf/admin/evidencias/{trabajo}', [PdfTrabajoController::class, 'evidencia'])->name('trabajo.pdf.evidencia');
@@ -118,4 +119,15 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
 
     Route::get('/asistencia', [AsistenciaController::class, 'index'])->name('asistencia.index');
     Route::post('/asistencia', [AsistenciaController::class, 'registrar'])->name('asistencia.registrar');
+
+    // TEST
+    Route::prefix('test')->name('test.')->group(function () {
+        Route::resource('presupuestos', TestPresupuestoController::class);
+        Route::get('presupuestos/{presupuesto}/pdf', [TestPresupuestoController::class, 'printPdf'])
+            ->name('presupuestos.pdf');
+        Route::get('search/clientes', [TestPresupuestoController::class, 'searchClientes'])
+            ->name('search.clientes');
+        Route::get('search/vehiculos', [TestPresupuestoController::class, 'searchVehiculos'])
+            ->name('search.vehiculos');
+    });
 });
