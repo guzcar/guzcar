@@ -27,6 +27,7 @@ class ViewTrabajo extends ViewRecord
             'articulos.subCategoria.categoria',
             'articulos.presentacion',
             'articulos.unidad',
+            'otros'
         ]);
 
         // Descripciones de técnicos (con usuario, y tolerante a nulos):
@@ -82,6 +83,14 @@ class ViewTrabajo extends ViewRecord
             })
             ->values();
 
+        $otrosResumen = $trabajo->otros
+            ->map(
+                fn($otro) => [
+                    'descripcion' => $otro->descripcion ?? 'Otro ítem',
+                    'cantidad' => (float) ($otro->cantidad ?? 0),
+                ]
+            )
+            ->values();
 
         $evidencias = $trabajo->evidencias()
             ->orderBy('created_at', 'desc')
@@ -102,6 +111,7 @@ class ViewTrabajo extends ViewRecord
             'observaciones' => $observaciones,
             'trabajoDescripcionTecnicos' => $trabajoDescripcionTecnicos,
             'articulosSalidosResumen' => $articulosSalidosResumen,
+            'otrosResumen' => $otrosResumen,
         ];
     }
 

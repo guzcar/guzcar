@@ -646,6 +646,10 @@ class TrabajoResource extends Resource
                         return $record->fecha_ingreso->format('h:i:s A');
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('kilometraje')
+                    ->sortable()
+                    ->placeholder('0.00')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 CheckboxColumn::make('control')
                     ->alignCenter()
                     ->hidden(fn() => !auth()->user()->can('update_trabajo')),

@@ -61,6 +61,7 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Widgets\AccountWidget::class,
                 \App\Filament\Widgets\ImportesSummary::class,
             ])
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

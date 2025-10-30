@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\ArticuloCluster;
 use App\Filament\Resources\UbicacionResource\Pages;
 use App\Filament\Resources\UbicacionResource\RelationManagers;
 use App\Models\Ubicacion;
@@ -29,19 +30,19 @@ class UbicacionResource extends Resource
 {
     protected static ?string $model = Ubicacion::class;
 
-    protected static ?string $navigationGroup = 'Configuración de logística';
-
     protected static ?int $navigationSort = 140;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationLabel = 'Ubicaciones en almacén';
+    protected static ?string $navigationLabel = 'Ubicaciones';
 
     protected static ?string $modelLabel = 'Ubicación';
 
     protected static ?string $pluralModelLabel = 'Ubicaciones';
 
     protected static ?string $slug = 'ubicaciones';
+
+    protected static ?string $cluster = ArticuloCluster::class;
 
     public static function form(Form $form): Form
     {

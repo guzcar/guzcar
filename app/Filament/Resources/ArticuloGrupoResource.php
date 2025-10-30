@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\ArticuloCluster;
 use App\Filament\Resources\ArticuloGrupoResource\Pages;
 use App\Filament\Resources\ArticuloGrupoResource\RelationManagers;
 use App\Models\ArticuloGrupo;
@@ -21,17 +22,17 @@ class ArticuloGrupoResource extends Resource
 {
     protected static ?string $model = ArticuloGrupo::class;
 
-    protected static ?string $navigationGroup = 'Logística';
-
     protected static ?int $navigationSort = 75;
 
     protected static ?string $navigationIcon = 'heroicon-o-swatch';
 
-    protected static ?string $modelLabel = 'Grupos de artículo';
+    protected static ?string $modelLabel = 'Grupos';
 
-    protected static ?string $pluralModelLabel = 'Grupos de artículos';
+    protected static ?string $pluralModelLabel = 'Grupos';
 
-    protected static ?string $navigationLabel = 'Grupos de artículos';
+    protected static ?string $navigationLabel = 'Grupos';
+
+    protected static ?string $cluster = ArticuloCluster::class;
 
     public static function form(Form $form): Form
     {

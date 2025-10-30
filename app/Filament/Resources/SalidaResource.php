@@ -525,18 +525,25 @@ class SalidaResource extends Resource
                         ->toggleable(isToggledHiddenByDefault: true),
                 ]),
                 ColumnGroup::make('Salida', [
-                    TextColumn::make('precio')
-                        ->label('Precio en Servicio')
-                        ->prefix('S/ ')
-                        ->alignRight()
-                        ->hidden(fn() => !auth()->user()->can('create_contabilidad'))
-                        ->sortable(),
                     TextColumn::make('cantidad')
                         ->sortable()
                         ->formatStateUsing(function ($state) {
                             return FractionService::decimalToFraction((float) $state);
                         })
                         ->alignCenter(),
+                    TextColumn::make('precio')
+                        ->label('P. Unitario')
+                        ->prefix('S/ ')
+                        ->alignRight()
+                        ->hidden(fn() => !auth()->user()->can('create_contabilidad'))
+                        ->sortable(),
+                    TextColumn::make('total')
+                        ->label('P. Total')
+                        ->state(fn(TrabajoArticulo $record): float => $record->precio * $record->cantidad)
+                        ->numeric()
+                        ->formatStateUsing(fn(float $state): string => 'S/ ' . number_format($state, 2))
+                        ->alignRight()
+                        ->sortable(query: fn(Builder $query, string $direction): Builder => $query->orderByRaw('(precio * cantidad) ' . $direction)),
                 ]),
                 ColumnGroup::make('Trabajo', [
                     TextColumn::make('trabajo.codigo')

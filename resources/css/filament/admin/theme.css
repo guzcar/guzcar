@@ -6,6 +6,7 @@
     --primary-admin-guzcar: #2563EB;
     --light-gray: #FAFAFA;
     --white: #FFFFFF;
+    --sidebar-width: 18.5rem !important;
 }
 
 div.fi-topbar nav {
@@ -97,4 +98,8 @@ header.fi-sidebar-header button.fi-icon-btn:disabled .fi-icon-btn-icon {
 
 .dark .desembolso-por-cobrar:hover {
     @apply bg-[#311A1A]; /* Cambio sutil */
+}
+
+div.fi-page-sub-navigation-sidebar-ctn {
+    width: 14rem !important; 
 }

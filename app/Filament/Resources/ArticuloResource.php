@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\ArticuloCluster;
 use App\Filament\Resources\ArticuloResource\Pages;
 use App\Filament\Resources\ArticuloResource\RelationManagers;
 use App\Models\Almacen;
@@ -12,6 +13,7 @@ use App\Models\Categoria;
 use App\Models\SubCategoria;
 use App\Models\Ubicacion;
 use App\Services\FractionService;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Grid;
@@ -50,8 +52,6 @@ class ArticuloResource extends Resource
 {
     protected static ?string $model = Articulo::class;
 
-    protected static ?string $navigationGroup = 'Logística';
-
     protected static ?int $navigationSort = 70;
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
@@ -61,6 +61,8 @@ class ArticuloResource extends Resource
     protected static ?string $pluralModelLabel = 'Artículos';
 
     protected static ?string $navigationLabel = 'Artículos';
+
+    protected static ?string $cluster = ArticuloCluster::class;
 
     public static function form(Form $form): Form
     {
@@ -262,6 +264,7 @@ class ArticuloResource extends Resource
     {
         return $table
             ->searchOnBlur(true)
+            ->paginated([5, 10, 25, 50, 100])
             ->columns([
                 ColorColumn::make('grupo.color')
                     ->alignCenter()
@@ -379,32 +382,31 @@ class ArticuloResource extends Resource
             ])
             ->bulkActions([
 
-                BulkAction::make('cambiar_grupo')
-                    ->label('Cambiar Grupo')
-                    ->color('gray')
-                    ->form([
-                        Select::make('grupo_id')
-                            ->label('Grupo')
-                            ->options(\App\Models\ArticuloGrupo::pluck('nombre', 'id'))
-                            ->searchable()
-                            ->required()
-                            ->placeholder('Selecciona un grupo')
-                    ])
-                    ->action(function (array $data, \Illuminate\Database\Eloquent\Collection $records): void {
-                        foreach ($records as $record) {
-                            $record->update([
-                                'grupo_id' => $data['grupo_id']
-                            ]);
-                        }
-                    })
-                    ->deselectRecordsAfterCompletion()
-                    ->modalWidth(MaxWidth::Large),
+                BulkActionGroup::make([
+                    BulkAction::make('cambiar_grupo')
+                        ->label('Cambiar Grupo')
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('gray')
+                        ->form([
+                            Select::make('grupo_id')
+                                ->label('Grupo')
+                                ->options(\App\Models\ArticuloGrupo::pluck('nombre', 'id'))
+                                ->searchable()
+                                ->required()
+                                ->placeholder('Selecciona un grupo')
+                        ])
+                        ->action(function (array $data, \Illuminate\Database\Eloquent\Collection $records): void {
+                            foreach ($records as $record) {
+                                $record->update([
+                                    'grupo_id' => $data['grupo_id']
+                                ]);
+                            }
+                        })
+                        ->deselectRecordsAfterCompletion()
+                        ->modalWidth(MaxWidth::Large),
+                    DeleteBulkAction::make(),
+                ]),
                 ExportBulkAction::make(),
-                // BulkActionGroup::make([
-                //     DeleteBulkAction::make(),
-                //     ForceDeleteBulkAction::make(),
-                //     RestoreBulkAction::make(),
-                // ]),
             ])
             ->persistColumnSearchesInSession()
             ->persistSearchInSession()

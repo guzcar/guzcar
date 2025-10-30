@@ -147,9 +147,17 @@ class TrabajoOtroResource extends Resource
                     ->sortable()
                     ->alignCenter(),
                 TextColumn::make('precio')
+                    ->label('P. Unitario')
                     ->prefix('S/ ')
                     ->sortable()
                     ->alignRight(),
+                TextColumn::make('total')
+                    ->label('P. Total')
+                    ->state(fn(TrabajoOtro $record): float => $record->precio * $record->cantidad)
+                    ->numeric()
+                    ->formatStateUsing(fn(float $state): string => 'S/ ' . number_format($state, 2))
+                    ->alignRight()
+                    ->sortable(query: fn(Builder $query, string $direction): Builder => $query->orderByRaw('(precio * cantidad) ' . $direction)),
                 ColumnGroup::make('Trabajo', [
                     TextColumn::make('trabajo.codigo')
                         ->label('Código')

@@ -235,6 +235,28 @@
         @endif
     </x-filament::section>
 
+    <x-filament::section>
+        <x-slot name="heading">
+            Otros
+        </x-slot>@php
+            $items = $otrosResumen ?? collect();
+        @endphp
+
+        @if(($items instanceof \Illuminate\Support\Collection ? $items->count() : count($items ?? [])) > 0)
+            <ul class="list-disc">
+                @foreach(($items instanceof \Illuminate\Support\Collection) ? $items : collect($items) as $item)
+                    <li class="text-gray-800 dark:text-gray-300" style="margin-left: 18px;">
+                        <span class="font-medium">
+                            {{ \App\Services\FractionService::decimalToFraction((float) (data_get($item, 'cantidad') ?? 0)) }}
+                        </span> × {{ data_get($item, 'descripcion') ?? 'Otro ítem' }}
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <p class="text-gray-500 dark:text-gray-400">Sin otros ítems.</p>
+        @endif
+    </x-filament::section>
+
     <h2 class="text-xl font-bold">Descripción de los técnicos</h2>
 
     <x-filament::section>
