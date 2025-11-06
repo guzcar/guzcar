@@ -17,6 +17,12 @@ return new class extends Migration {
                 ->constrained('trabajos')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
+            $table->foreignId('user_id')
+                ->nullable()
+                ->after('trabajo_id')
+                ->constrained('users')
+                ->onDelete('set null')
+                ->onUpdate('cascade');
             $table->text('descripcion');
             $table->decimal('precio')->unsigned();
             $table->unsignedInteger('cantidad')->default(1);

@@ -6,6 +6,7 @@ use App\Filament\Resources\TrabajoOtroResource\Pages;
 use App\Filament\Resources\TrabajoOtroResource\RelationManagers;
 use App\Models\Trabajo;
 use App\Models\TrabajoOtro;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -124,7 +125,13 @@ class TrabajoOtroResource extends Resource
                                                     });
                                             })
                                             ->searchable()
-                                            ->preload()
+                                            ->preload(),
+                                        Select::make('user_id')
+                                            ->label('Técnico')
+                                            ->prefixIcon('heroicon-s-user-circle')
+                                            ->options(User::all()->pluck('name', 'id'))
+                                            ->searchable()
+                                            ->preload(),
                                     ]),
                             ])
                             ->columnSpan(['xl' => 2, 'lg' => 2, 'md' => 2, 'sm' => 5])
@@ -159,6 +166,10 @@ class TrabajoOtroResource extends Resource
                     ->alignRight()
                     ->sortable(query: fn(Builder $query, string $direction): Builder => $query->orderByRaw('(precio * cantidad) ' . $direction)),
                 ColumnGroup::make('Trabajo', [
+                    TextColumn::make('user.name')
+                        ->label('Técnico')
+                        ->searchable(isIndividual: true)
+                        ->placeholder('Sin técnico'),
                     TextColumn::make('trabajo.codigo')
                         ->label('Código')
                         ->searchable(isIndividual: true)
@@ -212,6 +223,16 @@ class TrabajoOtroResource extends Resource
                         ->placeholder('Sin Vehiculo')
                         ->searchable(isIndividual: true),
                 ]),
+                TextColumn::make('created_at')
+                    ->label('Fecha de creación')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->label('Fecha de edición')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

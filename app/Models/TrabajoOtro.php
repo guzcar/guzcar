@@ -17,11 +17,17 @@ class TrabajoOtro extends Model
         'sort',
         'presupuesto',
         'trabajo_id',
+        'user_id',
     ];
 
     public function trabajo()
     {
         return $this->belongsTo(Trabajo::class, 'trabajo_id')->withTrashed();
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id')->withTrashed();
     }
 
     protected static function booted()
