@@ -40,6 +40,7 @@ use Filament\Tables\Actions\RestoreAction;
 use Filament\Tables\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -368,6 +369,11 @@ class ArticuloResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                SelectFilter::make('grupo')
+                    ->label('Grupo')
+                    ->relationship('grupo', 'nombre')
+                    ->searchable()
+                    ->preload(),
                 ValueRangeFilter::make('costo')
                     ->label('Costo de compra'),
                 ValueRangeFilter::make('precio')

@@ -36,6 +36,7 @@ use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -619,6 +620,11 @@ class SalidaResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                SelectFilter::make('grupo')
+                    ->label('Grupo de Artículo')
+                    ->relationship('articulo.grupo', 'nombre')
+                    ->searchable()
+                    ->preload(),
                 Filter::make('sin_confirmar')
                     ->label('Sin confirmar')
                     ->query(fn(Builder $query) => $query->where('confirmado', false)),
