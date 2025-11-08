@@ -223,10 +223,25 @@
         @if(($items instanceof \Illuminate\Support\Collection ? $items->count() : count($items ?? [])) > 0)
             <ul class="list-disc">
                 @foreach(($items instanceof \Illuminate\Support\Collection) ? $items : collect($items) as $item)
+                    @php
+                        // Obtener el nombre del artículo
+                        $nombreArticulo = data_get($item, 'nombre') ?? 'Artículo';
+
+                        // Obtener la cantidad
+                        $cantidad = (float) (data_get($item, 'cantidad') ?? 0);
+
+                        // Comprobar si el nombre contiene "manguera" (insensible a mayúsculas/minúsculas)
+                        $esManguera = str_contains(strtolower($nombreArticulo), 'manguera');
+
+                        // Determinar qué formato de cantidad usar
+                        $cantidadFormateada = $esManguera
+                            ? $cantidad // No aplicar la función, mostrar el número tal cual
+                            : \App\Services\FractionService::decimalToFraction($cantidad); // Aplicar la función
+                    @endphp
                     <li class="text-gray-800 dark:text-gray-300" style="margin-left: 18px;">
                         <span class="font-medium">
-                            {{ \App\Services\FractionService::decimalToFraction((float) (data_get($item, 'cantidad') ?? 0)) }}
-                        </span> × {{ data_get($item, 'nombre') ?? 'Artículo' }}
+                            {{ $cantidadFormateada }}
+                        </span> × {{ $nombreArticulo }}
                     </li>
                 @endforeach
             </ul>
@@ -481,8 +496,7 @@
                             </a>
                         @elseif ($evidencia->tipo === 'video')
                             <video controls="controls" preload="auto" class="w-full h-48 rounded-lg evidence-link" name="media"
-                                src="{{ Storage::url($evidencia->evidencia_url) }}"
-                                type="video/mp4">
+                                src="{{ Storage::url($evidencia->evidencia_url) }}" type="video/mp4">
                             </video>
                         @endif
 
