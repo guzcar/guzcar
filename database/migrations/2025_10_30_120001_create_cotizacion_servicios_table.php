@@ -10,11 +10,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('presupuesto_articulos', function (Blueprint $table) {
+        Schema::create('cotizacion_servicios', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('presupuesto_id')
-                ->constrained('presupuestos')
+            $table->foreignId('cotizacion_id')
+                ->constrained('cotizaciones')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
@@ -32,6 +32,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('presupuesto_articulos');
+        Schema::dropIfExists('cotizacion_servicios');
     }
 };

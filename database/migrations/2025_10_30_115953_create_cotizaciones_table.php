@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('presupuestos', function (Blueprint $table) {
+        Schema::create('cotizaciones', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('vehiculo_id')
@@ -30,7 +30,6 @@ return new class extends Migration {
             $table->text('observacion')->nullable();
 
             $table->timestamps();
-            $table->softdeletes();
         });
     }
 
@@ -39,6 +38,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('presupuestos');
+        Schema::dropIfExists('cotizaciones');
     }
 };

@@ -53,4 +53,9 @@ class Vehiculo extends Model
     {
         return $this->hasMany(Trabajo::class);
     }
+
+    public function cotizaciones(): HasMany
+    {
+        return $this->hasMany(Cotizacion::class);
+    }
 }

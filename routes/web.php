@@ -9,11 +9,11 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Pdf\ControlMaletaAsignacionController;
+use App\Http\Controllers\Pdf\CotizacionPdfController;
 use App\Http\Controllers\Pdf\DespachoController as PdfDespachoController;
 use App\Http\Controllers\Pdf\MaletaController;
 use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
 use App\Http\Controllers\Pdf\VentaController as PdfVentaController;
-use App\Http\Controllers\TestPresupuestoController;
 use App\Http\Controllers\TrabajoController;
 use App\Http\Controllers\TrabajoDescripcionTecnicoController;
 use App\Http\Controllers\UserController;
@@ -95,6 +95,8 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     Route::get('/pdf/maletas/{maleta}/detalles/{detalles}', [MaletaController::class, 'detallesSeleccionados'])->name('pdf.maleta.detalles');
     Route::get('/pdf/control-maletas/{control}', [ControlMaletaAsignacionController::class, 'show'])->name('pdf.control_maleta.asignacion');
 
+    Route::get('/cotizaciones/{cotizacion}/pdf', [CotizacionPdfController::class, 'show'])->name('cotizaciones.pdf');
+
     // Evidencias
     Route::get('/trabajos/{trabajo}/evidencias', [EvidenciaController::class, 'index'])->name('gestion.evidencias.index');
     Route::put('/trabajos/{trabajo}/evidencias/bulk', [EvidenciaController::class, 'bulkUpdate'])->name('gestion.evidencias.bulkUpdate');
@@ -119,15 +121,4 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
 
     Route::get('/asistencia', [AsistenciaController::class, 'index'])->name('asistencia.index');
     Route::post('/asistencia', [AsistenciaController::class, 'registrar'])->name('asistencia.registrar');
-
-    // TEST
-    Route::prefix('test')->name('test.')->group(function () {
-        Route::resource('presupuestos', TestPresupuestoController::class);
-        Route::get('presupuestos/{presupuesto}/pdf', [TestPresupuestoController::class, 'printPdf'])
-            ->name('presupuestos.pdf');
-        Route::get('search/clientes', [TestPresupuestoController::class, 'searchClientes'])
-            ->name('search.clientes');
-        Route::get('search/vehiculos', [TestPresupuestoController::class, 'searchVehiculos'])
-            ->name('search.vehiculos');
-    });
 });
