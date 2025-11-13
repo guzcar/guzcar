@@ -22,4 +22,9 @@ class EditCotizacion extends EditRecord
                     ->openUrlInNewTab(),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->previousUrl ?? $this->getResource()::getUrl('index');
+    }
 }

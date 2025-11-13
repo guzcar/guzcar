@@ -9,11 +9,17 @@ use App\Models\Vehiculo;
 use App\Models\Cliente;
 use App\Models\VehiculoMarca;
 use App\Models\VehiculoModelo;
+use App\Models\Servicio;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Grid;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -21,6 +27,7 @@ use Filament\Forms\Set;
 use Filament\Forms\Get;
 use Filament\Forms\Components\Repeater;
 use Illuminate\Support\Facades\DB;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class CotizacionResource extends Resource
 {
@@ -40,6 +47,7 @@ class CotizacionResource extends Resource
             ->schema([
                 Forms\Components\Section::make('Información Principal')
                     ->schema([
+                        // ... (el resto del código de información principal se mantiene igual)
                         Forms\Components\Select::make('vehiculo_id')
                             ->label('Vehículo')
                             ->relationship('vehiculo')
@@ -138,6 +146,56 @@ class CotizacionResource extends Resource
                                 Forms\Components\TextInput::make('ano')
                                     ->label('Año del modelo')
                                     ->maxLength(255),
+
+                                Repeater::make('propietarios')
+                                    ->relationship()
+                                    ->simple(
+                                        Select::make('cliente_id')
+                                            ->label('Seleccionar Cliente')
+                                            ->relationship('cliente', 'nombre_completo', fn($query) => $query->withTrashed())
+                                            ->distinct()
+                                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                            ->searchable()
+                                            ->createOptionForm([
+                                                TextInput::make('identificador')
+                                                    ->label('RUC / DNI')
+                                                    // ->required()
+                                                    ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
+                                                    ->maxLength(12),
+                                                TextInput::make('nombre')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                PhoneInput::make('telefono')
+                                                    ->defaultCountry('PE')
+                                                    ->initialCountry('pe'),
+                                                TextInput::make('direccion')
+                                                    ->label('Dirección')
+                                            ])
+                                            ->createOptionUsing(function (array $data): int {
+                                                return Cliente::create($data)->getKey();
+                                            })
+                                            ->editOptionForm([
+                                                TextInput::make('identificador')
+                                                    ->label('RUC / DNI')
+                                                    // ->required()
+                                                    ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
+                                                    ->maxLength(12),
+                                                TextInput::make('nombre')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                PhoneInput::make('telefono')
+                                                    ->defaultCountry('PE')
+                                                    ->initialCountry('pe'),
+                                                TextInput::make('direccion')
+                                                    ->label('Dirección')
+                                            ])
+                                            ->getOptionLabelUsing(function ($value): ?string {
+                                                $cliente = Cliente::withTrashed()->find($value);
+                                                return $cliente ? $cliente->nombre_completo : 'Cliente eliminado';
+                                            })
+                                            ->required()
+                                    )
+                                    ->defaultItems(0)
                             ])
                             ->editOptionForm([
                                 Forms\Components\Select::make('tipo_vehiculo_id')
@@ -218,6 +276,55 @@ class CotizacionResource extends Resource
                                 Forms\Components\TextInput::make('ano')
                                     ->label('Año del modelo')
                                     ->maxLength(255),
+                                Repeater::make('propietarios')
+                                    ->relationship()
+                                    ->simple(
+                                        Select::make('cliente_id')
+                                            ->label('Seleccionar Cliente')
+                                            ->relationship('cliente', 'nombre_completo', fn($query) => $query->withTrashed())
+                                            ->distinct()
+                                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                            ->searchable()
+                                            ->createOptionForm([
+                                                TextInput::make('identificador')
+                                                    ->label('RUC / DNI')
+                                                    // ->required()
+                                                    ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
+                                                    ->maxLength(12),
+                                                TextInput::make('nombre')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                PhoneInput::make('telefono')
+                                                    ->defaultCountry('PE')
+                                                    ->initialCountry('pe'),
+                                                TextInput::make('direccion')
+                                                    ->label('Dirección')
+                                            ])
+                                            ->createOptionUsing(function (array $data): int {
+                                                return Cliente::create($data)->getKey();
+                                            })
+                                            ->editOptionForm([
+                                                TextInput::make('identificador')
+                                                    ->label('RUC / DNI')
+                                                    // ->required()
+                                                    ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
+                                                    ->maxLength(12),
+                                                TextInput::make('nombre')
+                                                    ->required()
+                                                    ->maxLength(255),
+                                                PhoneInput::make('telefono')
+                                                    ->defaultCountry('PE')
+                                                    ->initialCountry('pe'),
+                                                TextInput::make('direccion')
+                                                    ->label('Dirección')
+                                            ])
+                                            ->getOptionLabelUsing(function ($value): ?string {
+                                                $cliente = Cliente::withTrashed()->find($value);
+                                                return $cliente ? $cliente->nombre_completo : 'Cliente eliminado';
+                                            })
+                                            ->required()
+                                    )
+                                    ->defaultItems(0)
                             ]),
 
                         Forms\Components\Select::make('cliente_id')
@@ -282,26 +389,99 @@ class CotizacionResource extends Resource
                         Repeater::make('servicios')
                             ->relationship('servicios')
                             ->schema([
-                                Forms\Components\TextInput::make('descripcion')
-                                    ->label('Descripción del servicio')
+                                Select::make('servicio_id')
+                                    ->label('Servicio')
+                                    ->relationship(
+                                        name: 'servicio',
+                                        titleAttribute: 'nombre',
+                                        modifyQueryUsing: fn(Builder $query) => $query->with('tipoVehiculo')
+                                    )
+                                    ->getOptionLabelFromRecordUsing(function (Servicio $record) {
+                                        return $record->tipoVehiculo
+                                            ? "{$record->tipoVehiculo->nombre} - {$record->nombre}"
+                                            : $record->nombre;
+                                    })
+                                    ->createOptionForm([
+                                        Grid::make()
+                                            ->schema([
+                                                Select::make('tipo_vehiculo_id')
+                                                    ->label('Tipo de Vehículo')
+                                                    ->relationship('tipoVehiculo', 'nombre')
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->columnSpan(1),
+                                                TextInput::make('costo')
+                                                    ->numeric()
+                                                    ->required()
+                                                    ->prefix('S/ ')
+                                                    ->maxValue(42949672.95)
+                                                    ->columnSpan(1),
+                                            ])
+                                            ->columns(2),
+                                        Textarea::make('nombre')
+                                            ->unique(ignoreRecord: true)
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->editOptionForm([
+                                        Grid::make()
+                                            ->schema([
+                                                Select::make('tipo_vehiculo_id')
+                                                    ->label('Tipo de Vehículo')
+                                                    ->relationship('tipoVehiculo', 'nombre')
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->columnSpan(1),
+                                                TextInput::make('costo')
+                                                    ->numeric()
+                                                    ->required()
+                                                    ->prefix('S/ ')
+                                                    ->maxValue(42949672.95)
+                                                    ->columnSpan(1),
+                                            ])
+                                            ->columns(2),
+                                        Textarea::make('nombre')
+                                            ->unique(ignoreRecord: true)
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->searchable()
+                                    ->preload()
                                     ->required()
-                                    ->maxLength(255)
+                                    ->reactive()
+                                    ->distinct()
+                                    ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                                    ->afterStateUpdated(function ($state, Set $set) {
+                                        $servicio = Servicio::find($state);
+                                        if ($servicio) {
+                                            $set('precio', $servicio->costo);
+                                        }
+                                    })
                                     ->columnSpan(2),
 
-                                Forms\Components\TextInput::make('cantidad')
+                                TextInput::make('cantidad')
                                     ->label('Cantidad')
                                     ->numeric()
                                     ->default(1)
                                     ->minValue(1)
-                                    ->required(),
+                                    ->required()
+                                    ->reactive(),
 
-                                Forms\Components\TextInput::make('precio')
+                                TextInput::make('precio')
                                     ->label('Precio unitario')
                                     ->numeric()
                                     ->prefix('S/')
                                     ->required()
                                     ->minValue(0)
-                                    ->step(0.01),
+                                    ->step(0.01)
+                                    ->reactive(),
+
+                                Textarea::make('detalle')
+                                    ->label('Detalles adicionales')
+                                    ->nullable()
+                                    ->columnSpan(2),
                             ])
                             ->columns(4)
                             ->defaultItems(0)
@@ -313,7 +493,9 @@ class CotizacionResource extends Resource
                             ->collapsible()
                             ->itemLabel(
                                 fn(array $state): ?string =>
-                                $state['descripcion'] ?? 'Nuevo servicio'
+                                isset($state['servicio_id']) ?
+                                (Servicio::find($state['servicio_id'])->nombre ?? 'Servicio no encontrado') :
+                                'Nuevo servicio'
                             ),
                     ])
                     ->collapsible(),
@@ -450,6 +632,14 @@ class CotizacionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->searchOnBlur(true)
+            ->paginated([5, 10, 25, 50, 100])
+            ->defaultSort('created_at', 'desc')
+            ->striped()
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession()
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
@@ -458,12 +648,12 @@ class CotizacionResource extends Resource
                 Tables\Columns\TextColumn::make('vehiculo.placa')
                     ->label('Vehículo')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
 
                 Tables\Columns\TextColumn::make('cliente.nombre')
                     ->label('Cliente')
                     ->sortable()
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->placeholder('Sin cliente'),
 
                 Tables\Columns\TextColumn::make('servicios_count')
@@ -484,7 +674,7 @@ class CotizacionResource extends Resource
 
                 Tables\Columns\TextColumn::make('total')
                     ->label('Total')
-                    ->money('PEN')
+                    ->prefix('S/ ')
                     ->sortable()
                     ->getStateUsing(function (Cotizacion $record): float {
                         return $record->total;
@@ -505,27 +695,29 @@ class CotizacionResource extends Resource
                     ->query(fn(Builder $query): Builder => $query->where('igv', false)),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('clonar')
-                    ->label('Clonar')
-                    ->icon('heroicon-o-document-duplicate')
-                    ->color('success')
-                    ->action(function (Cotizacion $record) {
-                        $nuevaCotizacion = self::clonarCotizacion($record);
-
-                        Notification::make()
-                            ->title('Cotización clonada exitosamente')
-                            ->success()
-                            ->send();
-
-                        return redirect(CotizacionResource::getUrl('edit', ['record' => $nuevaCotizacion]));
-                    }),
-                Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('pdf')
                     ->label('PDF')
                     ->icon('heroicon-o-document-arrow-down')
                     ->url(fn(Cotizacion $record) => route('cotizaciones.pdf', $record))
                     ->openUrlInNewTab(),
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('clonar')
+                        ->label('Clonar')
+                        ->icon('heroicon-o-document-duplicate')
+                        ->color('success')
+                        ->action(function (Cotizacion $record) {
+                            $nuevaCotizacion = self::clonarCotizacion($record);
+
+                            Notification::make()
+                                ->title('Cotización clonada exitosamente')
+                                ->success()
+                                ->send();
+
+                            return redirect(CotizacionResource::getUrl('edit', ['record' => $nuevaCotizacion]));
+                        }),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -563,10 +755,11 @@ class CotizacionResource extends Resource
             ]);
             $nuevaCotizacion->save();
 
-            // Clonar servicios
+            // Clonar servicios (actualizado para la nueva estructura)
             foreach ($original->servicios as $servicio) {
                 $nuevaCotizacion->servicios()->create([
-                    'descripcion' => $servicio->descripcion,
+                    'servicio_id' => $servicio->servicio_id,
+                    'detalle' => $servicio->detalle,
                     'cantidad' => $servicio->cantidad,
                     'precio' => $servicio->precio,
                 ]);

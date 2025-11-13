@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateCotizacion extends CreateRecord
 {
     protected static string $resource = CotizacionResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->previousUrl ?? $this->getResource()::getUrl('index');
+    }
 }

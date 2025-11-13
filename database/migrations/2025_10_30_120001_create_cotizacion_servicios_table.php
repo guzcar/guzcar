@@ -18,7 +18,11 @@ return new class extends Migration {
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
-            $table->string('descripcion');
+            $table->foreignId('servicio_id')
+                ->constrained('servicios')
+                ->onDelete('restrict')
+                ->onUpdate('cascade');
+            $table->text('detalle')->nullable();
             $table->unsignedInteger('cantidad')->default(1);
 
             $table->decimal('precio', 10, 2);

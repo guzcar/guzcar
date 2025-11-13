@@ -95,14 +95,19 @@
             @forelse($cotizacion->servicios as $index => $servicio)
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
-                    <td>{{ $servicio->descripcion }}</td>
+                    <td>
+                        <p class="m-0 bold">{{ $servicio->servicio->nombre ?? 'Servicio no encontrado' }}</p>
+                        @if($servicio->detalle)
+                            <p class="m-0">{{ $servicio->detalle }}</p>
+                        @endif
+                    </td>
                     <td class="text-center">{{ $servicio->cantidad }}</td>
                     <td class="text-right">S/ {{ number_format($servicio->precio, 2) }}</td>
                     <td class="text-right">S/ {{ number_format($servicio->total, 2) }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center" style="height: 15px;"></td>
+                    <td colspan="5" class="text-center" style="height: 15px;">No hay servicios</td>
                 </tr>
             @endforelse
         </tbody>
@@ -137,7 +142,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="text-center" style="height: 15px;"></td>
+                    <td colspan="5" class="text-center" style="height: 15px;">No hay artículos</td>
                 </tr>
             @endforelse
         </tbody>
