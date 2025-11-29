@@ -66,13 +66,21 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     // PDF Admin
     Route::get('pdf/admin/trabajos/{trabajo}/inventario', [PdfInventarioController::class, 'ingreso'])->name('pdf.admin.inventario.ingreso');
 
-    // Articulos
-    Route::get('/articulos', [ArticuloController::class, 'index'])->name('articulos');
-    Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'trabajo'])->name('gestion.trabajos.articulos');
-    Route::post('/trabajos/{trabajoArticulo}/articulos-trabajo', [ArticuloController::class, 'confirmarTrabajo'])->name('gestion.trabajos.articulos.confirmar.trabajo');
-    Route::post('/trabajos/{trabajoArticulo}/articulos-index', [ArticuloController::class, 'confirmarIndex'])->name('gestion.trabajos.articulos.confirmar.index');
-    Route::post('/trabajos/{trabajo}/articulos-trabajo-todos', [ArticuloController::class, 'confirmarTrabajoTodos'])->name('gestion.trabajos.articulos.confirmar.trabajo.todos');
-    Route::post('/trabajos/articulos-index-todos', [ArticuloController::class, 'confirmarIndexTodos'])->name('gestion.trabajos.articulos.confirmar.index.todos');
+// Articulos
+Route::get('/articulos', [ArticuloController::class, 'index'])->name('articulos');
+Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'trabajo'])->name('gestion.trabajos.articulos');
+
+// Confirmar artículos normales
+Route::post('/trabajos/{trabajoArticulo}/articulos-trabajo', [ArticuloController::class, 'confirmarTrabajo'])->name('gestion.trabajos.articulos.confirmar.trabajo');
+Route::post('/trabajos/{trabajoArticulo}/articulos-index', [ArticuloController::class, 'confirmarIndex'])->name('gestion.trabajos.articulos.confirmar.index');
+
+// Confirmar "otros" artículos
+Route::post('/trabajos/{trabajoOtro}/articulos-trabajo-otro', [ArticuloController::class, 'confirmarTrabajoOtro'])->name('gestion.trabajos.articulos.confirmar.trabajo.otro');
+Route::post('/trabajos/{trabajoOtro}/articulos-index-otro', [ArticuloController::class, 'confirmarIndexOtro'])->name('gestion.trabajos.articulos.confirmar.index.otro');
+
+// Confirmar todos
+Route::post('/trabajos/{trabajo}/articulos-trabajo-todos', [ArticuloController::class, 'confirmarTrabajoTodos'])->name('gestion.trabajos.articulos.confirmar.trabajo.todos');
+Route::post('/trabajos/articulos-index-todos', [ArticuloController::class, 'confirmarIndexTodos'])->name('gestion.trabajos.articulos.confirmar.index.todos');
 
     // Consulta Vehicular
     Route::get('/consulta-vehicular', [VehiculoController::class, 'consultaVehicular'])->name('consulta.vehicular');

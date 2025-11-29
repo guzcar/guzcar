@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Trabajo;
 use App\Models\TrabajoArticulo;
+use App\Models\TrabajoOtro; // Agregar este modelo
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,10 @@ class ArticuloController extends Controller
                     ->orderBy('fecha', 'desc')
                     ->orderBy('hora', 'desc');
             },
+            'trabajoOtros' => function ($query) { // Agregar esta relación
+                $query->where('user_id', Auth::id()) // Cambiar a user_id
+                    ->orderBy('created_at', 'desc'); // Ordenar por created_at
+            },
             'vehiculo.tipoVehiculo'
         ]);
 
@@ -33,6 +38,7 @@ class ArticuloController extends Controller
         $startOfWeek = Carbon::now()->startOfWeek();
         $endOfWeek = Carbon::now()->endOfWeek();
 
+        // Obtener artículos normales
         $articulos = TrabajoArticulo::where('tecnico_id', Auth::id())
             ->whereBetween('fecha', [$startOfWeek, $endOfWeek])
             ->with([
@@ -41,11 +47,40 @@ class ArticuloController extends Controller
             ])
             ->orderBy('fecha', 'desc')
             ->orderBy('hora', 'desc')
-            ->paginate(10);
+            ->get();
 
-        return view('articulos.index', compact('articulos'));
+        // Obtener "otros" artículos - usar created_at para el rango de fecha
+        $otros = TrabajoOtro::where('user_id', Auth::id()) // Cambiar a user_id
+            ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+            ->with(['trabajo.vehiculo'])
+            ->orderBy('created_at', 'desc') // Ordenar por created_at
+            ->get();
+
+        // Combinar y ordenar
+        $todosLosItems = $articulos->concat($otros)->sortByDesc(function($item) {
+            // Para artículos normales usar fecha y hora, para otros usar created_at
+            if ($item instanceof TrabajoArticulo) {
+                return Carbon::parse($item->fecha . ' ' . $item->hora);
+            } else {
+                return $item->created_at;
+            }
+        });
+
+        // Para paginación manual
+        $page = request()->get('page', 1);
+        $perPage = 10;
+        $paginatedItems = new \Illuminate\Pagination\LengthAwarePaginator(
+            $todosLosItems->forPage($page, $perPage),
+            $todosLosItems->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return view('articulos.index', compact('paginatedItems'));
     }
 
+    // Métodos para confirmar artículos normales (ya existentes)
     public function confirmarTrabajo(TrabajoArticulo $trabajoArticulo)
     {
         $trabajoArticulo->confirmado = true;
@@ -60,49 +95,55 @@ class ArticuloController extends Controller
         return back()->with('success', 'El artículo ha sido confirmado');
     }
 
+    // Nuevos métodos para confirmar "otros"
+    public function confirmarTrabajoOtro(TrabajoOtro $trabajoOtro)
+    {
+        $trabajoOtro->confirmado = true;
+        $trabajoOtro->save();
+        return back()->with('success', 'El artículo ha sido confirmado');
+    }
+
+    public function confirmarIndexOtro(TrabajoOtro $trabajoOtro)
+    {
+        $trabajoOtro->confirmado = true;
+        $trabajoOtro->save();
+        return back()->with('success', 'El artículo ha sido confirmado');
+    }
+
     public function confirmarTrabajoTodos(Request $request, Trabajo $trabajo)
     {
-        // Obtener los IDs de los artículos que pertenecen al usuario autenticado y al trabajo actual
-        $articulosIds = $trabajo->trabajoArticulos()
-            ->where('tecnico_id', Auth::id())
-            ->pluck('id');
+        DB::transaction(function () use ($trabajo) {
+            // Confirmar artículos normales
+            $trabajo->trabajoArticulos()
+                ->where('tecnico_id', Auth::id())
+                ->update(['confirmado' => true]);
 
-        // Validar que haya artículos para confirmar
-        if ($articulosIds->isEmpty()) {
-            return back()->with('error', 'No hay artículos para confirmar.');
-        }
-
-        // Confirmar todos los artículos
-        DB::transaction(function () use ($articulosIds) {
-            TrabajoArticulo::whereIn('id', $articulosIds)->update(['confirmado' => true]);
+            // Confirmar "otros" artículos - usar user_id
+            $trabajo->trabajoOtros()
+                ->where('user_id', Auth::id())
+                ->update(['confirmado' => true]);
         });
 
-        // Redireccionar con un mensaje de éxito
         return back()->with('success', 'Todos los artículos han sido confirmados correctamente.');
     }
 
     public function confirmarIndexTodos(Request $request)
     {
-        // Obtener el inicio y el fin de la semana actual
         $startOfWeek = Carbon::now()->startOfWeek();
         $endOfWeek = Carbon::now()->endOfWeek();
 
-        // Obtener los IDs de los artículos que pertenecen al usuario autenticado y están dentro de la semana actual
-        $articulosIds = TrabajoArticulo::where('tecnico_id', Auth::id())
-            ->whereBetween('fecha', [$startOfWeek, $endOfWeek])
-            ->pluck('id');
+        DB::transaction(function () use ($startOfWeek, $endOfWeek) {
+            // Confirmar artículos normales
+            TrabajoArticulo::where('tecnico_id', Auth::id())
+                ->whereBetween('fecha', [$startOfWeek, $endOfWeek])
+                ->update(['confirmado' => true]);
 
-        // Validar que haya artículos para confirmar
-        if ($articulosIds->isEmpty()) {
-            return back()->with('error', 'No hay artículos para confirmar esta semana.');
-        }
-
-        // Confirmar todos los artículos
-        DB::transaction(function () use ($articulosIds) {
-            TrabajoArticulo::whereIn('id', $articulosIds)->update(['confirmado' => true]);
+            // Confirmar "otros" artículos - usar user_id y created_at
+            TrabajoOtro::where('user_id', Auth::id())
+                ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                ->update(['confirmado' => true]);
         });
 
-        // Redireccionar con un mensaje de éxito
         return back()->with('success', 'Todos los artículos de esta semana han sido confirmados correctamente.');
     }
 }

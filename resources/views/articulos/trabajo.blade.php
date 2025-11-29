@@ -6,6 +6,12 @@
                 vertical-align: top;
                 padding: 0.25rem 0 0.25rem 0;
             }
+            .badge-otro {
+                background-color: #6c757d;
+                color: white;
+                font-size: 0.7em;
+                margin-left: 8px;
+            }
         </style>
     @endpush
 
@@ -41,6 +47,7 @@
         </div>
     </div>
 
+    <!-- Información del vehículo (sin cambios) -->
     <ul class="list-group mb-3">
         <li class="list-group-item">
             <div class="d-flex">
@@ -84,7 +91,7 @@
         @endif
     </ul>
 
-    <p>Esta es la lista de todos los artículos que solicitaste para este vehícuo.</p>
+    <p>Esta es la lista de todos los artículos que solicitaste para este vehículo.</p>
 
     @if(session('success'))
         <div class="alert alert-primary alert-dismissible fade show" role="alert">
@@ -101,9 +108,31 @@
     @endif
 
     <div class="accordion" id="articulosAcordion">
-        @forelse ($trabajo->trabajoArticulos as $index => $trabajoArticulo)
-                @php
-                    $articulo = $trabajoArticulo->articulo;
+        @php
+            // Combinar artículos normales y otros
+            $todosLosArticulos = $trabajo->trabajoArticulos->concat($trabajo->trabajoOtros)
+                ->sortByDesc(function($item) {
+                    if ($item instanceof \App\Models\TrabajoArticulo) {
+                        return Illuminate\Support\Carbon::parse($item->fecha . ' ' . $item->hora);
+                    } else {
+                        return $item->created_at;
+                    }
+                });
+        @endphp
+
+        @forelse ($todosLosArticulos as $index => $item)
+            @php
+                $esOtro = $item instanceof \App\Models\TrabajoOtro;
+                
+                if ($esOtro) {
+                    $label = $item->descripcion;
+                    $cantidad = $item->cantidad;
+                    $fecha = $item->created_at; // Usar created_at
+                    $hora = $item->created_at; // Usar created_at para hora también
+                    $responsable = $item->user; // Cambiar a user
+                    $confirmado = $item->confirmado;
+                } else {
+                    $articulo = $item->articulo;
                     $labelParts = [];
                     if ($articulo->categoria)
                         $labelParts[] = $articulo->categoria->nombre;
@@ -122,63 +151,92 @@
                     if ($articulo->color)
                         $labelParts[] = $articulo->color;
                     $label = implode(' ', $labelParts);
-                @endphp
+                    $cantidad = $item->cantidad;
+                    $fecha = $item->fecha;
+                    $hora = $item->hora;
+                    $responsable = $item->responsable;
+                    $confirmado = $item->confirmado;
+                }
+            @endphp
 
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="heading-{{ $index }}">
-                        <table class="w-100">
-                            <tr>
-                                <td>
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapse-{{ $index }}" aria-expanded="false"
-                                        aria-controls="collapse-{{ $index }}">
-                                        {{ $label }}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-{{ $index }}">
+                    <table class="w-100">
+                        <tr>
+                            <td>
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapse-{{ $index }}" aria-expanded="false"
+                                    aria-controls="collapse-{{ $index }}">
+                                    {{ $label }}
+                                    @if($esOtro)
+                                        <span class="badge badge-otro">OTRO</span>
+                                    @endif
+                                </button>
+                            </td>
+                            <td class="px-2" style="width: 1rem;">
+                                @if ($confirmado)
+                                    <button class="btn btn-secondary border-0 py-2 px-3" disabled>
+                                        <i class="fas fa-check"></i>
                                     </button>
-                                </td>
-                                <td class="px-2" style="width: 1rem;">
-                                    <form action="{{ route('gestion.trabajos.articulos.confirmar.trabajo', $trabajoArticulo) }}"
+                                @else
+                                    <form action="{{ $esOtro ? 
+                                        route('gestion.trabajos.articulos.confirmar.trabajo.otro', $item) : 
+                                        route('gestion.trabajos.articulos.confirmar.trabajo', $item) }}" 
                                         method="POST">
-                                        @if ($trabajoArticulo->confirmado)
-                                            <button class="btn btn-secondary border-0 py-2 px-3" disabled>
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        @else
-                                            @csrf
-                                            <button class="btn btn-success border-0 py-2 px-3" type="submit">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        @endif
+                                        @csrf
+                                        <button class="btn btn-success border-0 py-2 px-3" type="submit">
+                                            <i class="fas fa-check"></i>
+                                        </button>
                                     </form>
+                                @endif
+                            </td>
+                        </tr>
+                    </table>
+                </h2>
+
+                <div id="collapse-{{ $index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ $index }}"
+                    data-bs-parent="#articulosAcordion">
+                    <div class="accordion-body">
+                        <table class="articulos-table">
+                            <tr>
+                                <td><i class="fas text-secondary fa-fw me-2 fa-box"></i></td>
+                                <td><b>Cantidad:</b>
+                                    {{ \App\Services\FractionService::decimalToFraction($cantidad) }}</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas text-secondary fa-fw me-2 fa-calendar-alt"></i></td>
+                                <td><b>Día:</b> 
+                                    @if($esOtro)
+                                        {{ $fecha->isoFormat('dddd, D [de] MMMM') }}
+                                    @else
+                                        {{ $fecha->isoFormat('dddd, D [de] MMMM') }}
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas text-secondary fa-fw me-2 fa-clock"></i></td>
+                                <td><b>Hora:</b> 
+                                    @if($esOtro)
+                                        {{ $hora->format('h:i A') }}
+                                    @else
+                                        {{ $hora->format('h:i A') }}
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i class="fa-solid text-secondary fa-fw me-2 fa-user"></i></td>
+                                <td><b>Responsable:</b> 
+                                    @if($esOtro)
+                                        <span>Sistema</span>
+                                    @else
+                                        {{ $responsable->name }}
+                                    @endif
                                 </td>
                             </tr>
                         </table>
-                    </h2>
-
-                    <div id="collapse-{{ $index }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ $index }}"
-                        data-bs-parent="#articulosAcordion">
-                        <div class="accordion-body">
-                            <table class="articulos-table">
-                                <tr>
-                                    <td><i class="fas text-secondary fa-fw me-2 fa-box"></i></td>
-                                    <td><b>Cantidad:</b>
-                                        {{ \App\Services\FractionService::decimalToFraction($trabajoArticulo->cantidad) }}</td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas text-secondary fa-fw me-2 fa-calendar-alt"></i></td>
-                                    <td><b>Día:</b> {{ $trabajoArticulo->fecha->isoFormat('dddd, D [de] MMMM') }}</td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas text-secondary fa-fw me-2 fa-clock"></i></td>
-                                    <td><b>Hora:</b> {{ $trabajoArticulo->hora->format('h:i A') }}</td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fa-solid text-secondary fa-fw me-2 fa-user"></i></td>
-                                    <td><b>Responsable:</b> {{ $trabajoArticulo->responsable->name }}</td>
-                                </tr>
-                            </table>
-                        </div>
                     </div>
                 </div>
+            </div>
         @empty
             <div class="card">
                 <div class="card-body">

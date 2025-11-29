@@ -39,6 +39,7 @@ class TrabajoDescripcionTecnicoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 ColumnGroup::make('Trabajo', [
                     TextColumn::make('trabajo.codigo')
@@ -97,7 +98,8 @@ class TrabajoDescripcionTecnicoResource extends Resource
                     TextColumn::make('descripcion')
                         ->label('Descripción')
                         ->wrap()
-                        ->html(),
+                        ->html()
+                        ->formatStateUsing(fn ($state) => nl2br(e($state))),
                 ]),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')

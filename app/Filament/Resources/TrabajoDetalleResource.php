@@ -43,6 +43,7 @@ class TrabajoDetalleResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->searchOnBlur(true)
             ->paginated([5, 10, 25, 50, 100])
             ->columns([
@@ -103,6 +104,8 @@ class TrabajoDetalleResource extends Resource
                 ColumnGroup::make('Detalles del trabajo', [
                     TextColumn::make('descripcion')
                         ->html()
+                        ->formatStateUsing(fn ($state) => nl2br(e($state)))
+                        ->wrap()
                         ->searchable(isIndividual: true)
                         ->sortable()
                 ]),

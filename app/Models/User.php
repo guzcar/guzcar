@@ -8,6 +8,7 @@ use Filament\Panel;
 use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -105,5 +106,24 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     public function asistencias()
     {
         return $this->hasMany(Asistencia::class);
+    }
+
+    
+    public function cronogramas(): HasMany
+    {
+        return $this->hasMany(Cronograma::class);
+    }
+
+    
+    public function tareasCronograma()
+    {
+        return $this->hasManyThrough(
+            CronogramaTarea::class,
+            Cronograma::class,
+            'user_id', // Foreign key on cronogramas table
+            'id', // Foreign key on cronograma_tareas table
+            'id', // Local key on users table
+            'tarea_id' // Local key on cronogramas table
+        );
     }
 }

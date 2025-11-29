@@ -14,6 +14,7 @@ class TrabajoOtro extends Model
         'descripcion',
         'precio',
         'cantidad',
+        'confirmado',
         'sort',
         'presupuesto',
         'trabajo_id',
