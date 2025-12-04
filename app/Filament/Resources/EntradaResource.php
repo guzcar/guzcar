@@ -7,6 +7,7 @@ use App\Filament\Resources\EntradaResource\RelationManagers;
 use App\Filament\Resources\EntradaResource\RelationManagers\EntradaArticulosRelationManager;
 use App\Models\Entrada;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -74,6 +75,13 @@ class EntradaResource extends Resource
                                                     $component->state($userName);
                                                 }
                                             }),
+                                        Select::make('proveedor_id')
+                                            ->label('Proveedor')
+                                            ->searchable()
+                                            ->preload()
+                                            ->relationship('proveedor', 'nombre')
+                                            ->nullable()
+                                            ->columnSpan(1),
                                         DatePicker::make('fecha')
                                             ->required()
                                             ->default(now()),
@@ -111,6 +119,12 @@ class EntradaResource extends Resource
                 TextColumn::make('responsable.name')
                     ->searchable(isIndividual: true)
                     ->sortable(),
+                TextColumn::make('proveedor.nombre')
+                    ->label('Proveedor')
+                    ->placeholder('Sin proveedor')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('articulos_count')
                     ->label('Ítems')
                     ->badge()

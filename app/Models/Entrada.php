@@ -40,6 +40,11 @@ class Entrada extends Model
         return $this->belongsTo(User::class)->withTrashed();
     }
 
+    public function proveedor()
+    {
+        return $this->belongsTo(Proveedor::class, 'proveedor_id');
+    }
+
     protected static function booted(): void
     {
         // Evento para cuando se elimina permanentemente una entrada
