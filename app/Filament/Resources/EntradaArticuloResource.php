@@ -152,6 +152,11 @@ class EntradaArticuloResource extends Resource
                     ->sortable()
                     ->searchable(isIndividual: true),
 
+                TextColumn::make('entrada.proveedor.nombre')
+                    ->placeholder('Sin proveedor')
+                    ->sortable()
+                    ->searchable(isIndividual: true),
+
                 // entrada.evidencia_url como link a nueva pestaña
                 TextColumn::make('evidencia')
                     ->label('Evidencia')
