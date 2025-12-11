@@ -56,12 +56,18 @@ class ArticuloController extends Controller
             ->orderBy('created_at', 'desc') // Ordenar por created_at
             ->get();
 
-        // Combinar y ordenar
-        $todosLosItems = $articulos->concat($otros)->sortByDesc(function($item) {
-            // Para artículos normales usar fecha y hora, para otros usar created_at
+        // Combinar y ordenar - CORREGIDO
+        $todosLosItems = $articulos->concat($otros)->sortByDesc(function ($item) {
+            // Para artículos normales usar fecha (que ya incluye hora completa)
             if ($item instanceof TrabajoArticulo) {
-                return Carbon::parse($item->fecha . ' ' . $item->hora);
+                // Si fecha ya es un objeto Carbon/DateTime
+                if ($item->fecha instanceof \DateTimeInterface) {
+                    return $item->fecha;
+                }
+                // Si es string, parsearlo directamente
+                return Carbon::parse($item->fecha);
             } else {
+                // Para otros usar created_at
                 return $item->created_at;
             }
         });
