@@ -52,15 +52,50 @@ class EvidenciaApiController extends Controller
         $resultado = [];
 
         foreach ($files as $file) {
-            // Detectar tipo
-            $ext = strtolower($file->getClientOriginalExtension());
-            $tipo = in_array($ext, ['mp4', 'mov']) ? 'video' : 'imagen';
+            // 1) Detectar MIME real (más confiable que el nombre)
+            $mime = $file->getMimeType(); // ej: image/jpeg, video/mp4
 
-            // Guardar archivo
-            $filename = uniqid() . '.' . $ext;
+            if (str_starts_with($mime, 'video/')) {
+                $tipo = 'video';
+            } elseif (str_starts_with($mime, 'image/')) {
+                $tipo = 'imagen';
+            } else {
+                // si vino otra cosa (raro, porque el picker ya filtra)
+                $tipo = 'imagen';
+            }
+
+            // 2) Extensión "bonita" en base al MIME
+            //    usamos extension() que se basa en el MIME y no en el nombre .tmp
+            $ext = strtolower($file->extension() ?? '');
+
+            if (!$ext) {
+                // fallback según MIME
+                if (str_starts_with($mime, 'image/')) {
+                    $ext = match ($mime) {
+                        'image/jpeg' => 'jpg',
+                        'image/png' => 'png',
+                        'image/webp' => 'webp',
+                        default => 'jpg',
+                    };
+                } elseif (str_starts_with($mime, 'video/')) {
+                    $ext = match ($mime) {
+                        'video/mp4' => 'mp4',
+                        'video/3gpp' => '3gp',
+                        'video/quicktime' => 'mov',
+                        default => 'mp4',
+                    };
+                } else {
+                    $ext = 'bin';
+                }
+            }
+
+            // 3) Nombre final con extensión correcta
+            $filename = uniqid('evidencia_') . '.' . $ext;
+
+            // 4) Guardar archivo
             $file->storeAs('public/evidencia', $filename);
 
-            // Crear registro
+            // 5) Crear registro
             $e = Evidencia::create([
                 'trabajo_id' => $trabajo->id,
                 'user_id' => auth()->id(),
@@ -79,10 +114,9 @@ class EvidenciaApiController extends Controller
 
         return response()->json([
             'message' => 'Evidencias registradas correctamente',
-            'data' => $resultado
+            'data' => $resultado,
         ], 201);
     }
-
 
     /**
      * Editar evidencia individual (solo observación)
