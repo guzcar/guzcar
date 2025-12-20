@@ -103,3 +103,195 @@ header.fi-sidebar-header button.fi-icon-btn:disabled .fi-icon-btn-icon {
 div.fi-page-sub-navigation-sidebar-ctn {
     width: 14rem !important; 
 }
+
+/* ===== 30 colores normalizados (claro + hover + oscuro + hover) ===== */
+
+/* 1 */
+.extra-color-1 { @apply bg-[#B4CBEF] text-black transition-colors duration-300; }
+.extra-color-1:hover { @apply bg-[#9BBAEA]; }
+.dark .extra-color-1 { @apply bg-[#1E2F4D] text-white transition-colors duration-300; }
+.dark .extra-color-1:hover { @apply bg-[#18263D]; }
+
+/* 2 */
+.extra-color-2 { @apply bg-[#B2E3EF] text-black transition-colors duration-300; }
+.extra-color-2:hover { @apply bg-[#99DAEA]; }
+.dark .extra-color-2 { @apply bg-[#1B3B46] text-white transition-colors duration-300; }
+.dark .extra-color-2:hover { @apply bg-[#16313B]; }
+
+/* 3 */
+.extra-color-3 { @apply bg-[#B4EFD8] text-black transition-colors duration-300; }
+.extra-color-3:hover { @apply bg-[#9BEACB]; }
+.dark .extra-color-3 { @apply bg-[#1C4437] text-white transition-colors duration-300; }
+.dark .extra-color-3:hover { @apply bg-[#17382D]; }
+
+/* 4 */
+.extra-color-4 { @apply bg-[#C6E9B3] text-black transition-colors duration-300; }
+.extra-color-4:hover { @apply bg-[#B4E29B]; }
+.dark .extra-color-4 { @apply bg-[#2A451F] text-white transition-colors duration-300; }
+.dark .extra-color-4:hover { @apply bg-[#223818]; }
+
+/* 5 */
+.extra-color-5 { @apply bg-[#D9E9B4] text-black transition-colors duration-300; }
+.extra-color-5:hover { @apply bg-[#CDE29C]; }
+.dark .extra-color-5 { @apply bg-[#3B4A1A] text-white transition-colors duration-300; }
+.dark .extra-color-5:hover { @apply bg-[#313D15]; }
+
+/* 6 */
+.extra-color-6 { @apply bg-[#E5DDB1] text-black transition-colors duration-300; }
+.extra-color-6:hover { @apply bg-[#DDD39A]; }
+.dark .extra-color-6 { @apply bg-[#4A421C] text-white transition-colors duration-300; }
+.dark .extra-color-6:hover { @apply bg-[#3E3717]; }
+
+/* 7 */
+.extra-color-7 { @apply bg-[#EED2B0] text-black transition-colors duration-300; }
+.extra-color-7:hover { @apply bg-[#E9C497]; }
+.dark .extra-color-7 { @apply bg-[#4A3218] text-white transition-colors duration-300; }
+.dark .extra-color-7:hover { @apply bg-[#3C2913]; }
+
+/* 8 */
+.extra-color-8 { @apply bg-[#EDCEAB] text-black transition-colors duration-300; }
+.extra-color-8:hover { @apply bg-[#E8BF92]; }
+.dark .extra-color-8 { @apply bg-[#4A2D1B] text-white transition-colors duration-300; }
+.dark .extra-color-8:hover { @apply bg-[#3D2516]; }
+
+/* 9 */
+.extra-color-9 { @apply bg-[#EFB3B3] text-black transition-colors duration-300; }
+.extra-color-9:hover { @apply bg-[#EA9A9A]; }
+.dark .extra-color-9 { @apply bg-[#4A1F1F] text-white transition-colors duration-300; }
+.dark .extra-color-9:hover { @apply bg-[#3C1919]; }
+
+/* 10 */
+.extra-color-10 { @apply bg-[#EFB4CB] text-black transition-colors duration-300; }
+.extra-color-10:hover { @apply bg-[#EA9BBA]; }
+.dark .extra-color-10 { @apply bg-[#4A2436] text-white transition-colors duration-300; }
+.dark .extra-color-10:hover { @apply bg-[#3D1D2C]; }
+
+/* 11 */
+.extra-color-11 { @apply bg-[#E5B4EF] text-black transition-colors duration-300; }
+.extra-color-11:hover { @apply bg-[#DC9BEA]; }
+.dark .extra-color-11 { @apply bg-[#3A244A] text-white transition-colors duration-300; }
+.dark .extra-color-11:hover { @apply bg-[#311F3D]; }
+
+/* 12 */
+.extra-color-12 { @apply bg-[#C6B7F0] text-black transition-colors duration-300; }
+.extra-color-12:hover { @apply bg-[#B29EEB]; }
+.dark .extra-color-12 { @apply bg-[#2E234A] text-white transition-colors duration-300; }
+.dark .extra-color-12:hover { @apply bg-[#261D3D]; }
+
+/* 13 */
+.extra-color-13 { @apply bg-[#BCB6EF] text-black transition-colors duration-300; }
+.extra-color-13:hover { @apply bg-[#A59DE9]; }
+.dark .extra-color-13 { @apply bg-[#262652] text-white transition-colors duration-300; }
+.dark .extra-color-13:hover { @apply bg-[#1F2144]; }
+
+/* 14 */
+.extra-color-14 { @apply bg-[#B4C7EF] text-black transition-colors duration-300; }
+.extra-color-14:hover { @apply bg-[#9BB4EA]; }
+.dark .extra-color-14 { @apply bg-[#1F2A52] text-white transition-colors duration-300; }
+.dark .extra-color-14:hover { @apply bg-[#192245]; }
+
+/* 15 */
+.extra-color-15 { @apply bg-[#B4D5EF] text-black transition-colors duration-300; }
+.extra-color-15:hover { @apply bg-[#9BC7EA]; }
+.dark .extra-color-15 { @apply bg-[#223A4D] text-white transition-colors duration-300; }
+.dark .extra-color-15:hover { @apply bg-[#1C3040]; }
+
+/* 16 */
+.extra-color-16 { @apply bg-[#ADEED7] text-black transition-colors duration-300; }
+.extra-color-16:hover { @apply bg-[#94E9CB]; }
+.dark .extra-color-16 { @apply bg-[#1F3D36] text-white transition-colors duration-300; }
+.dark .extra-color-16:hover { @apply bg-[#19322C]; }
+
+/* 17 */
+.extra-color-17 { @apply bg-[#C5E3B1] text-black transition-colors duration-300; }
+.extra-color-17:hover { @apply bg-[#B4DB9A]; }
+.dark .extra-color-17 { @apply bg-[#2F3C2A] text-white transition-colors duration-300; }
+.dark .extra-color-17:hover { @apply bg-[#273223]; }
+
+/* 18 */
+.extra-color-18 { @apply bg-[#DCE9B4] text-black transition-colors duration-300; }
+.extra-color-18:hover { @apply bg-[#D1E29C]; }
+.dark .extra-color-18 { @apply bg-[#3A421F] text-white transition-colors duration-300; }
+.dark .extra-color-18:hover { @apply bg-[#303718]; }
+
+/* 19 */
+.extra-color-19 { @apply bg-[#EED3AD] text-black transition-colors duration-300; }
+.extra-color-19:hover { @apply bg-[#E9C594]; }
+.dark .extra-color-19 { @apply bg-[#433224] text-white transition-colors duration-300; }
+.dark .extra-color-19:hover { @apply bg-[#382A1E]; }
+
+/* 20 */
+.extra-color-20 { @apply bg-[#DFC3C3] text-black transition-colors duration-300; }
+.extra-color-20:hover { @apply bg-[#D4AFAF]; }
+.dark .extra-color-20 { @apply bg-[#2B2B2B] text-white transition-colors duration-300; }
+.dark .extra-color-20:hover { @apply bg-[#242424]; }
+
+/* 21 */
+.extra-color-21 { @apply bg-[#B5CBEF] text-black transition-colors duration-300; }
+.extra-color-21:hover { @apply bg-[#9CB9EA]; }
+.dark .extra-color-21 { @apply bg-[#1E2E5A] text-white transition-colors duration-300; }
+.dark .extra-color-21:hover { @apply bg-[#18264B]; }
+
+/* 22 */
+.extra-color-22 { @apply bg-[#B2EFE3] text-black transition-colors duration-300; }
+.extra-color-22:hover { @apply bg-[#99EADA]; }
+.dark .extra-color-22 { @apply bg-[#17453F] text-white transition-colors duration-300; }
+.dark .extra-color-22:hover { @apply bg-[#123A35]; }
+
+/* 23 */
+.extra-color-23 { @apply bg-[#BEEAB8] text-black transition-colors duration-300; }
+.extra-color-23:hover { @apply bg-[#A8E3A0]; }
+.dark .extra-color-23 { @apply bg-[#224423] text-white transition-colors duration-300; }
+.dark .extra-color-23:hover { @apply bg-[#1C381D]; }
+
+/* 24 */
+.extra-color-24 { @apply bg-[#EFCBB4] text-black transition-colors duration-300; }
+.extra-color-24:hover { @apply bg-[#EABA9B]; }
+.dark .extra-color-24 { @apply bg-[#4A2A1E] text-white transition-colors duration-300; }
+.dark .extra-color-24:hover { @apply bg-[#3D2319]; }
+
+/* 25 */
+.extra-color-25 { @apply bg-[#EFC3B2] text-black transition-colors duration-300; }
+.extra-color-25:hover { @apply bg-[#EAAF99]; }
+.dark .extra-color-25 { @apply bg-[#4A231C] text-white transition-colors duration-300; }
+.dark .extra-color-25:hover { @apply bg-[#3D1D17]; }
+
+/* 26 */
+.extra-color-26 { @apply bg-[#F0B9B9] text-black transition-colors duration-300; }
+.extra-color-26:hover { @apply bg-[#EBA0A0]; }
+.dark .extra-color-26 { @apply bg-[#4D1E2A] text-white transition-colors duration-300; }
+.dark .extra-color-26:hover { @apply bg-[#401924]; }
+
+/* 27 */
+.extra-color-27 { @apply bg-[#E7B6EF] text-black transition-colors duration-300; }
+.extra-color-27:hover { @apply bg-[#DF9DE9]; }
+.dark .extra-color-27 { @apply bg-[#3D1E4A] text-white transition-colors duration-300; }
+.dark .extra-color-27:hover { @apply bg-[#33193D]; }
+
+/* 28 */
+.extra-color-28 { @apply bg-[#B8BFF0] text-black transition-colors duration-300; }
+.extra-color-28:hover { @apply bg-[#9FA8EB]; }
+.dark .extra-color-28 { @apply bg-[#2A2352] text-white transition-colors duration-300; }
+.dark .extra-color-28:hover { @apply bg-[#221D45]; }
+
+/* 29 */
+.extra-color-29 { @apply bg-[#B4DAEF] text-black transition-colors duration-300; }
+.extra-color-29:hover { @apply bg-[#9BCEEA]; }
+.dark .extra-color-29 { @apply bg-[#193A4A] text-white transition-colors duration-300; }
+.dark .extra-color-29:hover { @apply bg-[#14313F]; }
+
+/* 30 */
+.extra-color-30 { @apply bg-[#CCEAB8] text-black transition-colors duration-300; }
+.extra-color-30:hover { @apply bg-[#BBE3A0]; }
+.dark .extra-color-30 { @apply bg-[#314A1E] text-white transition-colors duration-300; }
+.dark .extra-color-30:hover { @apply bg-[#283D18]; }
+
+/* Permite que el background del <tr> se vea en Filament (los <td> suelen traer fondo propio) */
+.fi-ta-table tbody tr[class^="extra-color-"] > td {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+
+.fi-ta-table tbody tr[class^="extra-color-"]:hover > td {
+    background-color: transparent !important;
+}

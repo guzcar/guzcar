@@ -11,7 +11,8 @@ class ArticuloGrupo extends Model
 
     protected $fillable = [
         'nombre',
-        'color'
+        'color',
+        'extra_color',
     ];
 
     public function articulos()

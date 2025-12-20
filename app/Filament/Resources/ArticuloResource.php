@@ -45,6 +45,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\HtmlString;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use function PHPUnit\Framework\isInfinite;
@@ -264,13 +265,10 @@ class ArticuloResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordClasses(fn (Articulo $record) => $record->grupo?->extra_color ?: null)
             ->searchOnBlur(true)
             ->paginated([5, 10, 25, 50, 100])
             ->columns([
-                ColorColumn::make('grupo.color')
-                    ->alignCenter()
-                    ->placeholder('S.G.')
-                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('categoria.nombre')
                     ->label('Artículo')
                     ->sortable()
@@ -309,6 +307,10 @@ class ArticuloResource extends Resource
                     ->sortable()
                     ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make('grupo.nombre')
+                    ->placeholder('Sin grupo')
+                    ->searchable(isIndividual: true)
+                    ->sortable(),
                 TextColumn::make('ubicaciones.codigo')
                     ->label('Ubicación')
                     ->placeholder('Sin ubicación')

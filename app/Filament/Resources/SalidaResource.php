@@ -402,6 +402,8 @@ class SalidaResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['articulo.grupo']))
+            ->recordClasses(fn (TrabajoArticulo $record) => $record->articulo?->grupo?->extra_color ?: null)
             ->searchOnBlur(true)
             ->paginated([5, 10, 25, 50])
             ->columns([
@@ -432,10 +434,10 @@ class SalidaResource extends Resource
                         ->offIcon('heroicon-c-x-mark'),
                 ]),
                 ColumnGroup::make('Artículo', [
-                    ColorColumn::make('articulo.grupo.color')
-                        ->alignCenter()
-                        ->placeholder('S.G.')
-                        ->toggleable(isToggledHiddenByDefault: false),
+                    // ColorColumn::make('articulo.grupo.color')
+                    //     ->alignCenter()
+                    //     ->placeholder('S.G.')
+                    //     ->toggleable(isToggledHiddenByDefault: false),
                     TextColumn::make('articulo')
                         ->label('Descripción del artículo')
                         ->state(function (TrabajoArticulo $record) {
