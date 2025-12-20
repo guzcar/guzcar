@@ -286,11 +286,11 @@ div.fi-page-sub-navigation-sidebar-ctn {
 .dark .extra-color-30 { @apply bg-[#314A1E] text-white transition-colors duration-300; }
 .dark .extra-color-30:hover { @apply bg-[#283D18]; }
 
-/* 31 (gris neutro) */
-.extra-color-31 { @apply bg-[#D1D5DB] text-black transition-colors duration-300; }
-.extra-color-31:hover { @apply bg-[#C1C7D1]; }
-.dark .extra-color-31 { @apply bg-[#374151] text-white transition-colors duration-300; }
-.dark .extra-color-31:hover { @apply bg-[#2F3948]; }
+/* 31 (gris neutro real) */
+.extra-color-31 { @apply bg-[#D6D6D6] text-black transition-colors duration-300; }
+.extra-color-31:hover { @apply bg-[#C8C8C8]; }
+.dark .extra-color-31 { @apply bg-[#2F2F2F] text-white transition-colors duration-300; }
+.dark .extra-color-31:hover { @apply bg-[#262626]; }
 
 /* Permite que el background del <tr> se vea en Filament (los <td> suelen traer fondo propio) */
 .fi-ta-table tbody tr[class^="extra-color-"] > td {

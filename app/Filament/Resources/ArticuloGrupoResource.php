@@ -64,7 +64,7 @@ class ArticuloGrupoResource extends Resource
             'extra-color-28' => '#B8BFF0',
             'extra-color-29' => '#B4DAEF',
             'extra-color-30' => '#CCEAB8',
-            'extra-color-31' => '#D1D5DB',
+            'extra-color-31' => '#D6D6D6',
         ];
     }
 
