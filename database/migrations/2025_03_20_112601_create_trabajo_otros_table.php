@@ -19,7 +19,6 @@ return new class extends Migration {
                 ->onUpdate('cascade');
             $table->foreignId('user_id')
                 ->nullable()
-                ->after('trabajo_id')
                 ->constrained('users')
                 ->onDelete('set null')
                 ->onUpdate('cascade');

@@ -516,9 +516,25 @@ class TrabajoResource extends Resource
                                     ->required(),
                                 DateTimePicker::make('fecha_salida')
                                     ->hiddenOn('create'),
-                                TextInput::make('kilometraje')
-                                    ->numeric()
-                                    ->maxValue(42949672.95),
+                                DateTimePicker::make('fecha_entrega')
+                                    ->label('Fecha prevista de entrega')
+                                    ->time(false)
+                                    ->nullable(),
+                                Grid::make(['default' => 2])
+                                    ->schema([
+                                        TextInput::make('kilometraje')
+                                            ->numeric()
+                                            ->maxValue(42949672.95)
+                                            ->disabled(fn(Get $get): bool => !$get('aplica_kilometraje'))
+                                            ->required(fn(Get $get): bool => (bool) $get('aplica_kilometraje'))
+                                            ->dehydrated(fn(Get $get): bool => (bool) $get('aplica_kilometraje'))
+                                            ->nullable(),
+                                        Toggle::make('aplica_kilometraje')
+                                            ->inline(false)
+                                            ->label('Aplica kilometraje')
+                                            ->default(true)
+                                            ->live(),
+                                    ]),
                                 Textarea::make('descripcion_servicio')
                                     ->required()
                                     ->columnSpanFull(),
@@ -648,7 +664,7 @@ class TrabajoResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('kilometraje')
                     ->sortable()
-                    ->placeholder('0.00')
+                    ->placeholder('No aplica')
                     ->toggleable(isToggledHiddenByDefault: true),
                 CheckboxColumn::make('control')
                     ->alignCenter()
@@ -742,6 +758,42 @@ class TrabajoResource extends Resource
                         return '';
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('fecha_entrega')
+                    ->label('Fecha entrega')
+                    ->dateTime('d/m/Y')
+                    ->placeholder('No previsto')
+                    // Badge SOLO si aún no se ha entregado (fecha_salida null):
+                    ->badge(fn($record) => is_null($record->fecha_salida) && filled($record->fecha_entrega))
+                    ->color(function ($state, $record): ?string {
+                        // Si ya salió/entregó, tono normal:
+                        if (!is_null($record->fecha_salida)) {
+                            return null;
+                        }
+
+                        if (blank($state)) {
+                            return null;
+                        }
+
+                        $entrega = $state instanceof Carbon ? $state : Carbon::parse($state);
+                        $hoy = now()->startOfDay();
+                        $diaEntrega = $entrega->startOfDay();
+
+                        // Si es hoy o ya pasó => danger:
+                        if ($hoy->greaterThanOrEqualTo($diaEntrega)) {
+                            return 'danger';
+                        }
+
+                        // Días restantes (1,2,3 => warning)
+                        $dias = $hoy->diffInDays($diaEntrega);
+
+                        if ($dias >= 1 && $dias <= 3) {
+                            return 'warning';
+                        }
+
+                        // 4+ días => success
+                        return 'success';
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y H:i:s')
@@ -773,6 +825,13 @@ class TrabajoResource extends Resource
                     ->label('Control vehicular')
                     ->query(fn($query) => $query->where('control', true)->orWhereNull('fecha_salida'))
                     ->hidden(fn() => !auth()->user()->can('update_trabajo')),
+                Filter::make('pendientes_con_fecha_entrega')
+                    ->label('Pendientes con fecha de entrega')
+                    ->query(
+                        fn(Builder $query): Builder =>
+                        $query->whereNull('fecha_salida')
+                            ->whereNotNull('fecha_entrega')
+                    ),
                 TernaryFilter::make('estado_trabajo')
                     ->label('Estado del Trabajo')
                     ->placeholder('Todos')
