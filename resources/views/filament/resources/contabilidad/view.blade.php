@@ -180,6 +180,57 @@
             </div>
         </x-filament::section>
 
+        {{-- NUEVO BLOQUE: Detalle Técnico del Vehículo --}}
+        <x-filament::section class="fi-section-content-p2">
+            <x-slot name="heading">Detalle Técnico del Vehículo</x-slot>
+
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto text-left border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <tbody>
+                        {{-- VIN --}}
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300 w-40"
+                                style="width: 120px;">Vin/Chasis</th>
+                            <td class="px-4 py-2">
+                                @php $vin = $trabajo->vehiculo->vin ?? null; @endphp
+                                @if(!empty($vin))
+                                    {{ $vin }}
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">Sin VIN</span>
+                                @endif
+                            </td>
+                        </tr>
+
+                        {{-- Motor --}}
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Motor</th>
+                            <td class="px-4 py-2">
+                                @php $motor = $trabajo->vehiculo->motor ?? null; @endphp
+                                @if(!empty($motor))
+                                    {{ $motor }}
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">Sin N° Motor</span>
+                                @endif
+                            </td>
+                        </tr>
+
+                        {{-- Año --}}
+                        <tr>
+                            <th class="px-4 py-2 font-medium text-gray-700 dark:text-gray-300">Año</th>
+                            <td class="px-4 py-2">
+                                @php $ano = $trabajo->vehiculo->ano ?? null; @endphp
+                                @if(!empty($ano))
+                                    {{ $ano }}
+                                @else
+                                    <span class="text-gray-500 dark:text-gray-400">Sin año</span>
+                                @endif
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </x-filament::section>
+        
         {{-- Técnicos Asignados --}}
         <x-filament::section>
             <x-slot name="heading">Técnicos Asignados</x-slot>

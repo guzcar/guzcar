@@ -702,6 +702,24 @@ class TrabajoResource extends Resource
                     ->sortable()
                     ->searchable(isIndividual: true)
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('vehiculo.vin')
+                    ->label('Vin/Chasis')
+                    ->placeholder('Sin información')
+                    ->sortable()
+                    ->searchable(isIndividual: true)
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('vehiculo.motor')
+                    ->label('Motor')
+                    ->placeholder('Sin información')
+                    ->sortable()
+                    ->searchable(isIndividual: true)
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('vehiculo.ano')
+                    ->label('Año')
+                    ->placeholder('Sin información')
+                    ->sortable()
+                    ->searchable(isIndividual: true)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('clientes_display')
                     ->label('Clientes')
                     ->searchable(
