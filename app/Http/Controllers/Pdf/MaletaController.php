@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Pdf;
 
 use App\Http\Controllers\Controller;
+use App\Models\ContenidoInforme;
 use App\Models\Maleta;
 use App\Models\MaletaDetalle;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -12,6 +13,8 @@ class MaletaController extends Controller
     public function show(Maleta $maleta)
     {
         $maleta->load(['propietario', 'detalles.herramienta']);
+
+        $contenidoInforme = ContenidoInforme::find(1)?->contenido;
 
         // Obtener todas las herramientas de la maleta
         $herramientas = $maleta->detalles->map(function ($detalle) {
@@ -25,7 +28,7 @@ class MaletaController extends Controller
         $pdf = Pdf::loadView('pdf.maleta', [
             'maleta' => $maleta,
             'generatedAt' => now(),
-            'herramientasAgrupadas' => $herramientasAgrupadas,
+            'herramientasAgrupadas' => $herramientasAgrupadas,'contenidoInforme' => $contenidoInforme,
         ])->setPaper('A4', 'portrait');
 
         return $pdf->stream("maleta-{$maleta->codigo}.pdf");

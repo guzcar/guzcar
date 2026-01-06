@@ -4,16 +4,12 @@
 
     <ol style="text-transform: none">
         <li>
-            <p><b>Información general</b></p>
-            <p>Por la presente se hace constancia de la entrega de maletas de herramientas para que cada trabajador
-                pueda ejecutar sus labores. Se deberá cuidar minuciosamente cada herramienta y se deberá informar al
-                área
-                correspondiente de algún imprevisto (fracturado, reventador, deteriorado, etc). Esta lista deberá ser
-                presentada en cada supervisión.</p>
+            <p><b>INFORMACIÓN GENERAL</b></p>
+            <p>{{ $contenidoInforme }}</p>
         </li>
 
         <li>
-            <p><b>Información de datos</b></p>
+            <p><b>INFORMACIÓN DE DATOS</b></p>
             <ul>
                 <li><b>Nombres de quién recibió:</b> {{ $maleta->propietario->name ?? '—' }}</li>
                 <li><b>Nombres de quién entrega:</b> {{ Auth::user()->name }}</li>
@@ -23,7 +19,7 @@
         </li>
 
         <li>
-            <p><b>Información de herramientas</b></p>
+            <p><b>INFORMACIÓN DE HERRAMIENTAS</b></p>
             <p>Total de herramientas: {{ $maleta->detalles->count() }}</p>
 
             @if($herramientasAgrupadas->isEmpty())
