@@ -23,7 +23,7 @@ class ArticuloController extends Controller
                     ->orderBy('fecha', 'desc')
                     ->orderBy('hora', 'desc');
             },
-            'trabajoOtros' => function ($query) { // Agregar esta relación
+            'otros' => function ($query) { // Agregar esta relación
                 $query->where('user_id', Auth::id()) // Cambiar a user_id
                     ->orderBy('created_at', 'desc'); // Ordenar por created_at
             },
@@ -125,7 +125,7 @@ class ArticuloController extends Controller
                 ->update(['confirmado' => true]);
 
             // Confirmar "otros" artículos - usar user_id
-            $trabajo->trabajoOtros()
+            $trabajo->otros()
                 ->where('user_id', Auth::id())
                 ->update(['confirmado' => true]);
         });

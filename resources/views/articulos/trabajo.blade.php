@@ -109,14 +109,14 @@
 
     <div class="accordion" id="articulosAcordion">
         @php
-            // Combinar artículos normales y otros
-            $todosLosArticulos = $trabajo->trabajoArticulos->concat($trabajo->trabajoOtros)
+            $todosLosArticulos = $trabajo->trabajoArticulos->concat($trabajo->otros)
                 ->sortByDesc(function($item) {
-                    if ($item instanceof \App\Models\TrabajoArticulo) {
-                        return Illuminate\Support\Carbon::parse($item->fecha . ' ' . $item->hora);
-                    } else {
-                        return $item->created_at;
-                    }
+                    // Usa created_at si existe, sino intenta con fecha/hora
+                    return $item->created_at ?? 
+                        Carbon::parse(
+                            $item->fecha . ' ' . 
+                            (strlen($item->hora) > 8 ? substr($item->hora, 11, 8) : $item->hora)
+                        );
                 });
         @endphp
 
@@ -168,9 +168,9 @@
                                     data-bs-target="#collapse-{{ $index }}" aria-expanded="false"
                                     aria-controls="collapse-{{ $index }}">
                                     {{ $label }}
-                                    @if($esOtro)
+                                    {{-- @if($esOtro)
                                         <span class="badge badge-otro">OTRO</span>
-                                    @endif
+                                    @endif --}}
                                 </button>
                             </td>
                             <td class="px-2" style="width: 1rem;">

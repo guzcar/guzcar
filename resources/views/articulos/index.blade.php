@@ -113,9 +113,9 @@
                                     data-bs-target="#collapse-{{ $index }}" aria-expanded="false"
                                     aria-controls="collapse-{{ $index }}">
                                     {{ $label }}
-                                    @if($esOtro)
+                                    {{-- @if($esOtro)
                                         <span class="badge badge-otro">OTRO</span>
-                                    @endif
+                                    @endif --}}
                                 </button>
                             </td>
                             <td class="px-2" style="width: 1rem;">
