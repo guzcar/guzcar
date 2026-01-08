@@ -264,7 +264,7 @@ class ArticuloController extends Controller
         // Obtener datos del vehículo si se cargó la relación
         $vehiculoInfo = null;
         if ($item->trabajo && $item->trabajo->vehiculo) {
-            $vehiculoInfo = $item->trabajo->vehiculo->placa . ' - ' . ($item->trabajo->vehiculo->modelo->nombre ?? '');
+            $vehiculoInfo = $item->trabajo->vehiculo->placa . ' - ' . ($item->trabajo->vehiculo->tipoVehiculo->nombre ?? '') . ' ' . ($item->trabajo->vehiculo->marca->nombre ?? '') . ' ' . ($item->trabajo->vehiculo->modelo->nombre ?? '');
         }
 
         return [
