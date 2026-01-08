@@ -23,9 +23,6 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // Revocar tokens viejos (opcional)
-        // $user->tokens()->delete();
-
         // Crear token nuevo
         $token = $user->createToken('mobile')->plainTextToken;
 

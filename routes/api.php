@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ArticuloController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EvidenciaApiController;
 use App\Http\Controllers\Api\TrabajoApiController;
@@ -45,4 +46,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/trabajos/{trabajo}/descripciones', [TrabajoDescripcionApiController::class, 'store']);
     Route::put('/descripciones/{descripcion}', [TrabajoDescripcionApiController::class, 'update']);
     Route::delete('/descripciones/{descripcion}', [TrabajoDescripcionApiController::class, 'destroy']);
+
+    Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'itemsPorTrabajo']);
+    Route::post('/trabajos/{trabajo}/articulos/confirmar-todo', [ArticuloController::class, 'confirmarTodosPorTrabajo']);
+    Route::get('/mi-semana/articulos', [ArticuloController::class, 'itemsSemanaActual']);
+    Route::post('/mi-semana/articulos/confirmar-todo', [ArticuloController::class, 'confirmarTodosSemana']);
+    Route::post('/articulos/{trabajoArticulo}/confirmar', [ArticuloController::class, 'confirmarArticuloIndividual']);
+    Route::post('/otros/{trabajoOtro}/confirmar', [ArticuloController::class, 'confirmarOtroIndividual']);
 });
