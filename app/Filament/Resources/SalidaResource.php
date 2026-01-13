@@ -542,6 +542,7 @@ class SalidaResource extends Resource
                         ->sortable(),
                     TextColumn::make('total')
                         ->label('P. Total')
+                        ->hidden(fn() => !auth()->user()->can('create_contabilidad'))
                         ->state(fn(TrabajoArticulo $record): float => $record->precio * $record->cantidad)
                         ->numeric()
                         ->formatStateUsing(fn(float $state): string => 'S/ ' . number_format($state, 2))
