@@ -96,6 +96,12 @@ class DetallesRelationManager extends RelationManager
     {
         return $table
             ->defaultSort('created_at', 'desc')
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession()
+            ->searchOnBlur(true)
+            ->paginated([5, 10, 25, 50, 100])
             ->columns([
                 TextColumn::make('herramienta.nombre')
                     ->searchable(isIndividual: true)

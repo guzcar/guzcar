@@ -55,6 +55,13 @@ class DetallesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession()
+            ->searchOnBlur(true)
+            ->paginated([5, 10, 25, 50, 100])
             ->recordTitleAttribute('herramienta_id')
             ->columns([
                 TextColumn::make('herramienta.nombre')

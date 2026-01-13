@@ -56,6 +56,12 @@ class MaletaResource extends Resource
     {
         return $table
             ->defaultSort('created_at', 'desc')
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession()
+            ->searchOnBlur(true)
+            ->paginated([5, 10, 25, 50, 100])
             ->columns([
                 TextColumn::make('codigo')
                     ->sortable()

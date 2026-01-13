@@ -81,6 +81,8 @@ class UserResource extends Resource
                                     ->dehydrated(fn($state) => filled($state))
                                     ->required(fn(string $context): bool => $context === 'create')
                                     ->minLength(8),
+                                TextInput::make('dni')
+                                    ->prefixIcon('heroicon-o-identification')
                             ])
                             ->heading('Información de Usuario')
                             ->columnSpan(['xl' => 2, 'lg' => 2, 'md' => 1, 'sm' => 1]),
