@@ -135,9 +135,6 @@ class DetallesRelationManager extends RelationManager
                 Tables\Actions\DeleteAction::make()
                     ->button()
                     ->label('Quitar'),
-                Tables\Actions\ForceDeleteAction::make()
-                    ->button()
-                    ->label("Eliminar")
                 // Tables\Actions\RestoreAction::make()
                 //     ->button(),
             ])
