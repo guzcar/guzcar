@@ -21,12 +21,29 @@ class DateFilterWidget extends Widget implements HasForms
 
     public function mount()
     {
+        // CAMBIO IMPORTANTE: 
+        // Ya NO leemos de la sesión (session('dashboard_start_date')).
+        // Siempre forzamos el inicio a la semana actual.
+        
+        $defaultStart = Carbon::now()->startOfWeek()->toDateString();
+        $defaultEnd = Carbon::now()->toDateString();
+
         $this->data = [
-            'startDate' => Carbon::now()->startOfWeek()->toDateString(),
-            'endDate' => Carbon::now()->toDateString()
+            'startDate' => $defaultStart,
+            'endDate' => $defaultEnd
         ];
 
+        // Sobrescribimos la sesión inmediatamente con la fecha actual.
+        // Esto "borra" cualquier fecha antigua que haya quedado guardada
+        // y asegura que los gráficos carguen con los datos de HOY.
+        session([
+            'dashboard_start_date' => $defaultStart,
+            'dashboard_end_date' => $defaultEnd
+        ]);
+
         $this->readyToFilter = true;
+        
+        // Enviamos el evento para que todos los gráficos se enteren
         $this->dispatchFilterUpdate();
     }
 
@@ -69,9 +86,15 @@ class DateFilterWidget extends Widget implements HasForms
     protected function dispatchFilterUpdate(): void
     {
         if ($this->readyToFilter) {
-            // Convertimos las fechas al formato Y-m-d que usa la base de datos
             $startDate = Carbon::parse($this->data['startDate'])->format('Y-m-d');
             $endDate = Carbon::parse($this->data['endDate'])->format('Y-m-d');
+
+            // Seguimos guardando en sesión cuando el usuario CAMBIA la fecha manualmente
+            // para que la paginación de la tabla o recargas mantengan el filtro.
+            session([
+                'dashboard_start_date' => $startDate,
+                'dashboard_end_date' => $endDate
+            ]);
 
             $this->dispatch('updateDateFilter', [
                 'startDate' => $startDate,

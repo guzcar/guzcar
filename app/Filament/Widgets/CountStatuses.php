@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Trabajo;
+use App\Models\TrabajoPago;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -21,16 +22,19 @@ class CountStatuses extends BaseWidget
 
     protected function getStats(): array
     {
-        // Establecemos fechas por defecto (semana actual)
-        $startDate = $this->hasFilters
-            ? Carbon::parse($this->filters['startDate'])
-            : Carbon::now()->startOfWeek(); // Lunes de esta semana
+        // 1. Recuperar fechas (Prioridad: Filtro > Sesión > Defecto)
+        if ($this->hasFilters) {
+            $startDate = Carbon::parse($this->filters['startDate']);
+            $endDate = Carbon::parse($this->filters['endDate']);
+        } elseif (session()->has('dashboard_start_date')) {
+            $startDate = Carbon::parse(session('dashboard_start_date'));
+            $endDate = Carbon::parse(session('dashboard_end_date'));
+        } else {
+            $startDate = Carbon::now()->startOfWeek();
+            $endDate = Carbon::now()->endOfDay();
+        }
 
-        $endDate = $this->hasFilters
-            ? Carbon::parse($this->filters['endDate'])
-            : Carbon::now()->endOfDay(); // Hoy
-
-        // Consultas base con filtro de fechas
+        // 2. Consultas para los estados de Trabajos (filtro por fecha de ingreso)
         $queryCobrados = Trabajo::where('desembolso', 'COBRADO')
             ->whereDate('fecha_ingreso', '>=', $startDate)
             ->whereDate('fecha_ingreso', '<=', $endDate);
@@ -43,30 +47,42 @@ class CountStatuses extends BaseWidget
             ->whereDate('fecha_ingreso', '>=', $startDate)
             ->whereDate('fecha_ingreso', '<=', $endDate);
 
+        // 3. Consulta para INGRESOS (filtro por fecha de pago real)
+        $totalIngresos = TrabajoPago::whereDate('fecha_pago', '>=', $startDate)
+            ->whereDate('fecha_pago', '<=', $endDate)
+            ->sum('monto');
+
+        // 4. Retornar los 4 Stats
         return [
             Stat::make('Cobrados', $queryCobrados->count())
                 ->label('Trabajos cobrados')
                 ->icon('heroicon-m-check-circle')
-                ->chart([1, 1])
+                ->chart([7, 3, 4, 5, 6, 3, 5, 3])
                 ->color('success'),
 
             Stat::make('A cuentas', $queryACuenta->count())
                 ->label('Trabajos a cuenta')
                 ->icon('heroicon-m-clock')
-                ->chart([1, 1])
+                ->chart([3, 5, 3, 6, 5, 3, 7, 3])
                 ->color('warning'),
 
             Stat::make('Por cobrar', $queryPorCobrar->count())
                 ->label('Trabajos por cobrar')
                 ->icon('heroicon-m-x-circle')
-                ->chart([1, 1])
+                ->chart([2, 5, 8, 4, 2, 7, 1, 6])
                 ->color('danger'),
+            
+            Stat::make('Ingresos', 'S/ ' . number_format($totalIngresos, 2))
+                ->label('Total Ingresos')
+                ->icon('heroicon-m-currency-dollar')
+                ->chart([4, 6, 3, 7, 4, 8, 5, 9])
+                ->color('primary'), // Color solicitado
         ];
     }
 
-    protected function formatDate($date): string
+    protected function getColumns(): int
     {
-        return Carbon::parse($date)->format('d/m/Y');
+        return 4; // Forzar 4 columnas en una sola fila
     }
 
     public function updateFilteredData(array $filters): void
@@ -81,11 +97,6 @@ class CountStatuses extends BaseWidget
         $this->filters = [];
         $this->hasFilters = false;
         $this->dispatch('updateStats');
-    }
-
-    protected function getColumns(): int
-    {
-        return 3;
     }
     
     public static function canView(): bool

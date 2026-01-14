@@ -24,13 +24,16 @@ class IngresosChart extends ChartWidget
     {
         $meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
-        $startDate = $this->hasFilters
-            ? Carbon::parse($this->filters['startDate'])
-            : now()->startOfWeek();
-
-        $endDate = $this->hasFilters
-            ? Carbon::parse($this->filters['endDate'])
-            : now()->endOfDay();
+        if ($this->hasFilters) {
+            $startDate = Carbon::parse($this->filters['startDate']);
+            $endDate = Carbon::parse($this->filters['endDate']);
+        } elseif (session()->has('dashboard_start_date')) {
+            $startDate = Carbon::parse(session('dashboard_start_date'));
+            $endDate = Carbon::parse(session('dashboard_end_date'));
+        } else {
+            $startDate = now()->startOfWeek();
+            $endDate = now()->endOfDay();
+        }
 
         // Determinar la granularidad del gráfico
         $diffInDays = $startDate->diffInDays($endDate);
