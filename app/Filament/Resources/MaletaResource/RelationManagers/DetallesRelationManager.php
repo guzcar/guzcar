@@ -60,7 +60,10 @@ class DetallesRelationManager extends RelationManager
                                     ->disabledOn('edit')
                                     ->preload()
                                     ->live()
-                                    ->rule(fn() => function (string $attribute, $value, \Closure $fail) {
+                                    ->rule(fn($operation) => function (string $attribute, $value, \Closure $fail) use ($operation) {
+                                        if ($operation === 'edit') {
+                                            return;
+                                        }
                                         if (!$value)
                                             return;
                                         $stock = Herramienta::query()->whereKey($value)->value('stock');
@@ -135,8 +138,8 @@ class DetallesRelationManager extends RelationManager
                     ->label('Ver')
                     ->icon('heroicon-s-eye')
                     ->color('gray')
-                    ->disabled(fn ($record) => empty($record->evidencia_url))
-                    ->url(fn ($record) => Storage::url($record->evidencia_url))
+                    ->disabled(fn($record) => empty($record->evidencia_url))
+                    ->url(fn($record) => Storage::url($record->evidencia_url))
                     ->openUrlInNewTab(),
                 Tables\Actions\DeleteAction::make()
                     ->button()
