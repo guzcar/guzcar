@@ -34,6 +34,10 @@ class CountStatuses extends BaseWidget
             $endDate = Carbon::now()->endOfDay();
         }
 
+        if ($startDate->gt($endDate)) {
+            $endDate = $startDate->copy()->endOfDay();
+        }
+
         // 2. Consultas para los estados de Trabajos (filtro por fecha de ingreso)
         $queryCobrados = Trabajo::where('desembolso', 'COBRADO')
             ->whereDate('fecha_ingreso', '>=', $startDate)

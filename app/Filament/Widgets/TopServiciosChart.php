@@ -33,6 +33,10 @@ class TopServiciosChart extends ChartWidget
             $endDate = now()->endOfDay();
         }
 
+        if ($startDate->gt($endDate)) {
+            $endDate = $startDate->copy()->endOfDay();
+        }
+
         $data = TrabajoServicio::query()
             ->join('trabajos', 'trabajo_servicios.trabajo_id', '=', 'trabajos.id')
             ->join('servicios', 'trabajo_servicios.servicio_id', '=', 'servicios.id')

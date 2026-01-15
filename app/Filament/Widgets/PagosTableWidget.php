@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class PagosTableWidget extends BaseWidget
 {
@@ -44,6 +45,7 @@ class PagosTableWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
+            ->striped()
             ->query(
                 TrabajoPago::query()
                     ->with(['trabajo.vehiculo.clientes']) // Pre-cargamos para optimizar
@@ -57,7 +59,7 @@ class PagosTableWidget extends BaseWidget
                     TextColumn::make('trabajo.vehiculo.placa')
                         ->label('Placa')
                         ->weight('bold')
-                        ->searchable()
+                        ->searchable(isIndividual: true)
                         // Movimos la URL aquí ya que quitamos el código
                         ->url(function (TrabajoPago $record): ?string {
                             if ($record->trabajo && auth()->user()->can('update_trabajo')) {
@@ -72,12 +74,28 @@ class PagosTableWidget extends BaseWidget
                     TextColumn::make('trabajo.vehiculo.marca.nombre')
                         ->label('Marca')
                         ->placeholder('-')
+                        ->searchable(isIndividual: true)
                         ->toggleable(isToggledHiddenByDefault: false),
 
                     TextColumn::make('trabajo.vehiculo.modelo.nombre')
                         ->label('Modelo')
                         ->placeholder('-')
+                        ->searchable(isIndividual: true)
                         ->toggleable(isToggledHiddenByDefault: false),
+                ]),
+
+                ColumnGroup::make('Trabajo', [
+                    TextColumn::make('trabajo.descripcion_servicio')
+                        ->wrap()
+                        ->lineClamp(2)
+                        ->label('Descripción')
+                        ->searchable(isIndividual: true)
+                        ->toggleable(isToggledHiddenByDefault: true),
+                    TextColumn::make('trabajo.kilometraje')
+                        ->label('Kilometraje')
+                        ->placeholder('Sin kilometraje')
+                        ->sortable()
+                        ->toggleable(isToggledHiddenByDefault: true),
                 ]),
 
                 // GRUPO CLIENTES (Tu código adaptado)
@@ -143,6 +161,10 @@ class PagosTableWidget extends BaseWidget
                         ]),
                 ]),
             ])
+            ->headerActions([
+                \pxlrbt\FilamentExcel\Actions\Tables\ExportAction::make()
+                    ->color('success')
+            ])
             ->paginated([5, 10, 25]);
     }
 
@@ -164,12 +186,16 @@ class PagosTableWidget extends BaseWidget
     {
         $this->startDate = $filters['startDate'];
         $this->endDate = $filters['endDate'];
+
+        $this->resetTable();
     }
 
     public function clearFilters(): void
     {
         $this->startDate = null;
         $this->endDate = null;
+
+        $this->resetTable();
     }
 
     public static function canView(): bool

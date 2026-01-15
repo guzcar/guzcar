@@ -35,6 +35,10 @@ class SalidasChart extends ChartWidget
             $endDate = now()->endOfDay();
         }
 
+        if ($startDate->gt($endDate)) {
+            $endDate = $startDate->copy()->endOfDay();
+        }
+
         // Determinar la granularidad del gráfico
         $diffInDays = $startDate->diffInDays($endDate);
 

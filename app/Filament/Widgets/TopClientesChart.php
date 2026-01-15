@@ -33,6 +33,10 @@ class TopClientesChart extends ChartWidget
             $endDate = now()->endOfDay();
         }
 
+        if ($startDate->gt($endDate)) {
+            $endDate = $startDate->copy()->endOfDay();
+        }
+
         // 2. Obtener trabajos
         $trabajos = Trabajo::query()
             ->with(['cliente', 'vehiculo.clientes']) 
