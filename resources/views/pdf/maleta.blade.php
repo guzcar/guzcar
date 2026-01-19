@@ -1,57 +1,61 @@
-<x-pdf-layout title="Maleta {{ $maleta->codigo }}" code="{{ $maleta->codigo }}" tipoReporte="ACTA DE ENTRAGA" footer="AUTOMOTORES GUZCAR S.A.C.">
+<x-pdf-layout title="Maleta {{ $maleta->codigo }}" code="{{ $maleta->codigo }}" tipoReporte="ACTA DE ENTREGA" footer="AUTOMOTORES GUZCAR S.A.C.">
 
     <h1>ACTA DE ENTREGA - MALETA DE HERRAMIENTAS</h1>
 
-    <ol style="text-transform: none">
+    <ol style="text-transform: none; font-size: 13px; margin-left: -1rem;">
+
         <li>
             <p><b>INFORMACIÓN GENERAL</b></p>
-            <p>{{ $contenidoInforme }}</p>
+            <ul style="margin-left: -1rem; list-style-type: disc">
+                <li><b>Recibe:</b> {{ $maleta->propietario->name ?? '—' }}</li>
+                <li><b>Entrega:</b> {{ Auth::user()->name }}</li>
+                <li><b>Fecha:</b> {{ $generatedAt->translatedFormat('d \d\e F \d\e\l Y') }}</li>
+                <li><b>Codificación:</b> {{ $maleta->codigo ?? '—' }}</li>
+            </ul>
         </li>
 
         <li>
-            <p><b>INFORMACIÓN DE DATOS</b></p>
-            <ul>
-                <li><b>Nombres de quién recibió:</b> {{ $maleta->propietario->name ?? '—' }}</li>
-                <li><b>Nombres de quién entrega:</b> {{ Auth::user()->name }}</li>
-                <li><b>Fecha de entrega:</b> {{ $generatedAt->translatedFormat('d \d\e F \d\e\l Y') }}</li>
-                <li><b>Codificación:</b> {{ $maleta->codigo ?? '—' }}</li>
-            </ul>
+            <p><b>DECLARACIÓN DE ENTREGA</b></p>
+            <p>{{ $contenidoInforme }}</p>
         </li>
 
         <li>
             <p><b>INFORMACIÓN DE HERRAMIENTAS</b></p>
             <p>Total de herramientas: {{ $maleta->detalles->count() }}</p>
 
-            @if($herramientasAgrupadas->isEmpty())
+            @if($herramientas->isEmpty())
                 <p>No hay herramientas registradas.</p>
             @else
-                <ul>
-                    @foreach($herramientasAgrupadas as $grupo)
-                        <li>
-                            <b>{{ $grupo['cantidad'] }} × {{ $grupo['prefijo'] }}{{ count($grupo['variantes']) > 0 && $grupo['variantes'][0] !== '' ? ':' : '' }}</b>
-                            @if(count($grupo['variantes']) > 0 && $grupo['variantes'][0] !== '')
-                                {{ implode(', ', array_map('strtoupper', $grupo['variantes'])) }}.
-                            @endif
-                        </li>
+                <ul style="margin-left: -1rem; list-style-type: disc">
+                    @foreach($herramientas as $herramienta)
+                        <li>{{ $herramienta }}</li>
                     @endforeach
                 </ul>
             @endif
         </li>
     </ol>
 
-    <table style="border-collapse: collapse; width: 100%;">
+    <table style="border-collapse: collapse; width: 100%; font-size: 13px;">
         <tr>
-            <td style="width: 21%; padding-top: 50px;"></td>
-            <td style="width: 31%; border-bottom: 2px solid black;"></td>
-            <td style="width: 21%;"></td>
-            <td style="width: 31%; border-bottom: 2px solid black;"></td>
-            <td style="width: 21%;"></td>
+            <td style="width: 4%; padding-top: 50px;"></td>
+            <td style="width: 36%; border-bottom: 2px solid black;"></td>
+            <td style="width: 20%;"></td>
+            <td style="width: 36%; border-bottom: 2px solid black;"></td>
+            <td style="width: 4%;"></td>
         </tr>
         <tr>
             <td></td>
-            <td style="text-align: center; padding-top: 10px;">{{ $maleta->propietario->name ?? '—' }}</td>
+            <td style="padding-top: 5px">
+                <p>FIRMA DEL COLABORADOR</p>
+                <p style="margin: 0;"><b>Nobres:</b> {{ $maleta->propietario->name ?? '' }}</p>
+                <p style="margin: 0;"><b>DNI:</b> {{ $maleta->propietario->dni ?? '' }}</p>
+            </td>
             <td></td>
-            <td style="text-align: center; padding-top: 10px;">{{ Auth::user()->name }}</td>
+            <td style="padding-top: 5px;">
+                <p>FIRMA DEL RESPONSABLE</p>
+                <p style="margin: 0;"><b>Nombres:</b> {{ Auth::user()->name ?? '' }}</p>
+                <p style="margin: 0;"><b>DNI:</b> {{ Auth::user()->dni ?? '' }}</p>
+            </td>
             <td></td>
         </tr>
     </table>

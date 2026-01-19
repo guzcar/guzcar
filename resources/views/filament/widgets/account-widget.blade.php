@@ -4,7 +4,7 @@
 
 <x-filament-widgets::widget class="fi-account-widget">
     <x-filament::section>
-        <div class="flex items-center gap-x-3" style="height: 93px;">
+        <div class="flex items-center gap-x-3" style="height: 125px;">
             <x-filament-panels::avatar.user style="height: 4rem; width: 4rem;" :user="$user" />
 
             <div class="flex-1">

@@ -606,8 +606,7 @@
 
                             <div id="diagram-canvas">
                                 <img id="vehicle-image"
-                                    src="{{ asset('storage/' . $trabajo->vehiculo->tipoVehiculo->diagrama) }}"
-                                    alt="Diagrama del vehículo">
+                                    src="{{ asset('storage/' . $trabajo->vehiculo->tipoVehiculo->diagrama) }}">
                                 <div id="symbols-container"></div>
                             </div>
                         @else

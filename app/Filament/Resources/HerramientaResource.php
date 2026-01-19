@@ -39,6 +39,7 @@ class HerramientaResource extends Resource
                     Section::make()
                         ->schema([
                             TextInput::make('nombre')
+                                ->unique(ignoreRecord: true)
                                 ->required()
                                 ->columnSpanFull(),
                             TextInput::make('costo')

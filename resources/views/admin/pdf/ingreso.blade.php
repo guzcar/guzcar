@@ -141,7 +141,7 @@
                             <div class="checklist-item">• {{ $item['cantidad'] }} × {{ $item['nombre'] }}</div>
                         @endforeach
                     @else
-                        <div style="font-style: italic; color: #666;">No hay items marcados</div>
+                        <div style="font-style: italic; color: #666;">No hay items</div>
                     @endif
 
                     <br>
@@ -163,11 +163,9 @@
                     @if($trabajo->vehiculo?->tipoVehiculo?->diagrama)
                         <div class="diagram-container">
                             <img src="{{ storage_path('app/public/' . $trabajo->vehiculo->tipoVehiculo->diagrama) }}"
-                                class="diagram-image" alt="Diagrama del vehículo">
-                            MISMO CONTENEDOR -->
+                                class="diagram-image">
                             @foreach($symbols as $symbol)
                                 @php
-                                    // Usar los porcentajes directamente sobre el contenedor 200x150
                                     $x = (float) str_replace('%', '', $symbol['x']);
                                     $y = (float) str_replace('%', '', $symbol['y']);
                                 @endphp
@@ -212,7 +210,8 @@
                             @endif
                         </div>
                         <div style="margin-top: 5px; font-size: 11px;">
-                            {{ $clientePrincipal?->nombre ?? '' }}
+                            <p>FIRMA DE CONFORMIDAD</p>
+                            <p>{{ $clientePrincipal?->nombre ?? '' }}</p>
                         </div>
                     </div>
                 </td>
