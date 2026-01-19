@@ -53,8 +53,8 @@ class EvidenciaController extends Controller
         }
 
         $request->validate([
-            'evidencias' => 'required|array|max:15',
-            'evidencias.*' => 'file|mimes:jpg,jpeg,png,mp4,mov',
+            'evidencias' => 'required|array',
+            'evidencias.*' => 'file',
             'observacion' => 'nullable|string',
         ]);
 
@@ -68,7 +68,7 @@ class EvidenciaController extends Controller
                 'trabajo_id' => $trabajo->id,
                 'user_id' => $user->id,
                 'evidencia_url' => $path,
-                'tipo' => $file->getMimeType() === 'video/mp4' ? 'video' : 'imagen',
+                'tipo' => str_starts_with($file->getMimeType(), 'video/') ? 'video' : 'imagen',
                 'observacion' => $observacion
             ]);
         }
@@ -123,60 +123,10 @@ class EvidenciaController extends Controller
         return redirect()->route('gestion.evidencias.index', $trabajo)->with('success', 'Evidencia eliminada correctamente.');
     }
 
-    /**
-     * Optimizar imagen utilizando GD.
-     * 
-     * @param mixed $path
-     * @param mixed $mimeType
-     * @return void
-     */
-    private function optimizeImage($path, $mimeType)
-    {
-        $maxWidth = 1920;
-
-        // Crear la imagen a partir del archivo
-        if ($mimeType === 'image/jpeg') {
-            $image = imagecreatefromjpeg($path);
-        } elseif ($mimeType === 'image/png') {
-            $image = imagecreatefrompng($path);
-        } else {
-            return; // Si no es JPEG o PNG, no hacer nada
-        }
-
-        // Obtener dimensiones originales
-        $width = imagesx($image);
-        $height = imagesy($image);
-
-        // Calcular nuevas dimensiones manteniendo la proporción
-        if ($width > $maxWidth) {
-            $newWidth = $maxWidth;
-            $newHeight = floor($height * ($maxWidth / $width));
-        } else {
-            $newWidth = $width;
-            $newHeight = $height;
-        }
-
-        // Redimensionar la imagen
-        $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
-        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-
-        // Guardar la imagen optimizada
-        if ($mimeType === 'image/jpeg') {
-            imagejpeg($resizedImage, $path, 85); // Calidad 85%
-        } elseif ($mimeType === 'image/png') {
-            imagepng($resizedImage, $path, 8); // Nivel de compresión 8
-        }
-
-        // Liberar memoria
-        imagedestroy($image);
-        imagedestroy($resizedImage);
-    }
-
     public function bulkUpdate(Request $request, Trabajo $trabajo)
     {
         $user = auth()->user();
 
-        // Seguridad: que el usuario pertenezca a este trabajo
         if (!$trabajo->usuarios->contains($user)) {
             abort(403, 'Forbidden');
         }
@@ -188,18 +138,15 @@ class EvidenciaController extends Controller
         ]);
 
         $ids = $validated['ids'];
-        // Si textarea viene vacío -> null
         $observacion = ($request->has('observacion') && $request->input('observacion') !== '')
             ? $request->input('observacion')
             : null;
 
-        // Filtramos solo las evidencias del trabajo y del usuario
         $query = Evidencia::where('trabajo_id', $trabajo->id)
             ->where('user_id', $user->id)
             ->whereIn('id', $ids);
 
         $totalEncontradas = (clone $query)->count();
-
         $actualizadas = $query->update(['observacion' => $observacion]);
 
         return redirect()
@@ -222,7 +169,6 @@ class EvidenciaController extends Controller
 
         $ids = $validated['ids'];
 
-        // Solo del trabajo y del usuario
         $evidencias = Evidencia::where('trabajo_id', $trabajo->id)
             ->where('user_id', $user->id)
             ->whereIn('id', $ids)
@@ -230,9 +176,6 @@ class EvidenciaController extends Controller
 
         $totalEncontradas = $evidencias->count();
 
-        // Eliminamos registros y (opcional) los archivos.
-        // Como pediste "solo editamos el texto", la edición no toca archivos.
-        // Para eliminar en grupo, mantenemos el mismo criterio que destroy individual: borrar archivo + registro.
         foreach ($evidencias as $ev) {
             Storage::disk('public')->delete($ev->evidencia_url);
             $ev->delete();

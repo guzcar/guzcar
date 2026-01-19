@@ -328,204 +328,67 @@
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // 1. Función para comprimir imágenes manteniendo formatos válidos
-                async function compressImage(file) {
-                    try {
-                        const validFormats = {
-                            'image/jpeg': 'jpg',
-                            'image/jpg': 'jpg',
-                            'image/png': 'png',
-                            'image/webp': 'webp',
-                            'video/mp4': 'mp4',
-                            'video/quicktime': 'mov'
-                        };
-
-                        if (!validFormats[file.type]) {
-                            console.log(`Archivo ${file.name} no requiere compresión. Tipo: ${file.type}`);
-                            return file;
-                        }
-
-                        if (file.type.startsWith('video/')) {
-                            console.log(`Video ${file.name} no se comprime. Tipo: ${file.type}`);
-                            return file;
-                        }
-
-                        return await new Promise((resolve) => {
-                            const reader = new FileReader();
-
-                            reader.onerror = () => {
-                                console.error('Error al leer el archivo:', file.name);
-                                resolve(file);
-                            };
-
-                            reader.onload = function (event) {
-                                const img = new Image();
-
-                                img.onerror = () => {
-                                    console.error('Error al cargar la imagen:', file.name);
-                                    resolve(file);
-                                };
-
-                                img.onload = function () {
-                                    try {
-                                        const canvas = document.createElement('canvas');
-                                        const ctx = canvas.getContext('2d');
-                                        const MAX_DIMENSION = 1200;
-                                        const QUALITY = 0.6;
-
-                                        let width = img.width;
-                                        let height = img.height;
-
-                                        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-                                            const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
-                                            width = Math.floor(width * ratio);
-                                            height = Math.floor(height * ratio);
-                                        }
-
-                                        canvas.width = width;
-                                        canvas.height = height;
-                                        ctx.imageSmoothingQuality = 'high';
-                                        ctx.drawImage(img, 0, 0, width, height);
-
-                                        const mimeType = 'image/jpeg';
-                                        const newFileName = file.name.replace(/\.[^/.]+$/, '') + '.jpg';
-
-                                        canvas.toBlob(
-                                            (blob) => {
-                                                if (!blob) {
-                                                    console.error('No se pudo generar blob para:', file.name);
-                                                    resolve(file);
-                                                    return;
-                                                }
-
-                                                const compressedFile = new File([blob], newFileName, {
-                                                    type: mimeType,
-                                                    lastModified: Date.now()
-                                                });
-
-                                                console.log(`Compresión: ${file.name} - Original: ${(file.size / 1024).toFixed(2)}KB | Comprimido: ${(blob.size / 1024).toFixed(2)}KB`);
-                                                resolve(compressedFile);
-                                            },
-                                            mimeType,
-                                            QUALITY
-                                        );
-                                    } catch (error) {
-                                        console.error('Error en compresión:', error);
-                                        resolve(file);
-                                    }
-                                };
-
-                                img.src = event.target.result;
-                            };
-
-                            reader.readAsDataURL(file);
-                        });
-                    } catch (error) {
-                        console.error('Error general en compressImage:', error);
-                        return file;
-                    }
-                }
 
                 // 2. Interceptar envío del formulario de subida
                 const form = document.querySelector('#nuevaEvidencia form');
-                if (form) {
-                    form.addEventListener('submit', async function (e) {
-                        e.preventDefault();
+    if (form) {
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-                        const fileInput = document.getElementById('evidencias');
-                        const submitButton = this.querySelector('button[type="submit"]');
-                        const originalButtonText = submitButton.innerHTML;
-                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ||
-                            document.querySelector('input[name="_token"]')?.value ||
-                            '';
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
 
-                        try {
-                            submitButton.disabled = true;
-                            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando archivos...';
+            try {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Subiendo archivos...';
 
-                            const formData = new FormData();
+                // Enviar formulario directamente sin procesar archivos
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: new FormData(this),
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                });
 
-                            for (const [key, value] of new FormData(this)) {
-                                if (key !== 'evidencias[]') {
-                                    formData.append(key, value);
-                                }
-                            }
-
-                            const files = Array.from(fileInput.files);
-                            console.log(`Procesando ${files.length} archivos...`);
-
-                            const processedFiles = await Promise.all(
-                                files.map(async (file) => {
-                                    try {
-                                        return await compressImage(file);
-                                    } catch (error) {
-                                        console.error('Error procesando archivo:', file.name, error);
-                                        return file;
-                                    }
-                                })
-                            );
-
-                            const validExtensions = ['.jpg', '.jpeg', '.png', '.mp4', '.mov'];
-                            processedFiles.forEach(file => {
-                                const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-                                if (!validExtensions.includes(fileExt)) {
-                                    console.error(`Archivo con extensión no permitida: ${file.name}`);
-                                    throw new Error(`El archivo ${file.name} no tiene un formato permitido (jpg, jpeg, png, mp4, mov)`);
-                                }
-                                formData.append('evidencias[]', file, file.name);
-                            });
-
-                            const headers = {
-                                'Accept': 'application/json'
-                            };
-
-                            if (csrfToken) {
-                                headers['X-CSRF-TOKEN'] = csrfToken;
-                            }
-
-                            const response = await fetch(this.action, {
-                                method: 'POST',
-                                body: formData,
-                                headers: headers
-                            });
-
-                            if (!response.ok) {
-                                const errorData = await response.json().catch(() => ({}));
-                                throw new Error(errorData.message || 'Error en el servidor');
-                            }
-
-                            window.location.reload();
-
-                        } catch (error) {
-                            console.error('Error en el envío:', error);
-
-                            let errorMessage = 'Error al procesar los archivos';
-                            if (error.message.includes('NetworkError')) {
-                                errorMessage = 'Error de conexión. Verifica tu red.';
-                            } else if (error.message) {
-                                errorMessage = error.message;
-                            }
-
-                            const errorContainer = document.getElementById('error-container');
-
-                            const existingAlert = errorContainer.querySelector('.alert');
-                            if (existingAlert) existingAlert.remove();
-
-                            const alertDiv = document.createElement('div');
-                            alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3 mb-0';
-                            alertDiv.innerHTML = `
-                                                    <strong>Error:</strong> ${errorMessage}
-                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                                `;
-
-                            errorContainer.appendChild(alertDiv);
-
-                        } finally {
-                            submitButton.disabled = false;
-                            submitButton.innerHTML = originalButtonText;
-                        }
-                    });
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Error en el servidor');
                 }
+
+                window.location.reload();
+
+            } catch (error) {
+                console.error('Error en el envío:', error);
+
+                let errorMessage = 'Error al subir los archivos';
+                if (error.message.includes('NetworkError')) {
+                    errorMessage = 'Error de conexión. Verifica tu red.';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+
+                const errorContainer = document.getElementById('error-container');
+
+                const existingAlert = errorContainer.querySelector('.alert');
+                if (existingAlert) existingAlert.remove();
+
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3 mb-0';
+                alertDiv.innerHTML = `
+                    <strong>Error:</strong> ${errorMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+
+                errorContainer.appendChild(alertDiv);
+
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            }
+        });
+    }
 
                 // --- Modales individuales (ya existentes) ---
                 const modals = document.querySelectorAll('.modal');
