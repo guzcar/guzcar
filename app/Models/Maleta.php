@@ -11,7 +11,12 @@ class Maleta extends Model
 
     protected $table = 'maletas';
 
-    protected $fillable = ['codigo', 'propietario_id'];
+    protected $fillable = [
+        'codigo',
+        'propietario_id',
+        'evidencia',
+        'observacion',
+    ];
 
     public function propietario()
     {

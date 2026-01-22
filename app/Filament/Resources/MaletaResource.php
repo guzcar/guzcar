@@ -7,8 +7,11 @@ use App\Filament\Resources\MaletaResource\RelationManagers;
 use App\Filament\Resources\MaletaResource\RelationManagers\DetallesRelationManager;
 use App\Models\Maleta;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -18,6 +21,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -39,13 +43,25 @@ class MaletaResource extends Resource
             ->schema([
                 Section::make()
                     ->schema([
-                        TextInput::make('codigo')
-                            ->required()
-                            ->unique(ignoreRecord: true),
-                        Select::make('propietario_id')
-                            ->relationship('propietario', 'name')
-                            ->searchable()
-                            ->preload()
+                        Grid::make()
+                            ->schema([
+                                Grid::make()
+                                    ->schema([
+                                        TextInput::make('codigo')
+                                            ->required()
+                                            ->unique(ignoreRecord: true),
+                                        Select::make('propietario_id')
+                                            ->relationship('propietario', 'name')
+                                            ->searchable()
+                                            ->preload(),
+                                        Textarea::make('observacion')
+                                            ->columnSpanFull()
+                                    ])
+                                    ->columnSpan(1),
+                                FileUpload::make('evidencia')
+                                    ->columnSpan(1)
+                            ])
+                            ->columns(2),
                     ])
                     ->columns(2)
                     ->heading('Maleta')
@@ -75,6 +91,8 @@ class MaletaResource extends Resource
                     ->counts('detalles')
                     ->badge()
                     ->sortable(),
+                ImageColumn::make('evidencia')
+                    ->placeholder('Sin Evidencia')
             ])
             ->filters([
                 //
