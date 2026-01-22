@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\HtmlString;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class DetallesRelationManager extends RelationManager
 {
@@ -149,6 +150,7 @@ class DetallesRelationManager extends RelationManager
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    ExportBulkAction::make(),
                     Tables\Actions\BulkAction::make('generarActaEntrega')
                         ->label('Generar acta de entrega')
                         ->icon('heroicon-o-document-text')
