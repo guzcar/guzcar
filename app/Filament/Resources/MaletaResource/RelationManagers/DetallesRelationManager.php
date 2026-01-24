@@ -31,17 +31,7 @@ class DetallesRelationManager extends RelationManager
 {
     protected static string $relationship = 'detalles';
 
-    protected static ?string $recordTitleAttribute = 'a';
-
-    protected static ?string $inverseRelationship = 'b';
-
-    protected static ?string $label = 'c';
-
-    protected static ?string $pluralLabel = 'd';
-
     protected static ?string $modelLabel = 'Herramienta';
-
-    protected static ?string $pluralModelLabel = 'f';
 
     protected static ?string $title = 'Herramientas';
 

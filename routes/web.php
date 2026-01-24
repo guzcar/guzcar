@@ -11,6 +11,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Pdf\ControlMaletaAsignacionController;
 use App\Http\Controllers\Pdf\CotizacionPdfController;
 use App\Http\Controllers\Pdf\DespachoController as PdfDespachoController;
+use App\Http\Controllers\Pdf\EntregaMaletaController;
 use App\Http\Controllers\Pdf\MaletaController;
 use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
 use App\Http\Controllers\Pdf\VentaController as PdfVentaController;
@@ -66,21 +67,21 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     // PDF Admin
     Route::get('pdf/admin/trabajos/{trabajo}/inventario', [PdfInventarioController::class, 'ingreso'])->name('pdf.admin.inventario.ingreso');
 
-// Articulos
-Route::get('/articulos', [ArticuloController::class, 'index'])->name('articulos');
-Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'trabajo'])->name('gestion.trabajos.articulos');
+    // Articulos
+    Route::get('/articulos', [ArticuloController::class, 'index'])->name('articulos');
+    Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'trabajo'])->name('gestion.trabajos.articulos');
 
-// Confirmar artículos normales
-Route::post('/trabajos/{trabajoArticulo}/articulos-trabajo', [ArticuloController::class, 'confirmarTrabajo'])->name('gestion.trabajos.articulos.confirmar.trabajo');
-Route::post('/trabajos/{trabajoArticulo}/articulos-index', [ArticuloController::class, 'confirmarIndex'])->name('gestion.trabajos.articulos.confirmar.index');
+    // Confirmar artículos normales
+    Route::post('/trabajos/{trabajoArticulo}/articulos-trabajo', [ArticuloController::class, 'confirmarTrabajo'])->name('gestion.trabajos.articulos.confirmar.trabajo');
+    Route::post('/trabajos/{trabajoArticulo}/articulos-index', [ArticuloController::class, 'confirmarIndex'])->name('gestion.trabajos.articulos.confirmar.index');
 
-// Confirmar "otros" artículos
-Route::post('/trabajos/{trabajoOtro}/articulos-trabajo-otro', [ArticuloController::class, 'confirmarTrabajoOtro'])->name('gestion.trabajos.articulos.confirmar.trabajo.otro');
-Route::post('/trabajos/{trabajoOtro}/articulos-index-otro', [ArticuloController::class, 'confirmarIndexOtro'])->name('gestion.trabajos.articulos.confirmar.index.otro');
+    // Confirmar "otros" artículos
+    Route::post('/trabajos/{trabajoOtro}/articulos-trabajo-otro', [ArticuloController::class, 'confirmarTrabajoOtro'])->name('gestion.trabajos.articulos.confirmar.trabajo.otro');
+    Route::post('/trabajos/{trabajoOtro}/articulos-index-otro', [ArticuloController::class, 'confirmarIndexOtro'])->name('gestion.trabajos.articulos.confirmar.index.otro');
 
-// Confirmar todos
-Route::post('/trabajos/{trabajo}/articulos-trabajo-todos', [ArticuloController::class, 'confirmarTrabajoTodos'])->name('gestion.trabajos.articulos.confirmar.trabajo.todos');
-Route::post('/trabajos/articulos-index-todos', [ArticuloController::class, 'confirmarIndexTodos'])->name('gestion.trabajos.articulos.confirmar.index.todos');
+    // Confirmar todos
+    Route::post('/trabajos/{trabajo}/articulos-trabajo-todos', [ArticuloController::class, 'confirmarTrabajoTodos'])->name('gestion.trabajos.articulos.confirmar.trabajo.todos');
+    Route::post('/trabajos/articulos-index-todos', [ArticuloController::class, 'confirmarIndexTodos'])->name('gestion.trabajos.articulos.confirmar.index.todos');
 
     // Consulta Vehicular
     Route::get('/consulta-vehicular', [VehiculoController::class, 'consultaVehicular'])->name('consulta.vehicular');
@@ -99,8 +100,8 @@ Route::post('/trabajos/articulos-index-todos', [ArticuloController::class, 'conf
     Route::get('/pdf/admin/evidencias/{trabajo}', [PdfTrabajoController::class, 'evidencia'])->name('trabajo.pdf.evidencia');
     Route::get('/pdf/admin/despachos/{despacho}', [PdfDespachoController::class, 'downloadPdf'])->name('despachos.pdf');
     Route::get('/pdf/admin/ventas/{venta}', [PdfVentaController::class, 'downloadPdf'])->name('ventas.pdf');
-    Route::get('/pdf/maletas/{maleta}', [MaletaController::class, 'show'])->name('pdf.maleta');
-    Route::get('/pdf/maletas/{maleta}/detalles/{detalles}', [MaletaController::class, 'detallesSeleccionados'])->name('pdf.maleta.detalles');
+    Route::get('/pdf/entrega/{entrega}', [EntregaMaletaController::class, 'show'])->name('pdf.entrega.acta');
+    Route::get('/pdf/entrega/{entrega}/detalles/{detalles}', [EntregaMaletaController::class, 'detallesSeleccionados'])->name('pdf.entrega.detalles');
     Route::get('/pdf/control-maletas/{control}', [ControlMaletaAsignacionController::class, 'show'])->name('pdf.control_maleta.asignacion');
 
     Route::get('/cotizaciones/{cotizacion}/pdf', [CotizacionPdfController::class, 'show'])->name('cotizaciones.pdf');
