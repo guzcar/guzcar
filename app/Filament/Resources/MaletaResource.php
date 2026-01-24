@@ -98,13 +98,6 @@ class MaletaResource extends Resource
                 //
             ])
             ->actions([
-                Action::make('pdf')
-                    ->label('Acta de entrega')
-                    ->button()
-                    ->size(ActionSize::Medium)
-                    ->icon('heroicon-o-document-text')
-                    ->url(fn(Maleta $record) => route('pdf.maleta', $record))
-                    ->openUrlInNewTab(),
                 ActionGroup::make([
                     EditAction::make(),
                     DeleteAction::make(),

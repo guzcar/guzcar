@@ -144,7 +144,15 @@ class EntregaMaletaResource extends Resource
             ->defaultSort('fecha', 'desc')
             ->filters([])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('pdf')
+                    ->button()
+                    ->label('Acta de entrega')
+                    ->icon('heroicon-o-printer')
+                    ->color('success')
+                    ->url(fn($record) => route('pdf.entrega.acta', $record))
+                    ->openUrlInNewTab(),
+                Tables\Actions\EditAction::make()
+                    ->button(),
             ])
             ->bulkActions([]);
     }

@@ -141,21 +141,6 @@ class DetallesRelationManager extends RelationManager
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     ExportBulkAction::make(),
-                    Tables\Actions\BulkAction::make('generarActaEntrega')
-                        ->label('Generar acta de entrega')
-                        ->icon('heroicon-o-document-text')
-                        ->action(function ($records) {
-                            $ids = $records->pluck('id')->toArray();
-                            $maletaId = $this->getOwnerRecord()->id;
-
-                            $url = URL::route('pdf.maleta.detalles', [
-                                'maleta' => $maletaId,
-                                'detalles' => implode(',', $ids)
-                            ]);
-
-                            // Abrir en nueva pestaña usando JavaScript
-                            $this->js("window.open('{$url}', '_blank')");
-                        }),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

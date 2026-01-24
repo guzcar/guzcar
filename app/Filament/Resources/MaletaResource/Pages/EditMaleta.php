@@ -14,11 +14,6 @@ class EditMaleta extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('pdf')
-                ->label('Acta de entrega')
-                ->icon('heroicon-o-document-text')
-                ->url(fn(Maleta $record) => route('pdf.maleta', $record))
-                ->openUrlInNewTab(),
             Actions\DeleteAction::make(),
         ];
     }

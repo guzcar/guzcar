@@ -13,7 +13,7 @@ class EditEntregaMaleta extends EditRecord
     {
         return [
             \Filament\Actions\Action::make('pdf')
-                ->label('Imprimir Acta')
+                ->label('Acta de entrega')
                 ->icon('heroicon-o-printer')
                 ->color('success')
                 ->url(fn($record) => route('pdf.entrega.acta', $record))
