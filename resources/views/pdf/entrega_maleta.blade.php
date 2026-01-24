@@ -1,51 +1,61 @@
-<x-pdf-layout 
-    title="Acta Entrega #{{ $entrega->id }}" 
-    code="{{ $entrega->maleta->codigo }}" 
-    tipoReporte="ACTA DE ENTREGA {{ $soloSeleccionados ? '(PARCIAL)' : '' }}" 
-    footer="AUTOMOTORES GUZCAR S.A.C.">
+<x-pdf-layout title="Acta de Entrega {{ $entrega->maleta->codigo }}" code="{{ $entrega->maleta->codigo }}" tipoReporte="ACTA DE ENTREGA" footer="AUTOMOTORES GUZCAR S.A.C.">
 
-    <h1>ACTA DE ENTREGA - MALETA DE HERRAMIENTAS</h1>
+    <h1>ENTREGA DE MALETA DE HERRAMIENTAS - PERSONAL</h1>
 
-    <ol style="text-transform: none; font-size: 13px; margin-left: -1rem;">
+    {{-- Texto introductorio fuera de la lista numerada para que encabece el documento --}}
+    <div style="font-size: 13px; text-align: justify; margin-bottom: 15px; text-transform: none;">
+        Yo, <b>{{ $entrega->propietario->name ?? '____________________________________________________' }}</b>, 
+        identificado con DNI N.° <b>{{ $entrega->propietario->dni ?? '__________________________' }}</b>, 
+        a la fecha de: <b>{{ $generatedAt->format('d/m/Y') }}</b>, 
+        colaborador del taller <b>AUTOMOTORES GUZCAR S.A.C.</b>, 
+        Con RUC: <b>20600613716</b> declaro lo siguiente:
+    </div>
 
-        <li>
-            <p><b>INFORMACIÓN GENERAL</b></p>
-            <ul style="margin-left: -1rem; list-style-type: disc">
-                {{-- Usamos los datos guardados en la entrega, no los actuales del usuario --}}
-                <li><b>Recibe (Propietario):</b> {{ $entrega->propietario->name ?? '—' }}</li>
-                <li><b>Entrega (Responsable):</b> {{ $entrega->responsable->name ?? '—' }}</li>
-                <li><b>Fecha de Emisión:</b> {{ $generatedAt->translatedFormat('d \d\e F \d\e\l Y') }}</li>
-                <li><b>Fecha de Registro:</b> {{ $entrega->fecha->translatedFormat('d/m/Y') }}</li>
-                <li><b>Codificación Maleta:</b> {{ $entrega->maleta->codigo ?? '—' }}</li>
-            </ul>
+    {{-- Usamos type="I" para números romanos (I, II, IV) --}}
+    <ol type="I" style="text-transform: none; font-size: 13px; margin-left: -1rem; font-weight: bold;">
+
+        <li style="margin-bottom: 10px;">
+            <p>DECLARACIÓN DE RESPONSABILIDAD</p>
+            {{-- Regresamos a font-weight normal para el contenido --}}
+            <ol style="margin-left: -1rem; font-weight: normal; list-style-type: decimal;">
+                <li>He recibido una maleta de herramientas debidamente inventariada.</li>
+                <li>Me comprometo a usar las herramientas únicamente para labores propias del taller.</li>
+                <li>Me obligo a cuidar, limpiar y conservar las herramientas en buen estado.</li>
+                <li>Informaré de manera inmediata cualquier daño, pérdida o desperfecto.</li>
+                <li>Asumiré la reposición de las herramientas perdidas o dañadas por descuido, negligencia o mal uso, conforme a la evaluación del responsable del taller.</li>
+            </ol>
         </li>
 
-        <li>
-            <p><b>DECLARACIÓN DE ENTREGA</b></p>
-            <p>{{ $contenidoInforme ?? 'Por la presente se hace constancia de la entrega...' }}</p>
-        </li>
-
-        <li>
-            <p><b>INFORMACIÓN DE HERRAMIENTAS {{ $soloSeleccionados ? '(SELECCIÓN)' : '' }}</b></p>
-            <p>Total listado: {{ $totalHerramientas }}</p>
+        <li style="margin-bottom: 10px;">
+            <p>INVENTARIO DE HERRAMIENTAS ASIGNADAS</p>
+            <p style="font-weight: normal; margin-top: 0;">Total de herramientas: {{ $totalHerramientas }}</p>
 
             @if($herramientas->isEmpty())
-                <p>No hay herramientas registradas en esta selección.</p>
+                <p style="font-weight: normal;">No hay herramientas registradas.</p>
             @else
-                <ul style="margin-left: -1rem; list-style-type: disc">
-                    @foreach($herramientas as $herramienta)
+                <ol style="margin-left: -1rem; font-weight: normal;">
+                    @foreach($herramientas as $herramienta) 
                         <li>{{ $herramienta }}</li>
                     @endforeach
-                </ul>
+                </ol>
             @endif
         </li>
+
+        {{-- Saltamos al IV manualmente en el valor del LI para respetar tu formato --}}
+        <li value="4">
+            <p>CONFORMIDAD</p>
+            <div style="font-weight: normal;">
+                <p>Declaro haber recibido la maleta de herramientas descrita en el presente inventario, completa y en el estado indicado.</p>
+                <p>Fecha: {{ now()->format('d') }} / {{ now()->format('m') }} / {{ now()->format('Y') }}</p>
+            </div>
+        </li>
+
     </ol>
 
-    <br><br><br>
-
+    {{-- Tu tabla de firmas original intacta, solo variables actualizadas --}}
     <table style="border-collapse: collapse; width: 100%; font-size: 13px;">
         <tr>
-            <td style="width: 4%; padding-top: 50px;"></td>
+            <td style="width: 4%; padding-top: 90px;"></td>
             <td style="width: 36%; border-bottom: 2px solid black;"></td>
             <td style="width: 20%;"></td>
             <td style="width: 36%; border-bottom: 2px solid black;"></td>
@@ -53,16 +63,16 @@
         </tr>
         <tr>
             <td></td>
-            <td style="padding-top: 5px; text-align: center;">
-                <p><b>RECIBÍ CONFORME</b></p>
-                <p style="margin: 0;">{{ $entrega->propietario->name ?? '' }}</p>
-                <p style="margin: 0; font-size: 11px;">DNI: {{ $entrega->propietario->dni ?? '___________' }}</p>
+            <td style="padding-top: 5px">
+                <p>FIRMA Y HUELLA DEL TRABAJADOR</p>
+                <p style="margin: 0;"><b>Nombres:</b> {{ $entrega->propietario->name ?? '' }}</p>
+                <p style="margin: 0;"><b>DNI:</b> {{ $entrega->propietario->dni ?? '' }}</p>
             </td>
             <td></td>
-            <td style="padding-top: 5px; text-align: center;">
-                <p><b>ENTREGUE CONFORME</b></p>
-                <p style="margin: 0;">{{ $entrega->responsable->name ?? '' }}</p>
-                <p style="margin: 0; font-size: 11px;">DNI: {{ $entrega->responsable->dni ?? '___________' }}</p>
+            <td style="padding-top: 5px;">
+                <p>FIRMA DEL RESPONSABLE DEL TALLER</p>
+                <p style="margin: 0;"><b>Nombres:</b> {{ $entrega->responsable->name ?? '' }}</p>
+                <p style="margin: 0;"><b>DNI:</b> {{ $entrega->responsable->dni ?? '' }}</p>
             </td>
             <td></td>
         </tr>
