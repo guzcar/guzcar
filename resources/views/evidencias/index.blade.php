@@ -10,7 +10,8 @@
                 <button id="bulkDropdownBtn" class="btn btn-light border py-2 dropdown-toggle" type="button"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     Opciones
-                    <span id="bulkCount" class="position-absolute top-0 start-90 translate-middle badge rounded-pill bg-danger">
+                    <span id="bulkCount"
+                        class="position-absolute top-0 start-90 translate-middle badge rounded-pill bg-danger">
                         0
                     </span>
                 </button>
@@ -114,7 +115,8 @@
                     <thead>
                         <tr>
                             <th class="py-3" style="width: 60px; text-align: center;">
-                                <input type="checkbox" id="checkAll" class="form-check-input" style="width: 1.4em; height: 1.4em;">
+                                <input type="checkbox" id="checkAll" class="form-check-input"
+                                    style="width: 1.4em; height: 1.4em;">
                             </th>
                             <th class="py-3">Evidencia</th>
                             <th class="py-3">Acciones</th>
@@ -124,7 +126,8 @@
                         @forelse ($evidencias as $evidencia)
                             <tr>
                                 <td style="width: 60px; text-align: center;">
-                                    <input type="checkbox" class="form-check-input select-evidencia" style="width: 1.4em; height: 1.4em; vertical-align: middle;"
+                                    <input type="checkbox" class="form-check-input select-evidencia"
+                                        style="width: 1.4em; height: 1.4em; vertical-align: middle;"
                                         value="{{ $evidencia->id }}">
                                 </td>
                                 <td>
@@ -167,11 +170,11 @@
         </div>
         {{--
         @if ($evidencias->hasPages())
-            <div class="card-footer border-top-0">
-                <div class="d-flex justify-content-center mt-3">
-                    {{ $evidencias->links('pagination::bootstrap-4') }}
-                </div>
+        <div class="card-footer border-top-0">
+            <div class="d-flex justify-content-center mt-3">
+                {{ $evidencias->links('pagination::bootstrap-4') }}
             </div>
+        </div>
         @endif
         --}}
     </div>
@@ -328,106 +331,9 @@
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // 1. Función para comprimir imágenes manteniendo formatos válidos
-                async function compressImage(file) {
-                    try {
-                        const validFormats = {
-                            'image/jpeg': 'jpg',
-                            'image/jpg': 'jpg',
-                            'image/png': 'png',
-                            'image/webp': 'webp',
-                            'video/mp4': 'mp4',
-                            'video/quicktime': 'mov'
-                        };
 
-                        if (!validFormats[file.type]) {
-                            console.log(`Archivo ${file.name} no requiere compresión. Tipo: ${file.type}`);
-                            return file;
-                        }
-
-                        if (file.type.startsWith('video/')) {
-                            console.log(`Video ${file.name} no se comprime. Tipo: ${file.type}`);
-                            return file;
-                        }
-
-                        return await new Promise((resolve) => {
-                            const reader = new FileReader();
-
-                            reader.onerror = () => {
-                                console.error('Error al leer el archivo:', file.name);
-                                resolve(file);
-                            };
-
-                            reader.onload = function (event) {
-                                const img = new Image();
-
-                                img.onerror = () => {
-                                    console.error('Error al cargar la imagen:', file.name);
-                                    resolve(file);
-                                };
-
-                                img.onload = function () {
-                                    try {
-                                        const canvas = document.createElement('canvas');
-                                        const ctx = canvas.getContext('2d');
-                                        const MAX_DIMENSION = 1200;
-                                        const QUALITY = 0.6;
-
-                                        let width = img.width;
-                                        let height = img.height;
-
-                                        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-                                            const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
-                                            width = Math.floor(width * ratio);
-                                            height = Math.floor(height * ratio);
-                                        }
-
-                                        canvas.width = width;
-                                        canvas.height = height;
-                                        ctx.imageSmoothingQuality = 'high';
-                                        ctx.drawImage(img, 0, 0, width, height);
-
-                                        const mimeType = 'image/jpeg';
-                                        const newFileName = file.name.replace(/\.[^/.]+$/, '') + '.jpg';
-
-                                        canvas.toBlob(
-                                            (blob) => {
-                                                if (!blob) {
-                                                    console.error('No se pudo generar blob para:', file.name);
-                                                    resolve(file);
-                                                    return;
-                                                }
-
-                                                const compressedFile = new File([blob], newFileName, {
-                                                    type: mimeType,
-                                                    lastModified: Date.now()
-                                                });
-
-                                                console.log(`Compresión: ${file.name} - Original: ${(file.size / 1024).toFixed(2)}KB | Comprimido: ${(blob.size / 1024).toFixed(2)}KB`);
-                                                resolve(compressedFile);
-                                            },
-                                            mimeType,
-                                            QUALITY
-                                        );
-                                    } catch (error) {
-                                        console.error('Error en compresión:', error);
-                                        resolve(file);
-                                    }
-                                };
-
-                                img.src = event.target.result;
-                            };
-
-                            reader.readAsDataURL(file);
-                        });
-                    } catch (error) {
-                        console.error('Error general en compressImage:', error);
-                        return file;
-                    }
-                }
-
-                // 2. Interceptar envío del formulario de subida
                 const form = document.querySelector('#nuevaEvidencia form');
+
                 if (form) {
                     form.addEventListener('submit', async function (e) {
                         e.preventDefault();
@@ -435,54 +341,37 @@
                         const fileInput = document.getElementById('evidencias');
                         const submitButton = this.querySelector('button[type="submit"]');
                         const originalButtonText = submitButton.innerHTML;
+
                         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ||
-                            document.querySelector('input[name="_token"]')?.value ||
-                            '';
+                            document.querySelector('input[name="_token"]')?.value || '';
 
                         try {
                             submitButton.disabled = true;
-                            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando archivos...';
-
+                            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Subiendo archivos...';
                             const formData = new FormData();
-
                             for (const [key, value] of new FormData(this)) {
                                 if (key !== 'evidencias[]') {
                                     formData.append(key, value);
                                 }
                             }
-
                             const files = Array.from(fileInput.files);
-                            console.log(`Procesando ${files.length} archivos...`);
+                            console.log(`Subiendo ${files.length} archivos originales...`);
 
-                            const processedFiles = await Promise.all(
-                                files.map(async (file) => {
-                                    try {
-                                        return await compressImage(file);
-                                    } catch (error) {
-                                        console.error('Error procesando archivo:', file.name, error);
-                                        return file;
-                                    }
-                                })
-                            );
+                            const validExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.mp4', '.mov'];
 
-                            const validExtensions = ['.jpg', '.jpeg', '.png', '.mp4', '.mov'];
-                            processedFiles.forEach(file => {
+                            files.forEach(file => {
                                 const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
                                 if (!validExtensions.includes(fileExt)) {
-                                    console.error(`Archivo con extensión no permitida: ${file.name}`);
-                                    throw new Error(`El archivo ${file.name} no tiene un formato permitido (jpg, jpeg, png, mp4, mov)`);
+                                    throw new Error(`El archivo ${file.name} no tiene un formato permitido.`);
                                 }
                                 formData.append('evidencias[]', file, file.name);
                             });
-
                             const headers = {
                                 'Accept': 'application/json'
                             };
-
                             if (csrfToken) {
                                 headers['X-CSRF-TOKEN'] = csrfToken;
                             }
-
                             const response = await fetch(this.action, {
                                 method: 'POST',
                                 body: formData,
@@ -493,31 +382,21 @@
                                 const errorData = await response.json().catch(() => ({}));
                                 throw new Error(errorData.message || 'Error en el servidor');
                             }
-
                             window.location.reload();
 
                         } catch (error) {
                             console.error('Error en el envío:', error);
-
-                            let errorMessage = 'Error al procesar los archivos';
-                            if (error.message.includes('NetworkError')) {
-                                errorMessage = 'Error de conexión. Verifica tu red.';
-                            } else if (error.message) {
-                                errorMessage = error.message;
-                            }
-
+                            let errorMessage = error.message || 'Error al subir los archivos';
                             const errorContainer = document.getElementById('error-container');
-
                             const existingAlert = errorContainer.querySelector('.alert');
                             if (existingAlert) existingAlert.remove();
 
                             const alertDiv = document.createElement('div');
                             alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3 mb-0';
                             alertDiv.innerHTML = `
-                                                    <strong>Error:</strong> ${errorMessage}
-                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                                `;
-
+                            <strong>Error:</strong> ${errorMessage}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        `;
                             errorContainer.appendChild(alertDiv);
 
                         } finally {
@@ -527,7 +406,6 @@
                     });
                 }
 
-                // --- Modales individuales (ya existentes) ---
                 const modals = document.querySelectorAll('.modal');
                 modals.forEach(modal => {
                     modal.addEventListener('hidden.bs.modal', function () {
@@ -540,10 +418,8 @@
                     button.addEventListener('click', function () {
                         const observacion = this.getAttribute('data-observacion');
                         const url = this.getAttribute('data-url');
-
                         document.getElementById('observacionEditar').value = observacion ?? '';
                         document.getElementById('editarEvidenciaForm').action = url;
-
                         const modal = new bootstrap.Modal(document.getElementById('editarEvidenciaModal'));
                         modal.show();
                     });
@@ -552,45 +428,49 @@
                 document.querySelectorAll('.btn-eliminar').forEach(button => {
                     button.addEventListener('click', function () {
                         const url = this.getAttribute('data-url');
-
                         document.getElementById('eliminarEvidenciaForm').action = url;
-
                         const modal = new bootstrap.Modal(document.getElementById('eliminarEvidenciaModal'));
                         modal.show();
                     });
                 });
 
-                // --- NUEVO: selección múltiple y modales en grupo ---
                 const checkAll = document.getElementById('checkAll');
                 const rowChecks = Array.from(document.querySelectorAll('.select-evidencia'));
                 const bulkBtn = document.getElementById('bulkDropdownBtn');
                 const bulkCount = document.getElementById('bulkCount');
                 const bulkEditBtn = document.getElementById('bulkEditBtn');
                 const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+                const bulkActionsContainer = document.getElementById('bulkActionsContainer');
 
-                const bulkEditModal = new bootstrap.Modal(document.getElementById('editarEvidenciasGrupoModal'));
-                const bulkDeleteModal = new bootstrap.Modal(document.getElementById('eliminarEvidenciasGrupoModal'));
+                const bulkEditModalEl = document.getElementById('editarEvidenciasGrupoModal');
+                const bulkDeleteModalEl = document.getElementById('eliminarEvidenciasGrupoModal');
+
+                let bulkEditModal, bulkDeleteModal;
+                if (bulkEditModalEl) bulkEditModal = new bootstrap.Modal(bulkEditModalEl);
+                if (bulkDeleteModalEl) bulkDeleteModal = new bootstrap.Modal(bulkDeleteModalEl);
 
                 const selected = new Set();
 
                 function refreshBulkUI() {
                     const n = selected.size;
-                    bulkCount.textContent = n;
+                    if (bulkCount) bulkCount.textContent = n;
 
-                    if (n > 0) {
-                        bulkActionsContainer.classList.remove('d-none');
-                    } else {
-                        bulkActionsContainer.classList.add('d-none');
+                    const container = document.getElementById('bulkActionsContainer') || document.querySelector('.bulk-actions');
+                    if (container) {
+                        if (n > 0) container.classList.remove('d-none');
+                        else container.classList.add('d-none');
                     }
 
-                    if (n === 0) {
-                        checkAll.checked = false;
-                        checkAll.indeterminate = false;
-                    } else if (n === rowChecks.length) {
-                        checkAll.checked = true;
-                        checkAll.indeterminate = false;
-                    } else {
-                        checkAll.indeterminate = true;
+                    if (checkAll) {
+                        if (n === 0) {
+                            checkAll.checked = false;
+                            checkAll.indeterminate = false;
+                        } else if (n === rowChecks.length) {
+                            checkAll.checked = true;
+                            checkAll.indeterminate = false;
+                        } else {
+                            checkAll.indeterminate = true;
+                        }
                     }
                 }
 
@@ -612,14 +492,11 @@
                     });
                 });
 
-                // Abrir modal de edición en grupo
                 bulkEditBtn?.addEventListener('click', function () {
                     if (selected.size === 0) return;
-
                     document.getElementById('observacionBulk').value = '';
                     const cont = document.getElementById('bulkEditIdsContainer');
                     cont.innerHTML = '';
-
                     selected.forEach(id => {
                         const input = document.createElement('input');
                         input.type = 'hidden';
@@ -627,17 +504,13 @@
                         input.value = id;
                         cont.appendChild(input);
                     });
-
-                    bulkEditModal.show();
+                    if (bulkEditModal) bulkEditModal.show();
                 });
 
-                // Abrir modal de eliminación en grupo
                 bulkDeleteBtn?.addEventListener('click', function () {
                     if (selected.size === 0) return;
-
                     const cont = document.getElementById('bulkDeleteIdsContainer');
                     cont.innerHTML = '';
-
                     selected.forEach(id => {
                         const input = document.createElement('input');
                         input.type = 'hidden';
@@ -645,13 +518,10 @@
                         input.value = id;
                         cont.appendChild(input);
                     });
-
-                    document.getElementById('bulkDeleteCount').textContent = selected.size;
-                    bulkDeleteModal.show();
+                    const countLabel = document.getElementById('bulkDeleteCount');
+                    if (countLabel) countLabel.textContent = selected.size;
+                    if (bulkDeleteModal) bulkDeleteModal.show();
                 });
-
-                document.getElementById('editarEvidenciasGrupoModal').addEventListener('hidden.bs.modal', () => bulkBtn.focus());
-                document.getElementById('eliminarEvidenciasGrupoModal').addEventListener('hidden.bs.modal', () => bulkBtn.focus());
 
                 document.querySelectorAll('.alert.auto-dismiss').forEach(el => {
                     setTimeout(() => {
