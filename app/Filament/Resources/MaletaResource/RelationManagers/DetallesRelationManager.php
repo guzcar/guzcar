@@ -7,6 +7,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -15,7 +16,6 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
@@ -23,9 +23,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\HtmlString;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use Filament\Notifications\Notification;
 
 class DetallesRelationManager extends RelationManager
 {
@@ -46,38 +46,79 @@ class DetallesRelationManager extends RelationManager
                                 Select::make('herramienta_id')
                                     ->label('Herramienta')
                                     ->required()
-                                    ->relationship('herramienta', 'nombre')
                                     ->searchable()
-                                    ->disabledOn('edit')
                                     ->preload()
-                                    ->live()
-                                    ->rule(fn($operation) => function (string $attribute, $value, \Closure $fail) use ($operation) {
-                                        if ($operation === 'edit') {
-                                            return;
-                                        }
-                                        if (!$value)
-                                            return;
-                                        $stock = Herramienta::query()->whereKey($value)->value('stock');
-                                        if ($stock !== null && $stock <= 0) {
-                                            $fail('Stock insuficiente.');
-                                        }
-                                    }),
-                                Placeholder::make('stock_info')
-                                    ->label('Stock disponible')
-                                    ->content(function (Get $get) {
-                                        $id = $get('herramienta_id');
-                                        if (!$id)
-                                            return new HtmlString('<span class="fi-ta-placeholder text-sm leading-6 text-gray-400 dark:text-gray-500">Seleccione una herramienta</span>');
-                                        $stock = Herramienta::query()->whereKey($id)->value('stock');
-                                        return $stock === null ? '—' : (string) $stock;
+                                    // Opción para crear nueva (Stock inicial 1 por defecto)
+                                    ->createOptionForm([
+                                        TextInput::make('nombre')
+                                            ->required()
+                                            ->unique('herramientas', 'nombre'),
+                                        Hidden::make('stock')->default(1),
+                                    ])
+                                    ->createOptionUsing(function (array $data) {
+                                        // Lógica manual de creación para asegurar retorno de ID
+                                        return Herramienta::create($data)->id;
                                     })
-                                    ->visibleOn('create'),
+                                    // Reactividad esencial
+                                    ->live()
+                                    // Cuando cambias la herramienta, cargamos su stock en el campo de abajo
+                                    ->afterStateUpdated(function ($state, Set $set) {
+                                        if ($state) {
+                                            $stock = Herramienta::find($state)?->stock ?? 0;
+                                            $set('stock_live', $stock);
+                                        } else {
+                                            $set('stock_live', 0);
+                                        }
+                                    })
+                                    ->relationship('herramienta', 'nombre')
+                                    ->disabledOn('edit') // Bloqueado en edición por lógica de triggers
+                                    ->columnSpan(1),
+
+                                TextInput::make('stock_live')
+                                    ->label('Stock Actual')
+                                    ->numeric()
+                                    ->minValue(0)
+                                    // Solo habilitado si hay herramienta seleccionada
+                                    ->disabled(fn(Get $get) => !$get('herramienta_id'))
+                                    // IMPORTANTE: Esto evita que Filament intente guardar 'stock_live' en 'maleta_detalles'
+                                    ->dehydrated(false)
+                                    // IMPORTANTE: Ejecuta la acción al salir del campo o pausar escritura
+                                    ->live(onBlur: true)
+                                    // Lógica de actualización directa a BD
+                                    ->afterStateUpdated(function ($state, Get $get, Set $set) {
+                                        $herramientaId = $get('herramienta_id');
+
+                                        if ($herramientaId && $state !== null) {
+                                            $herramienta = Herramienta::find($herramientaId);
+
+                                            if ($herramienta) {
+                                                // Actualizamos la BD real
+                                                $herramienta->update(['stock' => $state]);
+
+                                                // Notificación visual (opcional pero recomendada)
+                                                Notification::make()
+                                                    ->title('Stock actualizado en BD')
+                                                    ->success()
+                                                    ->duration(1000)
+                                                    ->send();
+                                            }
+                                        }
+                                    })
+                                    // Validación visual para que el usuario sepa si alcanzará
+                                    ->prefixIcon(fn($state) => $state > 0 ? 'heroicon-m-check-circle' : 'heroicon-m-exclamation-triangle')
+                                    ->prefixIconColor(fn($state) => $state > 0 ? 'success' : 'danger')
+                                    ->columnSpan(1),
+
+                                // Campo auxiliar invisible para forzar reactividad
+                                Hidden::make('stock_trigger_refresh'),
+
                                 TextInput::make('ultimo_estado')
                                     ->disabled()
                                     ->hiddenOn('create'),
                             ])
                             ->columns(1)
                             ->columnSpan(1),
+
                         FileUpload::make('evidencia_url')
                             ->label('Evidencia')
                             ->directory('maleta_detalles')
@@ -89,6 +130,7 @@ class DetallesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            // ... (Tu configuración de tabla se mantiene igual)
             ->defaultSort('created_at', 'desc')
             ->persistColumnSearchesInSession()
             ->persistSearchInSession()
@@ -111,6 +153,7 @@ class DetallesRelationManager extends RelationManager
                         'OPERATIVO' => 'success',
                         'MERMA' => 'warning',
                         'PERDIDO' => 'danger',
+                        default => 'gray',
                     })
                     ->sortable(),
             ])
@@ -122,8 +165,7 @@ class DetallesRelationManager extends RelationManager
                     ->label('Agregar herramienta'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->button(),
+                Tables\Actions\EditAction::make()->button(),
                 Tables\Actions\Action::make('viewImage')
                     ->button()
                     ->label('Ver')
@@ -135,8 +177,6 @@ class DetallesRelationManager extends RelationManager
                 Tables\Actions\DeleteAction::make()
                     ->button()
                     ->label('Quitar'),
-                // Tables\Actions\RestoreAction::make()
-                //     ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
