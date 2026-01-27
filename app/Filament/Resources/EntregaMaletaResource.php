@@ -17,8 +17,14 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\Section as InfoSection;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\Grid as InfoGrid;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
@@ -95,10 +101,13 @@ class EntregaMaletaResource extends Resource
                         Section::make('Evidencia')
                             ->schema([
                                 FileUpload::make('evidencia')
-                                    ->label('Foto / Documento')
+                                    ->label('Evidencias (Fotos/Documentos)')
                                     ->directory('entrega-maletas')
-                                    ->image()
-                                    ->imageEditor(),
+                                    ->multiple()
+                                    ->reorderable()
+                                    ->openable()
+                                    ->downloadable()
+                                    ->columnSpanFull(),
                             ])->columnSpanFull()
                             ->columnSpan(2),
                     ])
@@ -132,29 +141,69 @@ class EntregaMaletaResource extends Resource
                     ->label('Items')
                     ->badge(),
 
-                TextColumn::make('evidencia')
-                    ->label('Evidencia')
-                    ->placeholder('No hay')
-                    ->formatStateUsing(fn($state) => $state ? 'Ver' : 'No hay')
-                    ->icon(fn($state) => $state ? 'heroicon-o-eye' : 'heroicon-o-x-mark')
-                    ->color(fn($state) => $state ? 'primary' : 'gray')
-                    ->url(fn($record) => $record->evidencia ? Storage::url($record->evidencia) : null)
-                    ->openUrlInNewTab()
+                Tables\Columns\ImageColumn::make('evidencia')
+                    ->label('Evidencias')
+                    ->placeholder('Sin Evidencias')
+                    ->circular()
+                    ->stacked()
+                    ->limit(3)
+                    ->limitedRemainingText()
+                    ->size(40),
             ])
             ->defaultSort('fecha', 'desc')
             ->filters([])
             ->actions([
-                Tables\Actions\Action::make('pdf')
-                    ->button()
-                    ->label('Acta de entrega')
-                    ->icon('heroicon-o-printer')
-                    ->color('success')
-                    ->url(fn($record) => route('pdf.entrega.acta', $record))
-                    ->openUrlInNewTab(),
-                Tables\Actions\EditAction::make()
-                    ->button(),
+                ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->label('Ver'),
+                    Tables\Actions\Action::make('pdf')
+                        ->label('Acta de entrega')
+                        ->icon('heroicon-o-printer')
+                        ->url(fn($record) => route('pdf.entrega.acta', $record))
+                        ->openUrlInNewTab(),
+                    Tables\Actions\EditAction::make(),
+                ])->button(),
             ])
             ->bulkActions([]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                InfoSection::make('Detalles de la Entrega')
+                    ->schema([
+                        InfoGrid::make(3)->schema([
+                            TextEntry::make('fecha')->dateTime('d/m/Y H:i')->label('Fecha'),
+                            TextEntry::make('maleta.codigo')->label('Maleta'),
+                            TextEntry::make('propietario.name')->label('Propietario'),
+                            TextEntry::make('responsable.name')->label('Responsable'),
+                        ]),
+                    ]),
+
+                InfoSection::make('Archivos de Evidencia')
+                    ->schema([
+                        // Opción A: Si son SOLO IMÁGENES
+                        ImageEntry::make('evidencia')
+                            ->label('Galería Fotográfica')
+                            ->hiddenLabel()
+                            ->columns(4) // Muestra 4 por fila
+                            ->height(150),
+
+                        // Opción B: Si mezclas FOTOS y PDFs (Muestra una lista descargable)
+                        /* TextEntry::make('evidencia')
+                            ->label('Archivos Adjuntos')
+                            ->listWithLineBreaks()
+                            ->html()
+                            ->formatStateUsing(function ($state) {
+                                // Lógica para crear links si es necesario, 
+                                // pero ImageEntry suele ser suficiente para visuales.
+                                return $state; 
+                            }),
+                        */
+                    ])
+                    ->collapsible(),
+            ]);
     }
 
     public static function getRelations(): array

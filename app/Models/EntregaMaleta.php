@@ -19,6 +19,7 @@ class EntregaMaleta extends Model
     ];
 
     protected $casts = [
+        'evidencia' => 'array',
         'fecha' => 'datetime',
     ];
 
