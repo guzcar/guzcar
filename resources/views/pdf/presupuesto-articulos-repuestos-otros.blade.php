@@ -78,13 +78,17 @@
         </thead>
         <tbody>
             @php $counter = 1; @endphp
-            @if($articulosAgrupados->isNotEmpty())
-                @foreach($articulosAgrupados as $articulo)
-                    <tr>
-                        <td class="text-center">{{ $counter++ }}</td>
-                        <td>
+            
+            {{-- Iteramos sobre la colección unificada y ordenada --}}
+            @forelse($itemsUnificados as $item)
+                <tr>
+                    <td class="text-center">{{ $counter++ }}</td>
+                    
+                    {{-- Lógica de Descripción --}}
+                    <td>
+                        @if($item->tipo_item === 'articulo')
                             @php
-                                $articuloData = $articulo['articulo'];
+                                $articuloData = $item->articulo;
                                 $labelParts = [
                                     $articuloData->categoria->nombre ?? null,
                                     $articuloData->marca->nombre ?? null,
@@ -93,38 +97,39 @@
                                     $articuloData->presentacion->nombre ?? null,
                                     $articuloData->medida ?? null,
                                     $articuloData->unidad->nombre ?? null,
+                                    /*$articuloData->color ?? null*/
                                 ];
                                 echo implode(' ', array_filter($labelParts));
                             @endphp
-                        </td>
-                        <td class="text-center">
-                            {{ \App\Services\FractionService::decimalToFraction($articulo['cantidad']) }}
-                        </td>
-                        <td class="text-right">S/ {{ $articulo['precio'] }}</td>
-                        <td class="text-right">S/ {{ number_format($articulo['cantidad'] * $articulo['precio'], 2) }}</td>
-                    </tr>
-                @endforeach
-            @endif
+                        @else
+                            {{-- Si es 'otro', mostramos la descripción directa --}}
+                            {{ $item->descripcion }}
+                        @endif
+                    </td>
 
-            @forelse($trabajo->otros as $trabajoOtro)
-                <tr>
-                    <td class="text-center">{{ $counter++ }}</td>
-                    <td>{{ $trabajoOtro->descripcion }}</td>
-                    <td class="text-center">{{ $trabajoOtro->cantidad }}</td>
-                    <td class="text-right">S/ {{ $trabajoOtro->precio }}</td>
-                    <td class="text-right">S/ {{ number_format($trabajoOtro->cantidad * $trabajoOtro->precio, 2) }}</td>
+                    {{-- Lógica de Cantidad --}}
+                    <td class="text-center">
+                        @if($item->tipo_item === 'articulo')
+                            {{ \App\Services\FractionService::decimalToFraction($item->cantidad) }}
+                        @else
+                            {{ $item->cantidad }}
+                        @endif
+                    </td>
+
+                    {{-- Precio y Subtotal (Igual para ambos) --}}
+                    <td class="text-right">S/ {{ $item->precio }}</td>
+                    <td class="text-right">S/ {{ number_format($item->cantidad * $item->precio, 2) }}</td>
                 </tr>
             @empty
-                @if($articulosAgrupados->isEmpty())
-                    <tr>
-                        <td colspan="5" class="text-center" style="height: 15px;"></td>
-                    </tr>
-                @endif
+                <tr>
+                    <td colspan="5" class="text-center" style="height: 15px;"></td>
+                </tr>
             @endforelse
         </tbody>
         <tfoot>
             <tr>
                 <td colspan="4" class="border-top"></td>
+                {{-- Los subtotales se siguen pasando desde el controlador, así que esta suma sigue funcionando --}}
                 <td class="text-right border-top bold">S/ {{ number_format($subtotal_articulos + $subtotal_trabajo_otros, 2) }}</td>
             </tr>
         </tfoot>

@@ -19,6 +19,7 @@ class TrabajoOtro extends Model
         'presupuesto',
         'trabajo_id',
         'user_id',
+        'orden_combinado',
     ];
 
     public function trabajo()

@@ -98,13 +98,16 @@
         </thead>
         <tbody>
             @php $counter = 1; @endphp
-            @if($articulosAgrupados->isNotEmpty())
-                @foreach($articulosAgrupados as $articulo)
-                    <tr>
-                        <td class="text-center">{{ $counter++ }}</td>
-                        <td>
+            
+            @forelse($itemsUnificados as $item)
+                <tr>
+                    <td class="text-center">{{ $counter++ }}</td>
+                    
+                    {{-- Columna Descripción --}}
+                    <td>
+                        @if($item->tipo_item === 'articulo')
                             @php
-                                $articuloData = $articulo['articulo'];
+                                $articuloData = $item->articulo;
                                 $labelParts = [
                                     $articuloData->categoria->nombre ?? null,
                                     $articuloData->marca->nombre ?? null,
@@ -117,26 +120,25 @@
                                 ];
                                 echo implode(' ', array_filter($labelParts));
                             @endphp
-                        </td>
-                        <td class="text-center">
-                            {{ \App\Services\FractionService::decimalToFraction($articulo['cantidad']) }}
-                        </td>
-                    </tr>
-                @endforeach
-            @endif
+                        @else
+                            {{-- Descripción simple para Otros --}}
+                            {{ $item->descripcion }}
+                        @endif
+                    </td>
 
-            @forelse($trabajo->otros as $trabajoOtro)
-                <tr>
-                    <td class="text-center">{{ $counter++ }}</td>
-                    <td>{{ $trabajoOtro->descripcion }}</td>
-                    <td class="text-center">{{ $trabajoOtro->cantidad }}</td>
+                    {{-- Columna Cantidad --}}
+                    <td class="text-center">
+                        @if($item->tipo_item === 'articulo')
+                            {{ \App\Services\FractionService::decimalToFraction($item->cantidad) }}
+                        @else
+                            {{ $item->cantidad }}
+                        @endif
+                    </td>
                 </tr>
             @empty
-                @if($articulosAgrupados->isEmpty())
-                    <tr>
-                        <td colspan="3" class="text-center" style="height: 15px;"></td>
-                    </tr>
-                @endif
+                <tr>
+                    <td colspan="3" class="text-center" style="height: 15px;"></td>
+                </tr>
             @endforelse
         </tbody>
     </table>

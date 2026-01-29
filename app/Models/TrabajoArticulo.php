@@ -25,6 +25,7 @@ class TrabajoArticulo extends Model
         'confirmado',
         'presupuesto',
         'sort',
+        'orden_combinado',
     ];
 
     protected $casts = [

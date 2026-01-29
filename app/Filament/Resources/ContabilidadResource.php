@@ -82,6 +82,8 @@ use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
+use App\Livewire\Contabilidad\ItemsSorter;
+use Filament\Forms\Components\Livewire;
 
 class ContabilidadResource extends Resource
 {
@@ -683,6 +685,15 @@ class ContabilidadResource extends Resource
                             ->columns(1),
                     ])
                     ->columns(2),
+                Section::make('Ordenamiento de artículos y otros')
+                    ->collapsible()
+                    ->collapsed() // Colapsado por defecto para no molestar
+                    ->schema([
+                        Forms\Components\ViewField::make('items_sorter')
+                            ->label('')
+                            ->view('filament.forms.components.items-sorter-field') // Creamos una vista puente
+                            ->hidden(fn($record) => $record === null), // Solo mostrar en edición
+                    ]),
             ]);
     }
 
