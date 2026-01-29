@@ -8,11 +8,12 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Pdf\ControlEquipoAsignacionController;
 use App\Http\Controllers\Pdf\ControlMaletaAsignacionController;
 use App\Http\Controllers\Pdf\CotizacionPdfController;
 use App\Http\Controllers\Pdf\DespachoController as PdfDespachoController;
+use App\Http\Controllers\Pdf\EntregaEquipoController;
 use App\Http\Controllers\Pdf\EntregaMaletaController;
-use App\Http\Controllers\Pdf\MaletaController;
 use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
 use App\Http\Controllers\Pdf\VentaController as PdfVentaController;
 use App\Http\Controllers\TrabajoController;
@@ -103,6 +104,9 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     Route::get('/pdf/entrega/{entrega}', [EntregaMaletaController::class, 'show'])->name('pdf.entrega.acta');
     Route::get('/pdf/entrega/{entrega}/detalles/{detalles}', [EntregaMaletaController::class, 'detallesSeleccionados'])->name('pdf.entrega.detalles');
     Route::get('/pdf/control-maletas/{control}', [ControlMaletaAsignacionController::class, 'show'])->name('pdf.control_maleta.asignacion');
+    Route::get('/pdf/entrega-equipo/{entrega}', [EntregaEquipoController::class, 'show'])->name('pdf.entrega_equipo.acta');
+    Route::get('/pdf/entrega-equipo/{entrega}/detalles/{detalles}', [EntregaEquipoController::class, 'detallesSeleccionados'])->name('pdf.entrega_equipo.detalles');
+    Route::get('/pdf/control-equipos/{control}', [ControlEquipoAsignacionController::class, 'show'])->name('pdf.control_equipo.asignacion');
 
     Route::get('/cotizaciones/{cotizacion}/pdf', [CotizacionPdfController::class, 'show'])->name('cotizaciones.pdf');
 

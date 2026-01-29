@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Filament\Resources\ControlEquipoResource\RelationManagers;
+
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Columns\SelectColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\TextInputColumn;
+use Filament\Tables\Table;
+
+class DetallesRelationManager extends RelationManager
+{
+    protected static string $relationship = 'detalles';
+
+    public function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('observacion') // Corregí 'nose' por 'observacion'
+                    ->maxLength(255),
+            ]);
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->defaultSort('created_at', 'desc')
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession()
+            ->searchOnBlur(true)
+            ->paginated([5, 10, 25, 50, 100])
+            ->columns([
+                TextColumn::make('implemento.nombre') // Relación implemento
+                    ->label('Implemento')
+                    ->searchable(),
+                SelectColumn::make('estado')
+                    ->selectablePlaceholder(false)
+                    ->options([
+                        'OPERATIVO' => 'Operativa',
+                        'MERMA' => 'Merma',
+                        'PERDIDO' => 'Perdida',
+                    ]),
+                TextInputColumn::make('observacion')
+                    ->placeholder('Sin observaciones'),
+            ])
+            ->filters([
+                //
+            ])
+            ->headerActions([
+                // Tables\Actions\CreateAction::make(),
+            ])
+            ->actions([
+                // Tables\Actions\EditAction::make(),
+                // Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                // Tables\Actions\BulkActionGroup::make([
+                //      Tables\Actions\DeleteBulkAction::make(),
+                // ]),
+            ]);
+    }
+}
