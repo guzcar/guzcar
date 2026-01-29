@@ -23,7 +23,7 @@ class TrabajoController extends Controller
             'trabajoArticulos.articulo.marca',
             'trabajoArticulos.articulo.unidad',
             'trabajoArticulos.articulo.presentacion',
-            
+
             'servicios' => function ($query) {
                 $query->where('presupuesto', true)->orderBy('sort');
             },
@@ -56,14 +56,14 @@ class TrabajoController extends Controller
         // Definimos la variable explícitamente para compact()
         $descuentos = $trabajo->descuentos;
         $total_descuentos = 0;
-        
+
         if ($descuentos->isNotEmpty()) {
             foreach ($descuentos as $descuento) {
                 $monto_descuento = $total * ($descuento->descuento / 100);
                 $total_descuentos += $monto_descuento;
             }
         }
-        
+
         $total_con_descuentos = $total - $total_descuentos;
 
         $pdf = App::make('dompdf.wrapper');
@@ -74,7 +74,7 @@ class TrabajoController extends Controller
             'subtotal_servicios',
             'subtotal_articulos',
             'subtotal_trabajo_otros',
-            'itemsUnificados', 
+            'itemsUnificados',
             'total',
             'descuentos', // Ahora sí existe esta variable
             'total_descuentos',
@@ -100,9 +100,9 @@ class TrabajoController extends Controller
             'trabajoArticulos.articulo.marca',
             'trabajoArticulos.articulo.unidad',
             'trabajoArticulos.articulo.presentacion',
-            
+
             'otros' => fn($q) => $q->where('presupuesto', true),
-            
+
             'descuentos',
             'cliente',
             'vehiculo.clientes',
@@ -117,7 +117,7 @@ class TrabajoController extends Controller
         // Cálculos
         $subtotal_articulos = $trabajo->trabajoArticulos->where('presupuesto', true)->sum(fn($a) => $a->cantidad * $a->precio);
         $subtotal_trabajo_otros = $trabajo->otros->where('presupuesto', true)->sum(fn($o) => $o->cantidad * $o->precio);
-        
+
         $total = $subtotal_articulos + $subtotal_trabajo_otros;
 
         // CORRECCIÓN: Definir variable $descuentos
@@ -138,7 +138,7 @@ class TrabajoController extends Controller
             'tiempo',
             'subtotal_articulos',
             'subtotal_trabajo_otros',
-            'itemsUnificados', 
+            'itemsUnificados',
             'total',
             'total_descuentos',
             'total_con_descuentos',
@@ -240,33 +240,84 @@ class TrabajoController extends Controller
         return $pdf->stream($fileName);
     }
 
-    // --- MÉTODOS AUXILIARES PRIVADOS ---
-
+    /**
+     * Mezcla, ordena y AGRUPA artículos repetidos.
+     */
     private function mergeAndSortItems($articulos, $otros)
     {
         $collection = collect();
 
+        // 1. Preparar Artículos
         foreach ($articulos as $art) {
-            if (!$art->presupuesto) continue;
-            $art->tipo_item = 'articulo';
-            $art->sort_index = $art->orden_combinado ?? 999999; 
-            $collection->push($art);
+            if (!$art->presupuesto)
+                continue;
+
+            // Clonamos el objeto para no afectar los datos originales en memoria si hay referencias cruzadas
+            $item = clone $art;
+
+            $item->tipo_item = 'articulo';
+            $item->sort_index = $item->orden_combinado ?? 999999;
+            // Clave única para identificar duplicados: ID + Precio (Para no mezclar precios distintos)
+            $item->unique_key = 'art_' . $item->articulo_id . '_' . (float) $item->precio;
+
+            $collection->push($item);
         }
 
+        // 2. Preparar Otros
         foreach ($otros as $otro) {
-            if (!$otro->presupuesto) continue;
-            $otro->tipo_item = 'otro';
-            $otro->sort_index = $otro->orden_combinado ?? 999999;
-            $collection->push($otro);
+            if (!$otro->presupuesto)
+                continue;
+
+            $item = clone $otro;
+
+            $item->tipo_item = 'otro';
+            $item->sort_index = $item->orden_combinado ?? 999999;
+            // Los "otros" usualmente no se agrupan a menos que sean idénticos, 
+            // pero mejor dejarlos separados o usar un ID único si quisieras.
+            // Usamos el ID único de la fila para que nunca se agrupen entre sí.
+            $item->unique_key = 'otro_' . $item->id;
+
+            $collection->push($item);
         }
 
-        return $collection->sortBy('sort_index')->values();
+        // 3. Ordenar primero (para respetar "toma en cuenta el que aparece primero")
+        $sorted = $collection->sortBy('sort_index')->values();
+
+        // 4. Lógica de Agrupación (Merge)
+        $finalCollection = collect();
+        $seenItems = []; // Array auxiliar para rastrear lo que ya agregamos
+
+        foreach ($sorted as $item) {
+            // Si es 'otro', pasa directo (o aplica lógica si quieres agrupar otros idénticos)
+            if ($item->tipo_item === 'otro') {
+                $finalCollection->push($item);
+                continue;
+            }
+
+            // Es un artículo: verificamos si ya existe en nuestro registro
+            if (isset($seenItems[$item->unique_key])) {
+                // YA EXISTE: Recuperamos la referencia del primer item encontrado
+                $originalItem = $seenItems[$item->unique_key];
+
+                // Sumamos la cantidad del item actual al original
+                $originalItem->cantidad += $item->cantidad;
+
+                // NO agregamos este item actual a $finalCollection, efectivamente "borrándolo"
+            } else {
+                // ES NUEVO: Lo guardamos en el registro y en la colección final
+                $seenItems[$item->unique_key] = $item;
+                $finalCollection->push($item);
+            }
+        }
+
+        return $finalCollection;
     }
 
     private function calcularTiempo($ingreso, $salida)
     {
-        if (empty($salida)) return "EN TALLER";
-        
+        if (empty($salida))
+            return "EN TALLER";
+
         $fecha_ingreso = new DateTime($ingreso);
         $fecha_salida = new DateTime($salida);
         $diferencia = $fecha_ingreso->diff($fecha_salida);
@@ -288,7 +339,7 @@ class TrabajoController extends Controller
     public function informe($id)
     {
         $trabajo = Trabajo::with(['vehiculo.clientes', 'vehiculo.tipoVehiculo', 'vehiculo.marca', 'informes'])->find($id);
-        
+
         $titulo = "# " . $trabajo->vehiculo->placa . " " .
             ($trabajo->vehiculo->tipoVehiculo->nombre ?? '') . " " .
             ($trabajo->vehiculo->marca->nombre ?? '') . " " .
