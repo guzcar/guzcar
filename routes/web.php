@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MaletaController;
 use App\Http\Controllers\Pdf\ControlEquipoAsignacionController;
 use App\Http\Controllers\Pdf\ControlMaletaAsignacionController;
 use App\Http\Controllers\Pdf\CotizacionPdfController;
@@ -126,6 +127,9 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     Route::put('/trabajos/{trabajo}/detalles/{detalle}', [TrabajoDescripcionTecnicoController::class, 'update'])->name('gestion.detalles.update');
     Route::delete('/trabajos/{trabajo}/detalles/{detalle}', [TrabajoDescripcionTecnicoController::class, 'destroy'])->name('gestion.detalles.destroy');
 
+    Route::get('/maletas', [MaletaController::class, 'index'])->name('maletas.index');
+    Route::get('/maletas/{maleta}', [MaletaController::class, 'show'])->name('maletas.show');
+    
     // Editar perfil
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::post('/profile/edit', [UserController::class, 'update'])->name('user.update');
