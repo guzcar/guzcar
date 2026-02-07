@@ -6,6 +6,7 @@ use App\Http\Controllers\ArticuloController;
 use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\EntregaMaletaFirmaController;
 use App\Http\Controllers\EvidenciaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MaletaController;
@@ -138,4 +139,10 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
 
     Route::get('/asistencia', [AsistenciaController::class, 'index'])->name('asistencia.index');
     Route::post('/asistencia', [AsistenciaController::class, 'registrar'])->name('asistencia.registrar');
+
+    Route::prefix('entrega-maleta')->name('entrega.firma.')->group(function () {
+        Route::get('/{entrega}/firmar', [EntregaMaletaFirmaController::class, 'index'])->name('index');
+        Route::get('/{entrega}/firmar-seleccion/{detalles}', [EntregaMaletaFirmaController::class, 'seleccion'])->name('seleccion');
+        Route::post('/{entrega}/guardar', [EntregaMaletaFirmaController::class, 'save'])->name('save');
+    });
 });

@@ -48,6 +48,23 @@ class DetallesRelationManager extends RelationManager
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    BulkAction::make('firmarSeleccion')
+                        ->label('Firmar Selección')
+                        ->icon('heroicon-o-pencil-square')
+                        ->deselectRecordsAfterCompletion()
+                        ->action(function ($records) {
+                            // $records son instancias de EntregaMaletaDetalle
+                            $ids = $records->pluck('id')->toArray();
+                            $entregaId = $this->getOwnerRecord()->id;
+
+                            // URL para firma parcial
+                            $url = route('entrega.firma.seleccion', [
+                                'entrega' => $entregaId,
+                                'detalles' => implode(',', $ids)
+                            ]);
+
+                            $this->js("window.open('{$url}', '_blank')");
+                        }),
                     BulkAction::make('generarActaParcial')
                         ->label('Imprimir Selección')
                         ->icon('heroicon-o-printer')

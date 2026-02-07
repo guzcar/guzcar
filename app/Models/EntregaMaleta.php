@@ -14,6 +14,8 @@ class EntregaMaleta extends Model
         'maleta_id',
         'propietario_id',
         'responsable_id',
+        'firma_propietario',
+        'firma_responsable',
         'evidencia',
         'fecha',
     ];

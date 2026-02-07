@@ -24,6 +24,7 @@ use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Grid as InfoGrid;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -156,6 +157,11 @@ class EntregaMaletaResource extends Resource
                 ActionGroup::make([
                     Tables\Actions\ViewAction::make()
                         ->label('Ver'),
+                    Action::make('firmar')
+                        ->label('Firmar Digitalmente')
+                        ->icon('heroicon-o-pencil-square')
+                        ->url(fn($record) => route('entrega.firma.index', $record))
+                        ->openUrlInNewTab(),
                     Tables\Actions\Action::make('pdf')
                         ->label('Acta de entrega')
                         ->icon('heroicon-o-printer')

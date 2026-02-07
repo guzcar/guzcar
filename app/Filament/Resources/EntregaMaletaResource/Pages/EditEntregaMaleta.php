@@ -12,6 +12,12 @@ class EditEntregaMaleta extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+
+            \Filament\Actions\Action::make('firmar')
+                ->label('Firmar')
+                ->icon('heroicon-o-pencil-square')
+                ->url(fn($record) => route('entrega.firma.index', $record))
+                ->openUrlInNewTab(),
             \Filament\Actions\Action::make('pdf')
                 ->label('Acta de entrega')
                 ->icon('heroicon-o-printer')
@@ -27,7 +33,7 @@ class EditEntregaMaleta extends EditRecord
         // Rellenar los campos visuales que no están en el $fillable directo o son relaciones
         $data['responsable_nombre'] = $this->record->responsable?->name;
         $data['propietario_nombre'] = $this->record->propietario?->name ?? 'Sin Asignar';
-        
+
         return $data;
     }
 }
