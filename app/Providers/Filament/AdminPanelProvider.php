@@ -23,12 +23,14 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
+            ->databaseNotifications()
             ->default()
             ->id('admin')
             ->path('admin')
@@ -85,6 +87,9 @@ class AdminPanelProvider extends PanelProvider
                     ->enableBrowserSessions()
                     ->enableTwoFactorAuthentication(),
                 FilamentShieldPlugin::make(),
+                FilamentFullCalendarPlugin::make()
+                    ->selectable()
+                    ->editable()
             ]);
     }
 }
