@@ -111,6 +111,7 @@ class TrabajoArticulosRelationManager extends RelationManager
                                 Select::make('cantidad_fraccion')
                                     ->label('Cantidad fraccionada')
                                     ->options([
+                                        '0.125' => '1/8',
                                         '0.25' => '1/4',
                                         '0.50' => '1/2',
                                         '0.75' => '3/4',
