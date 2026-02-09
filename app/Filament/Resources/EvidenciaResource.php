@@ -122,6 +122,7 @@ class EvidenciaResource extends Resource
                         ->verticallyAlignCenter(),
                     TextColumn::make('user.name')
                         ->label('Subido por')
+                        ->sortable()
                         ->searchable(),
                     TextColumn::make('observacion')
                         ->label('Observación')

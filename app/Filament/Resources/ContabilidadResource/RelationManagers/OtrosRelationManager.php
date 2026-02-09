@@ -69,6 +69,16 @@ class OtrosRelationManager extends RelationManager
                     ->state(function (TrabajoOtro $record): string {
                         return number_format($record->precio * $record->cantidad, 2, '.', '');
                     }),
+                TextColumn::make('created_at')
+                    ->label('Fecha de creación')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->label('Fecha de edición')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
