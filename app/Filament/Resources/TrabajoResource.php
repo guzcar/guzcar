@@ -748,8 +748,28 @@ class TrabajoResource extends Resource
 
                         return $clientes->isNotEmpty() ? $clientes->toArray() : null;
                     }),
+                TextColumn::make('conductor.nombre')
+                    ->label('Conductor')
+                    ->placeholder('Sin Conductor')
+                    ->badge()
+                    ->formatStateUsing(function ($state, Trabajo $record) {
+                        // Obtenemos el teléfono del conductor
+                        $telefono = $record->conductor?->telefono;
+
+                        if ($telefono) {
+                            // Reutilizamos tu función estática existente para dar formato
+                            $telefonoFormateado = self::formatearTelefono($telefono);
+                            return "{$state} ({$telefonoFormateado})";
+                        }
+
+                        return $state;
+                    })
+                    ->sortable()
+                    ->searchable(isIndividual: true)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('descripcion_servicio')
                     ->searchable(isIndividual: true)
+                    ->copyable()
                     ->wrap()
                     ->lineClamp(2)
                     ->toggleable(isToggledHiddenByDefault: false),
