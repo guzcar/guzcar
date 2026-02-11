@@ -68,7 +68,6 @@
             top: 45%;
             left: 42.5%;
             transform: translate(-50%, -50%);
-            opacity: 0.1;
             z-index: -1;
         }
 

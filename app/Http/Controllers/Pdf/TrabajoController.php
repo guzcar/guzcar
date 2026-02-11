@@ -328,11 +328,18 @@ class TrabajoController extends Controller
 
     public function evidencia($id)
     {
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', '300');
+
         $trabajo = Trabajo::find($id);
         $evidencias = $trabajo->evidencias()->where('mostrar', true)->orderBy('sort')->get();
 
         $pdf = App::make('dompdf.wrapper');
+        
+        $pdf->getDomPDF()->set_option("enable_php", true);
+        
         $pdf->loadView('pdf.evidencia', compact('trabajo', 'evidencias'))->setPaper('A4', 'portrait');
+        
         return $pdf->stream('Evidencias ' . $trabajo->codigo . '.pdf');
     }
 
