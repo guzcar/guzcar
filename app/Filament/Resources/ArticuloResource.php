@@ -201,6 +201,7 @@ class ArticuloResource extends Resource
                                 Section::make()
                                     ->schema([
                                         Select::make('grupo')
+                                            ->required()
                                             ->relationship('grupo', 'nombre')
                                             ->searchable()
                                             ->preload(),
