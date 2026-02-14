@@ -76,31 +76,42 @@ class DashboardCalendarWidget extends FullCalendarWidget
             Grid::make()
                 ->schema([
                     TextInput::make('title')
-                        ->label('Nombre de la actividad')
+                        ->label('Título')
                         ->required(),
 
+                    // Nuevo campo Descripción
+                    \Filament\Forms\Components\Textarea::make('description')
+                        ->label('Descripción / Mensaje del Modal')
+                        ->rows(3)
+                        ->columnSpanFull(),
+
                     Toggle::make('is_global')
-                        ->label('Global (Visible para otros)')
+                        ->label('Global (Notificación Masiva)')
                         ->default(false)
-                        ->inline(false)
-                        ->live() // Hace que el formulario reaccione al cambio
+                        ->live()
                         ->hidden(fn(?CalendarEvent $record) => $record && $record->user_id !== auth()->id()),
 
-                    // Nuevo campo Select para roles
                     Select::make('target_roles')
-                        ->label('Visible solo para los roles (Dejar vacío para todos)')
+                        ->label('Restringir a Roles (Vacío = Todos)')
                         ->options(Role::all()->pluck('name', 'name'))
                         ->multiple()
                         ->searchable()
                         ->preload()
-                        ->visible(fn(Get $get) => $get('is_global')), // Solo visible si es global
+                        ->visible(fn(Get $get) => $get('is_global')),
+
+                    // Nueva Fecha de Notificación
+                    DateTimePicker::make('notification_date')
+                        ->label('Fecha de Notificación (Campana/Modal)')
+                        ->helperText('A partir de esta fecha aparecerá el aviso. Si se deja vacío, se usa la fecha de inicio.')
+                        ->visible(fn(Get $get) => $get('is_global'))
+                        ->default(now()),
 
                     DateTimePicker::make('starts_at')
-                        ->label('Inicio')
+                        ->label('Inicio Evento')
                         ->required(),
 
                     DateTimePicker::make('ends_at')
-                        ->label('Fin')
+                        ->label('Fin Evento')
                         ->required(),
                 ])
         ];
