@@ -14,6 +14,7 @@ class CalendarEvent extends Model
         'ends_at' => 'datetime',
         'is_global' => 'boolean',
         'notification_sent' => 'boolean',
+        'target_roles' => 'array',
     ];
 
     public function user(): BelongsTo
