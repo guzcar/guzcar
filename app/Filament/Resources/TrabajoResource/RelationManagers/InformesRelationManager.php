@@ -7,8 +7,10 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class InformesRelationManager extends RelationManager
@@ -35,8 +37,12 @@ class InformesRelationManager extends RelationManager
                         }
                     })
                     ->placeholder('Elige una plantilla...')
-                    ->columnSpanFull()
                     ->hiddenOn('edit'),
+
+                Forms\Components\Toggle::make('visible')
+                    ->label('Incluir en el informe PDF')
+                    ->inline(false)
+                    ->default(true),
 
                 Forms\Components\RichEditor::make('contenido')
                     ->columnSpanFull()
@@ -62,6 +68,13 @@ class InformesRelationManager extends RelationManager
     {
         return $table
             ->columns([
+                Tables\Columns\ToggleColumn::make('visible')
+                    ->label('¿Incluido?')
+                    ->onColor('success')
+                    ->onIcon('heroicon-m-check')
+                    ->offIcon('heroicon-m-x-mark')
+                    ->alignCenter()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('contenido')
                     ->wrap()
                     ->html()
@@ -81,6 +94,16 @@ class InformesRelationManager extends RelationManager
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    BulkAction::make('incluir')
+                        ->label('Incluir en PDF')
+                        ->icon('heroicon-o-check-circle')
+                        ->action(fn(Collection $records) => $records->each->update(['visible' => true]))
+                        ->deselectRecordsAfterCompletion(),
+                    BulkAction::make('excluir')
+                        ->label('Excluir de PDF')
+                        ->icon('heroicon-o-x-circle')
+                        ->action(fn(Collection $records) => $records->each->update(['visible' => false]))
+                        ->deselectRecordsAfterCompletion(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

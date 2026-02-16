@@ -335,17 +335,24 @@ class TrabajoController extends Controller
         $evidencias = $trabajo->evidencias()->where('mostrar', true)->orderBy('sort')->get();
 
         $pdf = App::make('dompdf.wrapper');
-        
+
         $pdf->getDomPDF()->set_option("enable_php", true);
-        
+
         $pdf->loadView('pdf.evidencia', compact('trabajo', 'evidencias'))->setPaper('A4', 'portrait');
-        
+
         return $pdf->stream('Evidencias ' . $trabajo->codigo . '.pdf');
     }
 
     public function informe($id)
     {
-        $trabajo = Trabajo::with(['vehiculo.clientes', 'vehiculo.tipoVehiculo', 'vehiculo.marca', 'informes'])->find($id);
+        $trabajo = Trabajo::with([
+            'vehiculo.clientes',
+            'vehiculo.tipoVehiculo',
+            'vehiculo.marca',
+            'informes' => function ($query) {
+                $query->where('visible', true);
+            }
+        ])->findOrFail($id);
 
         $titulo = "# " . $trabajo->vehiculo->placa . " " .
             ($trabajo->vehiculo->tipoVehiculo->nombre ?? '') . " " .
@@ -353,12 +360,11 @@ class TrabajoController extends Controller
             ($trabajo->vehiculo->modelo->nombre ?? '');
 
         $pdf = App::make('dompdf.wrapper');
-        $pdf->loadView('pdf.informe', [
+        return $pdf->loadView('pdf.informe', [
             'trabajo' => $trabajo,
             'informes' => $trabajo->informes,
             'titulo' => $titulo
-        ])->setPaper('A4', 'portrait');
-
-        return $pdf->stream("Informe {$trabajo->codigo}.pdf");
+        ])->setPaper('A4', 'portrait')
+            ->stream("Informe {$trabajo->codigo}.pdf");
     }
 }

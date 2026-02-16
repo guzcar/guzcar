@@ -14,6 +14,11 @@ class TrabajoInforme extends Model
     protected $fillable = [
         'trabajo_id',
         'contenido',
+        'visible',
+    ];
+
+    protected $casts = [
+        'visible' => 'boolean',
     ];
 
     public function trabajo()
