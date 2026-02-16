@@ -750,7 +750,7 @@ class TrabajoResource extends Resource
                     }),
                 TextColumn::make('conductor.nombre')
                     ->label('Conductor')
-                    ->placeholder('Sin Conductor')
+                    ->placeholder('No aplica')
                     ->badge()
                     ->formatStateUsing(function ($state, Trabajo $record) {
                         // Obtenemos el teléfono del conductor
@@ -766,7 +766,7 @@ class TrabajoResource extends Resource
                     })
                     ->sortable()
                     ->searchable(isIndividual: true)
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make('descripcion_servicio')
                     ->searchable(isIndividual: true)
                     ->copyable()
