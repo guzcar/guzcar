@@ -78,41 +78,48 @@ class DashboardCalendarWidget extends FullCalendarWidget
                     TextInput::make('title')
                         ->label('Título')
                         ->required(),
-
-                    // Nuevo campo Descripción
+                    
                     \Filament\Forms\Components\Textarea::make('description')
-                        ->label('Descripción / Mensaje del Modal')
-                        ->rows(3)
+                        ->label('Mensaje de la Notificación / Modal')
+                        ->rows(2)
                         ->columnSpanFull(),
 
+                    // Sección de fechas de AVISO (Ahora visible para todos)
+                    \Filament\Forms\Components\Section::make('Configuración de Avisos')
+                        ->schema([
+                            DateTimePicker::make('notification_date')
+                                ->label('1er Aviso (Campana/Modal)')
+                                ->helperText('Fecha principal para mostrar la notificación.')
+                                ->default(now())
+                                ->required(), // Opcional: puedes dejarlo required o no
+
+                            DateTimePicker::make('second_notification_date')
+                                ->label('2do Aviso (Opcional)')
+                                ->helperText('Fecha para volver a mostrar el modal como recordatorio.')
+                                ->nullable(),
+                        ])->columns(2),
+
                     Toggle::make('is_global')
-                        ->label('Global (Notificación Masiva)')
+                        ->label('Es un Evento Global')
                         ->default(false)
                         ->live()
-                        ->hidden(fn(?CalendarEvent $record) => $record && $record->user_id !== auth()->id()),
+                        // Solo el dueño puede editar si es global o no, o lógica que prefieras
+                        ->hidden(fn (?CalendarEvent $record) => $record && $record->user_id !== auth()->id()),
 
                     Select::make('target_roles')
-                        ->label('Restringir a Roles (Vacío = Todos)')
+                        ->label('Visible solo para roles (Vacío = Todos)')
                         ->options(Role::all()->pluck('name', 'name'))
                         ->multiple()
                         ->searchable()
                         ->preload()
-                        ->visible(fn(Get $get) => $get('is_global')),
+                        ->visible(fn (Get $get) => $get('is_global')),
 
-                    // Nueva Fecha de Notificación
-                    DateTimePicker::make('notification_date')
-                        ->label('Fecha de Notificación (Campana/Modal)')
-                        ->helperText('A partir de esta fecha aparecerá el aviso. Si se deja vacío, se usa la fecha de inicio.')
-                        ->visible(fn(Get $get) => $get('is_global'))
-                        ->default(now()),
-
-                    DateTimePicker::make('starts_at')
-                        ->label('Inicio Evento')
-                        ->required(),
-
-                    DateTimePicker::make('ends_at')
-                        ->label('Fin Evento')
-                        ->required(),
+                    // Fechas del evento en el calendario (dibujo visual)
+                    \Filament\Forms\Components\Section::make('Duración del Evento')
+                        ->schema([
+                            DateTimePicker::make('starts_at')->label('Inicio')->required(),
+                            DateTimePicker::make('ends_at')->label('Fin')->required(),
+                        ])->columns(2),
                 ])
         ];
     }

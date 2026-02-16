@@ -34,10 +34,10 @@
                         <li>
                             <div class="dropdown-item p-3 border-bottom" style="white-space: normal; cursor: pointer;"
                                 data-bs-toggle="modal" data-bs-target="#globalEventModal" onclick="loadModalContent(
-                                             '{{ addslashes($event->title) }}', 
-                                             '{{ addslashes(strip_tags($event->description)) }}', 
-                                             '{{ $event->ends_at->format('d/m/Y H:i') }}'
-                                         )">
+                                        '{{ addslashes($event->title) }}', 
+                                        '{{ addslashes(strip_tags($event->description)) }}', 
+                                        '{{ $event->ends_at->format('d/m/Y H:i') }}'
+                                    )">
 
                                 <h6 class="mb-1 text-primary fw-bold text-truncate">{{ $event->title }}</h6>
                                 <p class="mb-1 small text-muted">
@@ -152,43 +152,36 @@
 </div>
 
 <script>
-    // Función para actualizar el modal manualmente si clickean en la campana
-    function loadModalContent(title, description, date) {
-        document.getElementById('modalTitle').innerText = title;
-        document.getElementById('modalDescription').innerText = description;
-        document.getElementById('modalDate').innerText = date;
-    }
-
     document.addEventListener('DOMContentLoaded', function () {
-        // Lógica de Popup Automático (Solo para el MÁS reciente)
-        @if(isset($globalEvents) && $globalEvents->count() > 0)
-            @php $latestEvent = $globalEvents->first(); @endphp
+        @if(isset($modalEvent) && $modalEvent)
 
-            var eventId = "{{ $latestEvent->id }}";
-            var storageKey = 'guzcar_seen_event_' + eventId;
+            // Usamos ID del evento + la ETAPA ('first' o 'second')
+            var eventUniqueKey = "{{ $modalEvent->id }}_{{ $modalEvent->notification_stage }}";
+            var storageKey = 'guzcar_seen_' + eventUniqueKey;
 
-            // Si no lo ha visto en esta sesión
             if (!sessionStorage.getItem(storageKey)) {
-                // Escapar el contenido para JavaScript
-                var title = "{{ addslashes($latestEvent->title) }}";
-                var description = "{{ addslashes(strip_tags($latestEvent->description ?? '')) }}";
-                var date = "{{ $latestEvent->ends_at->format('d/m/Y H:i') }}";
+                // Cargar contenido
+                document.getElementById('modalTitle').innerText = "{{ $modalEvent->title }}";
 
-                // Prellenar modal con el último evento
-                loadModalContent(title, description, date);
+                // Agregamos un prefijo si es el segundo aviso para dar urgencia
+                var desc = `{{ $modalEvent->description ?? '' }}`;
+                @if($modalEvent->notification_stage === 'second')
+                    desc = "⚠️ SEGUNDO AVISO: \n" + desc;
+                @endif
 
-                var modalElement = document.getElementById('globalEventModal');
-                var myModal = new bootstrap.Modal(modalElement, {
+                document.getElementById('modalDescription').innerText = desc;
+                document.getElementById('modalDate').innerText = "{{ $modalEvent->ends_at->format('d/m/Y H:i') }}";
+
+                var myModal = new bootstrap.Modal(document.getElementById('globalEventModal'), {
                     backdrop: 'static',
                     keyboard: false
                 });
                 myModal.show();
 
-                // Marcar como visto cuando se cierre
-                modalElement.addEventListener('hidden.bs.modal', function () {
+                document.getElementById('globalEventModal').addEventListener('hidden.bs.modal', function () {
                     sessionStorage.setItem(storageKey, 'true');
-                }, { once: true });
+                });
             }
         @endif
-});
+    });
 </script>

@@ -13,8 +13,10 @@ class CalendarEvent extends Model
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
         'notification_date' => 'datetime',
+        'second_notification_date' => 'datetime',
         'is_global' => 'boolean',
         'notification_sent' => 'boolean',
+        'second_notification_sent' => 'boolean',
         'target_roles' => 'array',
     ];
 

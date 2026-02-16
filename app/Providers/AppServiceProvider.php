@@ -26,52 +26,55 @@ class AppServiceProvider extends ServiceProvider
             $events = collect();
 
             if ($user) {
-                $userRoleNames = method_exists($user, 'getRoleNames')
-                    ? $user->getRoleNames()->toArray()
-                    : [];
-
+                $userRoleNames = method_exists($user, 'getRoleNames') ? $user->getRoleNames()->toArray() : [];
                 $now = now();
 
-                // 1. Traemos TODOS los eventos globales vigentes
-                // Usamos notification_date para saber si ya debe mostrarse
-                // Usamos ends_at para saber si ya expiró
+                // Traemos eventos vigentes (que no hayan terminado)
+                // Y que ya haya pasado su fecha de notificación
                 $candidates = CalendarEvent::query()
-                    ->where('is_global', true)
-                    // Si notification_date es null, usamos starts_at, si no, usamos notification_date
-                    ->where(function ($q) use ($now) {
-                        $q->where(function ($sub) use ($now) {
-                            $sub->whereNotNull('notification_date')
-                                ->where('notification_date', '<=', $now);
-                        })->orWhere(function ($sub) use ($now) {
-                            $sub->whereNull('notification_date')
-                                ->where('starts_at', '<=', $now);
-                        });
-                    })
                     ->where('ends_at', '>=', $now)
+                    ->where(function ($q) use ($now) {
+                        $q->where('notification_date', '<=', $now)
+                            ->orWhere('second_notification_date', '<=', $now);
+                    })
                     ->orderBy('created_at', 'desc')
                     ->get();
 
-                // 2. Filtramos estrictamente por Rol usando PHP (Más seguro que JSON SQL simple)
-                $events = $candidates->filter(function ($event) use ($userRoleNames) {
-                    // Si target_roles es null o array vacío [], es para TODOS
-                    if (empty($event->target_roles)) {
-                        return true;
+                $events = $candidates->filter(function ($event) use ($userRoleNames, $user, $now) {
+                    // 1. Permisos (Global vs Personal)
+                    $hasPermission = false;
+                    if ($event->is_global) {
+                        if (empty($event->target_roles)) {
+                            $hasPermission = true;
+                        } else {
+                            $hasPermission = count(array_intersect($userRoleNames, $event->target_roles)) > 0;
+                        }
+                    } else {
+                        $hasPermission = $event->user_id === $user->id;
                     }
 
-                    // Si tiene restricciones, verificamos intersección
-                    // Si el usuario NO tiene roles ($userRoleNames vacío) y el evento pide roles, devuelve false.
-                    // Si el usuario tiene roles, verificamos si alguno coincide.
-                    $rolesPermitidos = $event->target_roles; // Array guardado en BD
+                    if (!$hasPermission)
+                        return false;
 
-                    // array_intersect devuelve los valores coincidentes. Si hay > 0, tiene permiso.
-                    return count(array_intersect($userRoleNames, $rolesPermitidos)) > 0;
+                    // 2. Determinar la "Etapa" del aviso para el Modal (Stage)
+                    // Si ya pasó la 2da fecha, la etapa es 'second'. Si no, es 'first'.
+                    $event->notification_stage = 'first';
+                    if ($event->second_notification_date && $now >= $event->second_notification_date) {
+                        $event->notification_stage = 'second';
+                    }
+
+                    return true;
                 });
 
-                // 3. Tomamos solo los últimos 5 para la campanita
-                $events = $events->take(5);
+                // Tomamos 5 para la lista de la campana
+                $eventsForMenu = $events->take(5);
+
+                // Para el modal, tomamos EL MÁS PRIORITARIO (por ejemplo, el que tenga etapa 'second' más reciente, o el creado más reciente)
+                $eventForModal = $events->first();
             }
 
-            $view->with('globalEvents', $events);
+            $view->with('globalEvents', $eventsForMenu ?? collect());
+            $view->with('modalEvent', $eventForModal ?? null);
         });
     }
 }
