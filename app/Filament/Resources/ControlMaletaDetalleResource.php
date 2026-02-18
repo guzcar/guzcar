@@ -38,6 +38,14 @@ class ControlMaletaDetalleResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->searchOnBlur(true)
+            ->paginated([5, 10, 25, 50, 100])
+            ->striped()
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession()
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('control.fecha')
                     ->label('Fecha')

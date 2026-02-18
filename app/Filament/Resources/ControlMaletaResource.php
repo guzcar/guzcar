@@ -117,10 +117,22 @@ class ControlMaletaResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->searchOnBlur(true)
+            ->paginated([5, 10, 25, 50, 100])
+            ->striped()
+            ->persistColumnSearchesInSession()
+            ->persistSearchInSession()
+            ->persistFiltersInSession()
+            ->persistSortInSession()
+            ->defaultSort('fecha', 'desc')
             ->columns([
                 TextColumn::make('fecha')
                     ->label('Fecha')
-                    ->dateTime('d/m/Y')
+                    ->dateTime('d/m/Y H:m A')
+                    ->sortable(),
+                TextColumn::make('fecha')
+                    ->label('Fecha')
+                    ->dateTime('d/m/Y H:m A')
                     ->sortable(),
 
                 TextColumn::make('responsable.name')
