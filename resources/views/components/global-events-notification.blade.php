@@ -78,7 +78,7 @@
                 @php $latestEvent = $events->first(); @endphp
                 <h4 class="text-xl font-bold text-gray-800 mb-2">{{ $latestEvent->title }}</h4>
                 <p class="text-sm text-gray-500 mb-4">
-                    Vigente hasta: {{ $latestEvent->ends_at->format('d/m/Y H:i') }}
+                    Fecha: {{ $latestEvent->ends_at->format('d/m/Y H:i') }}
                 </p>
                 
                 @if($events->count() > 1)

@@ -8,9 +8,9 @@
 
     <ul class="navbar-nav ms-auto me-3 me-lg-4">
         {{-- INICIO: Ícono de Campana / Notificaciones --}}
-        <li class="nav-item dropdown me-3">
-            <a class="nav-link dropdown-toggle position-relative" id="navbarDropdownNotifications" href="#"
-                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <li class="nav-item dropdown me-3 position-relative" id="notificationDropdownContainer">
+            <a class="nav-link dropdown-toggle" id="navbarDropdownNotifications" href="#" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
                 <i class="fas fa-bell fa-lg"></i>
                 @if(isset($globalEvents) && $globalEvents->count() > 0)
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
@@ -21,8 +21,9 @@
                 @endif
             </a>
 
-            <ul class="dropdown-menu dropdown-menu-end shadow p-0" aria-labelledby="navbarDropdownNotifications"
-                style="width: 320px; max-height: 400px; overflow-y: auto;">
+            <ul class="dropdown-menu shadow p-0" aria-labelledby="navbarDropdownNotifications"
+                style="max-height: 400px; overflow-y: auto;">
+
                 <li
                     class="dropdown-header bg-light fw-bold border-bottom d-flex justify-content-between align-items-center">
                     <span>Avisos Recientes</span>
@@ -140,7 +141,7 @@
 
                 <div class="alert alert-light border d-flex align-items-center" role="alert">
                     <i class="fas fa-clock text-primary me-2"></i>
-                    <div>Vigente hasta: <strong id="modalDate"></strong></div>
+                    <div>Fecha: <strong id="modalDate"></strong></div>
                 </div>
             </div>
 

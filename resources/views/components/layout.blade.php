@@ -26,6 +26,27 @@
                 background: transparent;
                 color: inherit;
             }
+
+            #notificationDropdownContainer .dropdown-menu {
+                position: absolute !important;
+                transform: none !important;
+                top: 100% !important;
+                right: 0 !important;
+                left: auto !important;
+                width: 320px !important;
+                margin-top: 8px !important;
+            }
+
+            @media (max-width: 575px) {
+                #notificationDropdownContainer .dropdown-menu {
+                    position: fixed !important;
+                    top: 65px !important;
+                    left: 15px !important;
+                    right: 15px !important;
+                    width: auto !important;
+                    max-width: none !important;
+                }
+            }
         </style>
     @endpush
 
