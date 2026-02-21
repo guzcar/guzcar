@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\CalendarEvent;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        URL::forceScheme('https');
         View::composer('components.navbar', function ($view) {
             $user = auth()->user();
             $events = collect();
