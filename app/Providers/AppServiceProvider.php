@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        URL::forceScheme('https');
+        // URL::forceScheme('https');
         View::composer('components.navbar', function ($view) {
             $user = auth()->user();
             $events = collect();
