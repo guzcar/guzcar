@@ -21,6 +21,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\ActionSize;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -106,8 +107,12 @@ class ControlMaletaResource extends Resource
                 Section::make()
                     ->schema([
                         FileUpload::make('evidencia_url')
-                            ->label('Evidencia')
-                            ->directory('control-maletas'),
+                            ->label('Evidencias')
+                            ->directory('control-maletas')
+                            ->image()
+                            ->multiple()
+                            ->reorderable()
+                            ->appendFiles(),
                     ])
                     ->columnSpan(1)
                     ->heading('Detalles'),
@@ -150,6 +155,13 @@ class ControlMaletaResource extends Resource
                     ->sortable()
                     ->searchable(isIndividual: true)
                     ->placeholder('No asignado'),
+
+                ImageColumn::make('evidencia_url')
+                    ->placeholder('Sin evidencias')
+                    ->label('Evidencias')
+                    ->circular()
+                    ->stacked()
+                    ->limit(3),
             ])
             ->filters([
                 //

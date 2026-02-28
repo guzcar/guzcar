@@ -21,6 +21,7 @@ class ControlMaleta extends Model
 
     protected $casts = [
         'fecha' => 'datetime',
+        'evidencia_url' => 'array',
     ];
 
     public function maleta()
