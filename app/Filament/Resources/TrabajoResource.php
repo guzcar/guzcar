@@ -450,7 +450,6 @@ class TrabajoResource extends Resource
                                             ->defaultItems(0)
                                     ]),
                                 Select::make('conductor_id')
-                                    ->hiddenOn('create')
                                     ->label('Conductor')
                                     ->relationship('conductor', 'nombre')
                                     ->searchable()
