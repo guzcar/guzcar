@@ -16,17 +16,78 @@ class VehiculoController extends Controller
 
     public function buscarVehiculo(Request $request)
     {
-        // Obtener la placa desde la URL (query parameter)
         $placa = $request->query('placa');
-        $vehiculo = Vehiculo::where('placa', $placa)
+        
+        // Limpiamos la placa: eliminamos guiones, espacios y pasamos a mayúsculas
+        $placaLimpia = strtoupper(str_replace(['-', ' '], '', $placa));
+
+        // Buscamos ignorando guiones y mayúsculas/minúsculas en la BD
+        $vehiculo = Vehiculo::whereRaw("REPLACE(UPPER(placa), '-', '') = ?", [$placaLimpia])
             ->first();
 
-        $trabajos = $vehiculo
-            ? $vehiculo->trabajos()
-                ->with(['usuarios'])
+        $trabajos = collect();
+        if ($vehiculo) {
+            // Eager loading con TODAS las relaciones necesarias para armar el nombre del artículo
+            $trabajos = $vehiculo->trabajos()
+                ->with([
+                    'usuarios', 
+                    'taller', 
+                    'otros',
+                    'articulos.categoria',
+                    'articulos.marca',
+                    'articulos.subCategoria.categoria',
+                    'articulos.presentacion',
+                    'articulos.unidad'
+                ])
                 ->orderByDesc('fecha_ingreso')
-                ->get()
-            : collect();
+                ->paginate(5)
+                ->appends(['placa' => $placa]);
+
+            // Transformamos la colección para adjuntar el resumen exacto de artículos (tu lógica)
+            $trabajos->getCollection()->transform(function ($trabajo) {
+                $trabajo->articulos_resumen = collect($trabajo->articulos ?? [])
+                    ->groupBy('id')
+                    ->map(function ($items) {
+                        $a = $items->first();
+
+                        // Suma de cantidades desde el pivot
+                        $cantidad = $items->sum(function ($it) {
+                            $raw = $it->pivot->cantidad ?? 0;
+                            return is_numeric($raw) ? (float) $raw : 0.0;
+                        });
+
+                        // Replicando la lógica de tu ViewTrabajo.php
+                        $categoriaNombre = optional($a->categoria)->nombre
+                            ?? optional(optional($a->subCategoria)->categoria)->nombre;
+            
+                        $parts = array_values(array_filter([
+                            $categoriaNombre,
+                            optional($a->marca)->nombre,
+                            optional($a->subCategoria)->nombre,
+                            $a->especificacion,
+                            optional($a->presentacion)->nombre,
+                            $a->medida,
+                            optional($a->unidad)->nombre,
+                            $a->color,
+                        ], fn($v) => is_string($v) && trim($v) !== ''));
+
+                        $nombre = trim(implode(' ', $parts));
+                        if ($nombre === '' && isset($a->nombre) && trim($a->nombre) !== '') {
+                            $nombre = trim($a->nombre);
+                        }
+                        if ($nombre === '') {
+                            $nombre = 'Artículo';
+                        }
+
+                        return (object) [
+                            'nombre' => $nombre,
+                            'cantidad' => $cantidad,
+                        ];
+                    })->values();
+
+                return $trabajo;
+            });
+        }
 
         return view('vehiculos.consulta_vehicular', compact('placa', 'vehiculo', 'trabajos'));
     }
