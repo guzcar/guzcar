@@ -60,7 +60,10 @@ class TrabajoArticulosRelationManager extends RelationManager
                         $articulo = Articulo::find($state);
                         if ($articulo) {
                             $set('stock', $articulo->stock);
-                            $set('precio', $articulo->precio);
+
+                            // AQUI ESTÁ EL CAMBIO: Jala el precio, si es nulo jala el costo
+                            $set('precio', $articulo->precio ?? $articulo->costo);
+
                             $set('fraccionable', $articulo->fraccionable);
                             $set('abiertos', $articulo->fraccionable ? $articulo->abiertos : null);
 
