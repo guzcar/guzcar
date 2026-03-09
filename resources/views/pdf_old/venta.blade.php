@@ -10,7 +10,7 @@
                 <table class="table-container">
                     <tbody>
                         <tr>
-                            <th style="width: 5rem; text-align: left;">RUC / DNI</th>
+                            <th style="width: 5rem; text-align: left;">RUC / DNI / CARNET</th>
                             <td>{{ $venta->cliente->identificador }}</td>
                         </tr>
                         <tr>

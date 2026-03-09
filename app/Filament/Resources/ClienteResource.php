@@ -47,7 +47,7 @@ class ClienteResource extends Resource
         return $form
             ->schema([
                 TextInput::make('identificador')
-                    ->label('RUC / DNI')
+                    ->label('RUC / DNI / CARNET')
                     ->unique(ignoreRecord: true)
                     // ->required()
                     ->maxLength(12),
@@ -68,7 +68,7 @@ class ClienteResource extends Resource
             ->searchOnBlur(true)
             ->columns([
                 TextColumn::make('identificador')
-                    ->label('RUC / DNI')
+                    ->label('RUC / DNI / CARNET')
                     ->searchable(isIndividual: true)
                     ->sortable()
                     ->placeholder('Sin ID'),

@@ -158,7 +158,7 @@ class CotizacionResource extends Resource
                                             ->searchable()
                                             ->createOptionForm([
                                                 TextInput::make('identificador')
-                                                    ->label('RUC / DNI')
+                                                    ->label('RUC / DNI / CARNET')
                                                     // ->required()
                                                     ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                     ->maxLength(12),
@@ -176,7 +176,7 @@ class CotizacionResource extends Resource
                                             })
                                             ->editOptionForm([
                                                 TextInput::make('identificador')
-                                                    ->label('RUC / DNI')
+                                                    ->label('RUC / DNI / CARNET')
                                                     // ->required()
                                                     ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                     ->maxLength(12),
@@ -287,7 +287,7 @@ class CotizacionResource extends Resource
                                             ->searchable()
                                             ->createOptionForm([
                                                 TextInput::make('identificador')
-                                                    ->label('RUC / DNI')
+                                                    ->label('RUC / DNI / CARNET')
                                                     // ->required()
                                                     ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                     ->maxLength(12),
@@ -305,7 +305,7 @@ class CotizacionResource extends Resource
                                             })
                                             ->editOptionForm([
                                                 TextInput::make('identificador')
-                                                    ->label('RUC / DNI')
+                                                    ->label('RUC / DNI / CARNET')
                                                     // ->required()
                                                     ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                     ->maxLength(12),
@@ -354,7 +354,7 @@ class CotizacionResource extends Resource
                             })
                             ->createOptionForm([
                                 Forms\Components\TextInput::make('identificador')
-                                    ->label('RUC / DNI')
+                                    ->label('RUC / DNI / CARNET')
                                     ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                     ->maxLength(12),
                                 Forms\Components\TextInput::make('nombre')

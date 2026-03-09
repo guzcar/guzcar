@@ -38,7 +38,7 @@
                             <th colspan="3">CLIENTES</th>
                         </tr>
                         <tr>
-                            <th style="width: 100px;">RUC / DNI</th>
+                            <th style="width: 100px;">RUC / DNI / CARNET</th>
                             <th style="width: 120px;">Nombre</th>
                             <th style="width: 100px;">Contacto</th>
                         </tr>

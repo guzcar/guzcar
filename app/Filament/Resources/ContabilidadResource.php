@@ -146,7 +146,7 @@ class ContabilidadResource extends Resource
                                     })
                                     ->createOptionForm([
                                         TextInput::make('identificador')
-                                            ->label('RUC / DNI')
+                                            ->label('RUC / DNI / CARNET')
                                             ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                             ->maxLength(12),
                                         TextInput::make('nombre')
@@ -280,7 +280,7 @@ class ContabilidadResource extends Resource
                                                     ->searchable()
                                                     ->createOptionForm([
                                                         TextInput::make('identificador')
-                                                            ->label('RUC / DNI')
+                                                            ->label('RUC / DNI / CARNET')
                                                             // ->required()
                                                             ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                             ->maxLength(12),
@@ -298,7 +298,7 @@ class ContabilidadResource extends Resource
                                                     })
                                                     ->editOptionForm([
                                                         TextInput::make('identificador')
-                                                            ->label('RUC / DNI')
+                                                            ->label('RUC / DNI / CARNET')
                                                             // ->required()
                                                             ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                             ->maxLength(12),
@@ -420,7 +420,7 @@ class ContabilidadResource extends Resource
                                                     ->searchable()
                                                     ->createOptionForm([
                                                         TextInput::make('identificador')
-                                                            ->label('RUC / DNI')
+                                                            ->label('RUC / DNI / CARNET')
                                                             // ->required()
                                                             ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                             ->maxLength(12),
@@ -438,7 +438,7 @@ class ContabilidadResource extends Resource
                                                     })
                                                     ->editOptionForm([
                                                         TextInput::make('identificador')
-                                                            ->label('RUC / DNI')
+                                                            ->label('RUC / DNI / CARNET')
                                                             // ->required()
                                                             ->unique(table: 'clientes', column: 'identificador', ignoreRecord: true)
                                                             ->maxLength(12),
@@ -473,7 +473,7 @@ class ContabilidadResource extends Resource
                                     )
                                     ->createOptionForm([
                                         TextInput::make('identificador')
-                                            ->label('RUC / DNI')
+                                            ->label('RUC / DNI / CARNET')
                                             ->unique(table: 'clientes', ignoreRecord: true)
                                             ->maxLength(12),
                                         TextInput::make('nombre')
@@ -487,7 +487,7 @@ class ContabilidadResource extends Resource
                                     ])
                                     ->editOptionForm([
                                         TextInput::make('identificador')
-                                            ->label('RUC / DNI')
+                                            ->label('RUC / DNI / CARNET')
                                             ->unique(table: 'clientes', ignoreRecord: true)
                                             ->maxLength(12),
                                         TextInput::make('nombre')

@@ -94,7 +94,7 @@ class VentaResource extends Resource
                                     ->required()
                                     ->createOptionForm([
                                         TextInput::make('identificador')
-                                            ->label('RUC / DNI')
+                                            ->label('RUC / DNI / CARNET')
                                             ->unique(ignoreRecord: true)
                                             ->maxLength(12),
                                         TextInput::make('nombre')
@@ -108,7 +108,7 @@ class VentaResource extends Resource
                                     ])
                                     ->editOptionForm([
                                         TextInput::make('identificador')
-                                            ->label('RUC / DNI')
+                                            ->label('RUC / DNI / CARNET')
                                             ->unique(ignoreRecord: true)
                                             ->maxLength(12),
                                         TextInput::make('nombre')
@@ -307,7 +307,7 @@ class VentaResource extends Resource
                     ->sortable(),
                 ColumnGroup::make('Cliente', [
                     TextColumn::make('cliente.identificador')
-                        ->label('RUC / DNI')
+                        ->label('RUC / DNI / CARNET')
                         ->placeholder('Sin ID')
                         ->searchable(isIndividual: true)
                         ->sortable()
