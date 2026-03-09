@@ -49,10 +49,10 @@
         </div>
 
         <div class="d-flex flex-column flex-sm-row gap-3 w-100 mb-5">
-            <a href="{{ route('consulta.vehiculo.articulos', $vehiculo->id) }}" class="btn btn-primary py-3 w-100 shadow-sm fw-semibold">
+            <a href="{{ route('consulta.vehiculo.articulos', $vehiculo->id) }}" class="btn btn-light border py-3 w-100 shadow-sm fw-semibold">
                 <i class="fa-solid fa-box-open me-2"></i> Ver Todos los Artículos
             </a>
-            <a href="{{ route('consulta.vehiculo.servicios', $vehiculo->id) }}" class="btn btn-primary py-3 w-100 shadow-sm fw-semibold">
+            <a href="{{ route('consulta.vehiculo.servicios', $vehiculo->id) }}" class="btn btn-light border py-3 w-100 shadow-sm fw-semibold">
                 <i class="fa-solid fa-wrench me-2"></i> Ver Todos los Servicios
             </a>
         </div>
@@ -143,6 +143,16 @@
                             @endif
                         </div>
                         
+                        <div class="mt-4 pt-3 border-top d-flex justify-content-end align-items-center">
+                            <a href="{{ route('consulta.vehiculo.trabajo.detalles', $trabajo->id) }}" class="btn btn-secondary fw-bold">
+                                <i class="fa-solid fa-file-lines me-2"></i> Trabajos 
+                                <span class="badge bg-light text-secondary ms-1">{{ $trabajo->descripcion_tecnicos_count ?? 0 }}</span>
+                            </a>
+                            <a href="{{ route('consulta.vehiculo.trabajo.evidencias', $trabajo->id) }}" class="btn btn-primary fw-bold ms-2">
+                                <i class="fa-solid fa-camera-retro me-2"></i> Evidencias 
+                                <span class="badge bg-light text-primary ms-1">{{ $trabajo->evidencias_count }}</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             @endforeach

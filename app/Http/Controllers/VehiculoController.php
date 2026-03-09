@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Trabajo;
+use App\Models\TrabajoDescripcionTecnico;
 use Illuminate\Http\Request;
 use App\Models\Vehiculo;
 use App\Models\Articulo;
@@ -17,7 +19,7 @@ class VehiculoController extends Controller
     public function buscarVehiculo(Request $request)
     {
         $placa = $request->query('placa');
-        
+
         // Limpiamos la placa: eliminamos guiones, espacios y pasamos a mayúsculas
         $placaLimpia = strtoupper(str_replace(['-', ' '], '', $placa));
 
@@ -30,8 +32,8 @@ class VehiculoController extends Controller
             // Eager loading con TODAS las relaciones necesarias para armar el nombre del artículo
             $trabajos = $vehiculo->trabajos()
                 ->with([
-                    'usuarios', 
-                    'taller', 
+                    'usuarios',
+                    'taller',
                     'otros',
                     'articulos.categoria',
                     'articulos.marca',
@@ -39,6 +41,7 @@ class VehiculoController extends Controller
                     'articulos.presentacion',
                     'articulos.unidad'
                 ])
+                ->withCount(['evidencias', 'descripcionTecnicos'])
                 ->orderByDesc('fecha_ingreso')
                 ->paginate(5)
                 ->appends(['placa' => $placa]);
@@ -59,7 +62,7 @@ class VehiculoController extends Controller
                         // Replicando la lógica de tu ViewTrabajo.php
                         $categoriaNombre = optional($a->categoria)->nombre
                             ?? optional(optional($a->subCategoria)->categoria)->nombre;
-            
+
                         $parts = array_values(array_filter([
                             $categoriaNombre,
                             optional($a->marca)->nombre,
@@ -119,5 +122,28 @@ class VehiculoController extends Controller
             ->get();
 
         return view('vehiculos.servicios_ejecutados', compact('servicios', 'vehiculo'));
+    }
+
+    public function evidenciasTrabajo($id)
+    {
+        $trabajo = Trabajo::with(['vehiculo', 'evidencias.user'])->findOrFail($id);
+
+        // Obtenemos las evidencias paginadas
+        $evidencias = $trabajo->evidencias()->orderBy('created_at', 'desc')->paginate(12);
+
+        return view('vehiculos.evidencias', compact('trabajo', 'evidencias'));
+    }
+
+    public function detallesTrabajo($id)
+    {
+        $trabajo = Trabajo::with(['vehiculo.marca', 'vehiculo.modelo', 'vehiculo.tipoVehiculo'])->findOrFail($id);
+
+        // Obtenemos los detalles de la misma forma que en el TrabajoDescripcionTecnicoController
+        $detalles = TrabajoDescripcionTecnico::where('trabajo_id', $trabajo->id)
+            ->with('user')
+            ->orderByDesc('created_at')
+            ->paginate(12);
+
+        return view('vehiculos.detalles', compact('trabajo', 'detalles'));
     }
 }
