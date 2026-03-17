@@ -19,6 +19,7 @@ class TrabajoOtro extends Model
         'presupuesto',
         'trabajo_id',
         'user_id',
+        'creador_id',
         'orden_combinado',
     ];
 
@@ -30,6 +31,11 @@ class TrabajoOtro extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id')->withTrashed();
+    }
+
+    public function creador()
+    {
+        return $this->belongsTo(User::class, 'creador_id');
     }
 
     protected static function booted()

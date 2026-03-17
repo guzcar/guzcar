@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EvidenciaApiController;
 use App\Http\Controllers\Api\TrabajoApiController;
 use App\Http\Controllers\Api\TrabajoDescripcionApiController;
+use App\Http\Controllers\Api\TrabajoRepuestoApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +47,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/trabajos/{trabajo}/descripciones', [TrabajoDescripcionApiController::class, 'store']);
     Route::put('/descripciones/{descripcion}', [TrabajoDescripcionApiController::class, 'update']);
     Route::delete('/descripciones/{descripcion}', [TrabajoDescripcionApiController::class, 'destroy']);
+
+    Route::get('/trabajos/{trabajo}/repuestos', [TrabajoRepuestoApiController::class, 'index']);
+    Route::post('/trabajos/{trabajo}/repuestos', [TrabajoRepuestoApiController::class, 'store']);
+    Route::put('/repuestos/{repuesto}', [TrabajoRepuestoApiController::class, 'update']);
+    Route::delete('/repuestos/{repuesto}', [TrabajoRepuestoApiController::class, 'destroy']);
 
     Route::get('/trabajos/{trabajo}/articulos', [ArticuloController::class, 'itemsPorTrabajo']);
     Route::post('/trabajos/{trabajo}/articulos/confirmar-todo', [ArticuloController::class, 'confirmarTodosPorTrabajo']);

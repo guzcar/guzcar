@@ -78,6 +78,14 @@
                                                                         Mis trabajos
                                                                     </a>
                                                                 </li>
+                                                                @if(auth()->user()->is_admin)
+                                                                    <li>
+                                                                        <a class="dropdown-item py-2" href="{{ route('gestion.repuestos.index', $trabajo) }}">
+                                                                            <i class="text-secondary fa-fw me-2 fa-solid fa-screwdriver-wrench"></i>
+                                                                            Gestionar repuestos
+                                                                        </a>
+                                                                    </li>
+                                                                @endif
                                                                 <hr>
                                                                 <li>
                                                                     <a class="dropdown-item py-2"

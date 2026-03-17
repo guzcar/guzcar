@@ -20,6 +20,7 @@ use App\Http\Controllers\Pdf\TrabajoController as PdfTrabajoController;
 use App\Http\Controllers\Pdf\VentaController as PdfVentaController;
 use App\Http\Controllers\TrabajoController;
 use App\Http\Controllers\TrabajoDescripcionTecnicoController;
+use App\Http\Controllers\TrabajoRepuestoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehiculoController;
 use Illuminate\Support\Facades\Route;
@@ -132,6 +133,11 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
 
     Route::get('/maletas', [MaletaController::class, 'index'])->name('maletas.index');
     Route::get('/maletas/{maleta}', [MaletaController::class, 'show'])->name('maletas.show');
+
+    Route::get('/trabajos/{trabajo}/repuestos', [TrabajoRepuestoController::class, 'index'])->name('gestion.repuestos.index');
+    Route::post('/trabajos/{trabajo}/repuestos', [TrabajoRepuestoController::class, 'store'])->name('gestion.repuestos.store');
+    Route::put('/trabajos/{trabajo}/repuestos/{repuesto}', [TrabajoRepuestoController::class, 'update'])->name('gestion.repuestos.update');
+    Route::delete('/trabajos/{trabajo}/repuestos/{repuesto}', [TrabajoRepuestoController::class, 'destroy'])->name('gestion.repuestos.destroy');
     
     // Editar perfil
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('user.edit');

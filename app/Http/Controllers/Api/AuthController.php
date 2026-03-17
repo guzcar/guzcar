@@ -33,9 +33,11 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'is_admin' => (bool) $user->is_admin,
                 'avatar_url' => $user->avatar_url
                     ? url('storage/' . $user->avatar_url)
-                    : null
+                    : null,
+                
             ]
         ]);
     }
