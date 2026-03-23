@@ -94,6 +94,7 @@ Route::middleware(['auth', '2fa.verified'])->group(function () {
     Route::get('/vehiculo/{id}/servicios', [VehiculoController::class, 'serviciosEjecutados'])->name('consulta.vehiculo.servicios');
     Route::get('/consulta-vehicular/trabajos/{trabajo}/evidencias', [VehiculoController::class, 'evidenciasTrabajo'])->name('consulta.vehiculo.trabajo.evidencias');
     Route::get('/consulta-vehicular/trabajos/{trabajo}/detalles', [VehiculoController::class, 'detallesTrabajo'])->name('consulta.vehiculo.trabajo.detalles');
+    Route::get('/vehiculo/trabajo/{id}/detalle', [VehiculoController::class, 'verTrabajoDetalle'])->name('consulta.vehiculo.trabajo.detalle');
 
     // PDF
     Route::get('/pdf/admin/trabajos/{trabajo}/presupuesto', [PdfTrabajoController::class, 'presupuesto'])->name('trabajo.pdf.presupuesto');
