@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Clusters\ArticuloCluster;
+use Filament\Pages\SubNavigationPosition;
 use App\Filament\Resources\UbicacionResource\Pages;
 use App\Filament\Resources\UbicacionResource\RelationManagers;
 use App\Models\Ubicacion;
@@ -43,6 +44,7 @@ class UbicacionResource extends Resource
     protected static ?string $slug = 'ubicaciones';
 
     protected static ?string $cluster = ArticuloCluster::class;
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     public static function form(Form $form): Form
     {

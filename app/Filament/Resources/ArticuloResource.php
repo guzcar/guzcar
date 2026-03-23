@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Clusters\ArticuloCluster;
+use Filament\Pages\SubNavigationPosition;
 use App\Filament\Resources\ArticuloResource\Pages;
 use App\Filament\Resources\ArticuloResource\RelationManagers;
 use App\Models\Almacen;
@@ -65,6 +66,8 @@ class ArticuloResource extends Resource
     protected static ?string $navigationLabel = 'Artículos';
 
     protected static ?string $cluster = ArticuloCluster::class;
+
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     public static function form(Form $form): Form
     {
