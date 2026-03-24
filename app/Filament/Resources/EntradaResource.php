@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\EntradaCluster;
 use App\Filament\Resources\EntradaResource\Pages;
 use App\Filament\Resources\EntradaResource\RelationManagers;
 use App\Filament\Resources\EntradaResource\RelationManagers\EntradaArticulosRelationManager;
 use App\Models\Entrada;
+use Filament\Pages\SubNavigationPosition;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
@@ -43,11 +45,13 @@ class EntradaResource extends Resource
 {
     protected static ?string $model = Entrada::class;
 
-    protected static ?string $navigationGroup = 'Logística';
-
-    protected static ?int $navigationSort = 60;
+    protected static ?int $navigationSort = 50;
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox-arrow-down';
+
+    protected static ?string $cluster = EntradaCluster::class;
+
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     public static function form(Form $form): Form
     {

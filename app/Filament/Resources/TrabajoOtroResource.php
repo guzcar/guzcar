@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\SalidaCluster;
 use App\Filament\Resources\TrabajoOtroResource\Pages;
 use App\Filament\Resources\TrabajoOtroResource\RelationManagers;
 use App\Models\Trabajo;
 use App\Models\TrabajoOtro;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Pages\SubNavigationPosition;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -28,8 +30,6 @@ class TrabajoOtroResource extends Resource
 {
     protected static ?string $model = TrabajoOtro::class;
 
-    protected static ?string $navigationGroup = 'Logística';
-
     protected static ?int $navigationSort = 42;
 
     protected static ?string $navigationIcon = 'heroicon-o-bolt';
@@ -39,6 +39,10 @@ class TrabajoOtroResource extends Resource
     protected static ?string $pluralModelLabel = 'Salidas directas';
 
     protected static ?string $slug = 'salidas-directas';
+
+    protected static ?string $cluster = SalidaCluster::class;
+
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     public static function form(Form $form): Form
     {

@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\SalidaCluster;
 use App\Filament\Resources\DespachoResource\Pages;
+use Filament\Pages\SubNavigationPosition;
 use App\Filament\Resources\DespachoResource\RelationManagers;
 use App\Filament\Resources\DespachoResource\RelationManagers\TrabajoArticulosRelationManager;
 use App\Models\Despacho;
@@ -38,11 +40,13 @@ class DespachoResource extends Resource
 {
     protected static ?string $model = Despacho::class;
 
-    protected static ?string $navigationGroup = 'Logística';
-
     protected static ?int $navigationSort = 50;
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox-stack';
+
+    protected static ?string $cluster = SalidaCluster::class;
+
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     public static function form(Form $form): Form
     {

@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\SalidaCluster;
 use App\Filament\Resources\SalidaResource\Pages;
+use Filament\Pages\SubNavigationPosition;
 use App\Filament\Resources\SalidaResource\RelationManagers;
 use App\Models\Articulo;
 use App\Models\Trabajo;
@@ -51,8 +53,6 @@ class SalidaResource extends Resource
 {
     protected static ?string $model = TrabajoArticulo::class;
 
-    protected static ?string $navigationGroup = 'Logística';
-
     protected static ?int $navigationSort = 40;
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
@@ -62,6 +62,10 @@ class SalidaResource extends Resource
     protected static ?string $pluralModelLabel = 'Salidas';
 
     protected static ?string $slug = 'salidas';
+
+    protected static ?string $cluster = SalidaCluster::class;
+
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     public static function form(Form $form): Form
     {

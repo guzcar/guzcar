@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Clusters\EntradaCluster;
 use App\Filament\Resources\EntradaArticuloResource\Pages;
 use App\Models\EntradaArticulo;
+use Filament\Pages\SubNavigationPosition;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -17,9 +19,7 @@ class EntradaArticuloResource extends Resource
 {
     protected static ?string $model = EntradaArticulo::class;
 
-    protected static ?string $navigationGroup = 'Logística';
-
-    protected static ?int $navigationSort = 50;
+    protected static ?int $navigationSort = 60;
 
     protected static ?string $navigationIcon = 'heroicon-o-arrow-down-on-square-stack';
 
@@ -28,6 +28,10 @@ class EntradaArticuloResource extends Resource
     protected static ?string $pluralModelLabel = 'Entradas de artículos';
 
     protected static ?string $navigationLabel = 'Entradas de artículos';
+
+    protected static ?string $cluster = EntradaCluster::class;
+
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     public static function form(Form $form): Form
     {
