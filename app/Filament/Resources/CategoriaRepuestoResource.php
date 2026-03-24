@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\ArticuloCluster;
+use App\Filament\Clusters\RepuestoCluster;
 use Filament\Pages\SubNavigationPosition;
-use App\Filament\Resources\ArticuloGrupoResource\Pages;
-use App\Models\ArticuloGrupo;
+use App\Filament\Resources\CategoriaRepuestoResource\Pages;
+use App\Models\CategoriaRepuesto;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -17,21 +17,20 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
 
-class ArticuloGrupoResource extends Resource
+class CategoriaRepuestoResource extends Resource
 {
-    protected static ?string $model = ArticuloGrupo::class;
+    protected static ?string $model = CategoriaRepuesto::class;
 
     protected static ?int $navigationSort = 75;
     protected static ?string $navigationIcon = 'heroicon-o-swatch';
-    protected static ?string $modelLabel = 'Grupos';
-    protected static ?string $pluralModelLabel = 'Grupos';
-    protected static ?string $navigationLabel = 'Grupos';
-    protected static ?string $cluster = ArticuloCluster::class;
+    protected static ?string $modelLabel = 'Categoría';
+    protected static ?string $pluralModelLabel = 'Categorías';
+    protected static ?string $navigationLabel = 'Categorías';
+    protected static ?string $cluster = RepuestoCluster::class;
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     /**
      * Mapa para mostrar un swatch en el Select (modo claro).
-     * (El modo oscuro lo maneja tu CSS .dark .extra-color-x)
      */
     protected static function extraColorHexMap(): array
     {
@@ -70,7 +69,6 @@ class ArticuloGrupoResource extends Resource
         ];
     }
 
-
     protected static function extraColorOptionsHtml(): array
     {
         $options = [];
@@ -99,22 +97,22 @@ class ArticuloGrupoResource extends Resource
                     ->required()
                     ->columnSpanFull(),
 
-                Select::make('extra_color')
+                // Usamos 'color' porque así se llama en tu migración
+                Select::make('color')
                     ->label('Color')
                     ->options(self::extraColorOptionsHtml())
                     ->searchable()
                     ->preload()
-                    ->native(false)   // recomendado para que el dropdown soporte HTML (Choices)
-                    ->allowHtml()     // Filament permite HTML en labels si lo habilitas
+                    ->native(false)
+                    ->allowHtml()
                     ->required()
                     ->live()
                     ->columnSpanFull(),
 
-                // Vista previa real usando tu clase CSS extra-color-x (incluye .dark)
-                Placeholder::make('extra_color_preview')
+                Placeholder::make('color_preview')
                     ->label('Vista previa')
                     ->content(function (Get $get): HtmlString {
-                        $class = $get('extra_color');
+                        $class = $get('color');
 
                         if (!$class) {
                             return new HtmlString('<span class="text-sm text-gray-500">Selecciona un color…</span>');
@@ -142,7 +140,7 @@ class ArticuloGrupoResource extends Resource
             ->searchOnBlur(true)
             ->paginated([5, 10, 25, 50, 100])
             ->columns([
-                TextColumn::make('extra_color')
+                TextColumn::make('color')
                     ->label('Color')
                     ->html()
                     ->formatStateUsing(function (?string $state): HtmlString {
@@ -163,9 +161,6 @@ class ArticuloGrupoResource extends Resource
                     ->searchable(isIndividual: true)
                     ->sortable(),
             ])
-            ->filters([
-                //
-            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -174,17 +169,13 @@ class ArticuloGrupoResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->persistColumnSearchesInSession()
-            ->persistSearchInSession()
-            ->persistFiltersInSession()
-            ->persistSortInSession();
+            ]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ManageArticuloGrupos::route('/'),
+            'index' => Pages\ManageCategoriaRepuestos::route('/'),
         ];
     }
 }

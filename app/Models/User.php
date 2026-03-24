@@ -127,4 +127,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             'tarea_id' // Local key on cronogramas table
         );
     }
+
+    public function repuestos()
+    {
+        return $this->hasMany(Repuesto::class, 'tecnico_id');
+    }
 }
