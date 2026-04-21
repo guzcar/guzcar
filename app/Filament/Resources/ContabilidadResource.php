@@ -723,6 +723,25 @@ class ContabilidadResource extends Resource
                     ->placeholder('Sin Placa')
                     ->sortable()
                     ->searchable(isIndividual: true),
+                TextColumn::make('vehiculo_completo')
+                    ->label('Vehículo')
+                    ->getStateUsing(function ($record) {
+                        $v = $record->vehiculo;
+                        return $v ? collect([
+                            $v->tipoVehiculo?->nombre,
+                            $v->marca?->nombre,
+                            $v->modelo?->nombre,
+                            $v->color
+                        ])->filter()->implode(' ') : 'Sin vehículo';
+                    })
+                    ->searchable(query: function (Builder $query, string $search) {
+                        $query->whereHas('vehiculo', function ($q) use ($search) {
+                            $q->where('color', 'like', "%{$search}%")
+                                ->orWhereHas('tipoVehiculo', fn($q2) => $q2->where('nombre', 'like', "%{$search}%"))
+                                ->orWhereHas('marca', fn($q2) => $q2->where('nombre', 'like', "%{$search}%"))
+                                ->orWhereHas('modelo', fn($q2) => $q2->where('nombre', 'like', "%{$search}%"));
+                        });
+                    }, isIndividual: true),
                 TextColumn::make('vehiculo.tipoVehiculo.nombre')
                     ->label('Tipo')
                     ->sortable()
@@ -733,8 +752,9 @@ class ContabilidadResource extends Resource
                     ->label('Marca')
                     ->sortable()
                     ->searchable(isIndividual: true)
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('vehiculo.modelo.nombre')
+                    ->width('200px')
                     ->placeholder('Sin Modelo')
                     ->label('Modelo')
                     ->wrap()
