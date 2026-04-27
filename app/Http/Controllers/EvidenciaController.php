@@ -54,7 +54,7 @@ class EvidenciaController extends Controller
 
         $request->validate([
             'evidencias' => 'required|array|max:15',
-            'evidencias.*' => 'file|mimes:jpg,jpeg,png,mp4,mov',
+            'evidencias.*' => 'file|mimes:jpg,jpeg,png,mp4,mov,pdf',
             'observacion' => 'nullable|string',
         ]);
 
@@ -64,11 +64,23 @@ class EvidenciaController extends Controller
         foreach ($files as $index => $file) {
             $path = $file->store('evidencia', 'public');
 
+            $mime = $file->getMimeType();
+
+            if (str_starts_with($mime, 'image/')) {
+                $tipo = 'imagen';
+            } elseif (str_starts_with($mime, 'video/')) {
+                $tipo = 'video';
+            } elseif ($mime === 'application/pdf') {
+                $tipo = 'pdf';
+            } else {
+                $tipo = 'otro';
+            }
+
             Evidencia::create([
                 'trabajo_id' => $trabajo->id,
                 'user_id' => $user->id,
                 'evidencia_url' => $path,
-                'tipo' => $file->getMimeType() === 'video/mp4' ? 'video' : 'imagen',
+                'tipo' => $tipo,
                 'observacion' => $observacion
             ]);
         }

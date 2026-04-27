@@ -132,13 +132,33 @@
                                 </td>
                                 <td>
                                     @if ($evidencia->tipo === 'imagen')
-                                        <img src="{{ Storage::url($evidencia->evidencia_url) }}" alt="Evidencia"
-                                            class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
-                                    @else
-                                        <a href="{{ Storage::url($evidencia->evidencia_url) }}" target="_blank"
-                                            class="btn btn-light border d-flex justify-content-center align-items-center"
-                                            style="width: 60px; height: 60px;">
+                                        <img src="{{ Storage::url($evidencia->evidencia_url) }}" 
+                                            alt="Evidencia"
+                                            class="img-thumbnail" 
+                                            style="width: 60px; height: 60px; object-fit: cover;">
+
+                                    @elseif ($evidencia->tipo === 'video')
+                                        <a href="{{ Storage::url($evidencia->evidencia_url) }}" 
+                                        target="_blank"
+                                        class="btn btn-light border d-flex justify-content-center align-items-center"
+                                        style="width: 60px; height: 60px;">
                                             <i class="fa-solid fa-video fs-3 text-muted"></i>
+                                        </a>
+
+                                    @elseif ($evidencia->tipo === 'pdf')
+                                        <a href="{{ Storage::url($evidencia->evidencia_url) }}" 
+                                        target="_blank"
+                                        class="btn btn-light border d-flex justify-content-center align-items-center"
+                                        style="width: 60px; height: 60px;">
+                                            <i class="fa-solid fa-file-pdf fs-3 text-danger"></i>
+                                        </a>
+
+                                    @else
+                                        <a href="{{ Storage::url($evidencia->evidencia_url) }}" 
+                                        target="_blank"
+                                        class="btn btn-light border d-flex justify-content-center align-items-center"
+                                        style="width: 60px; height: 60px;">
+                                            <i class="fa-solid fa-file fs-3 text-muted"></i>
                                         </a>
                                     @endif
                                 </td>
@@ -357,7 +377,7 @@
                             const files = Array.from(fileInput.files);
                             console.log(`Subiendo ${files.length} archivos originales...`);
 
-                            const validExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.mp4', '.mov'];
+                            const validExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.mp4', '.mov', '.pdf'];
 
                             files.forEach(file => {
                                 const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
