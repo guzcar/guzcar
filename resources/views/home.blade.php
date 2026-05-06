@@ -63,7 +63,7 @@
                                                                 data-bs-toggle="dropdown" aria-expanded="false">
                                                                 Gestionar
                                                             </button>
-                                                            <ul class="dropdown-menu py-2">
+                                                            <ul class="dropdown-menu py-2" style="z-index: 2000;">
                                                                 <li>
                                                                     <a class="dropdown-item py-2"
                                                                         href="{{ route('gestion.evidencias.index', $trabajo) }}">

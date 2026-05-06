@@ -1,6 +1,6 @@
 <x-layout>
 
-    <h1 class="mb-3">Evidencias para {{ $trabajo->vehiculo->placa ?? '-' }}</h1>
+    <h1 class="mb-3">EvidenciasS para {{ $trabajo->vehiculo->placa ?? '-' }}</h1>
 
     <div class="d-flex justify-content-between mb-3">
         <a class="btn btn-light border py-2" href="{{ route('home') }}">Volver</a>
@@ -349,6 +349,7 @@
     </div>
 
     @push('scripts')
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.2.1/compressor.min.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
 
@@ -368,30 +369,69 @@
                         try {
                             submitButton.disabled = true;
                             submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Subiendo archivos...';
+                            
                             const formData = new FormData();
                             for (const [key, value] of new FormData(this)) {
                                 if (key !== 'evidencias[]') {
                                     formData.append(key, value);
                                 }
                             }
+                            
                             const files = Array.from(fileInput.files);
-                            console.log(`Subiendo ${files.length} archivos originales...`);
+                            console.log(`Procesando ${files.length} archivos...`);
 
+                            // 1. Añadimos el .pdf a la lista de extensiones permitidas
                             const validExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.mp4', '.mov', '.pdf'];
+                            
+                            const compressedFilesPromises = [];
 
                             files.forEach(file => {
                                 const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+                                
                                 if (!validExtensions.includes(fileExt)) {
                                     throw new Error(`El archivo ${file.name} no tiene un formato permitido.`);
                                 }
+
+                                // Creamos una promesa por cada archivo
+                                const compressionPromise = new Promise((resolve, reject) => {
+                                    // 2. Si es video o PDF, pasa directo sin comprimir
+                                    if (fileExt === '.mp4' || fileExt === '.mov' || fileExt === '.pdf') {
+                                        resolve(file);
+                                        return;
+                                    }
+
+                                    // 3. Si es imagen, la comprimimos
+                                    new Compressor(file, {
+                                        quality: 0.6,
+                                        maxWidth: 1920,
+                                        success(result) {
+                                            resolve(result);
+                                        },
+                                        error(err) {
+                                            console.error('Error al comprimir:', err.message);
+                                            resolve(file); // Si falla, subimos la original para no perderla
+                                        },
+                                    });
+                                });
+
+                                compressedFilesPromises.push(compressionPromise);
+                            });
+
+                            // Esperamos a que todo termine de procesarse
+                            const finalFiles = await Promise.all(compressedFilesPromises);
+
+                            // Añadimos los archivos ya procesados (imágenes comprimidas, videos/pdfs originales)
+                            finalFiles.forEach(file => {
                                 formData.append('evidencias[]', file, file.name);
                             });
+
                             const headers = {
                                 'Accept': 'application/json'
                             };
                             if (csrfToken) {
                                 headers['X-CSRF-TOKEN'] = csrfToken;
                             }
+                            
                             const response = await fetch(this.action, {
                                 method: 'POST',
                                 body: formData,
@@ -414,9 +454,9 @@
                             const alertDiv = document.createElement('div');
                             alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3 mb-0';
                             alertDiv.innerHTML = `
-                            <strong>Error:</strong> ${errorMessage}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        `;
+                                <strong>Error:</strong> ${errorMessage}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            `;
                             errorContainer.appendChild(alertDiv);
 
                         } finally {

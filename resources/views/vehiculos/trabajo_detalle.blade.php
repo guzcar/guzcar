@@ -148,7 +148,7 @@
                         @foreach($trabajo->evidencias as $evidencia)
                             <div class="col-6 col-md-4 col-lg-3">
                                 <div class="position-relative">
-                                    <img src="{{ Storage::url($evidencia->url_foto ?? $evidencia->ruta) }}"
+                                    <img src="{{ Storage::url($evidencia->evidencia_url ?? $evidencia->ruta) }}"
                                         alt="Evidencia del trabajo" loading="lazy" class="img-fluid rounded shadow-sm"
                                         style="width: 100%; height: 160px; object-fit: cover; cursor: pointer;"
                                         onclick="window.open(this.src, '_blank')">
