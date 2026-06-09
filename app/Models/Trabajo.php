@@ -168,4 +168,14 @@ class Trabajo extends Model
         return max($porCobrar, 0);
     }
 
+    // Añádelo antes de la última llave de cierre "}" de la clase Trabajo
+    public function getSubtotal(): float
+    {
+        // Replicamos la lógica de tus triggers para obtener el total antes de descuentos
+        $totalArticulos = $this->trabajoArticulos()->where('presupuesto', true)->get()->sum(fn($item) => $item->precio * $item->cantidad);
+        $totalServicios = $this->servicios()->where('presupuesto', true)->get()->sum(fn($item) => $item->precio * $item->cantidad);
+        $totalOtros = $this->otros()->where('presupuesto', true)->get()->sum(fn($item) => $item->precio * $item->cantidad);
+
+        return (float) ($totalArticulos + $totalServicios + $totalOtros);
+    }
 }

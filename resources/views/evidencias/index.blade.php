@@ -1,6 +1,6 @@
 <x-layout>
 
-    <h1 class="mb-3">EvidenciasS para {{ $trabajo->vehiculo->placa ?? '-' }}</h1>
+    <h1 class="mb-3">Evidencias para {{ $trabajo->vehiculo->placa ?? '-' }}</h1>
 
     <div class="d-flex justify-content-between mb-3">
         <a class="btn btn-light border py-2" href="{{ route('home') }}">Volver</a>
@@ -132,32 +132,27 @@
                                 </td>
                                 <td>
                                     @if ($evidencia->tipo === 'imagen')
-                                        <img src="{{ Storage::url($evidencia->evidencia_url) }}" 
-                                            alt="Evidencia"
-                                            class="img-thumbnail" 
-                                            style="width: 60px; height: 60px; object-fit: cover;">
+                                        <img src="{{ Storage::url($evidencia->evidencia_url) }}" alt="Evidencia"
+                                            class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
 
                                     @elseif ($evidencia->tipo === 'video')
-                                        <a href="{{ Storage::url($evidencia->evidencia_url) }}" 
-                                        target="_blank"
-                                        class="btn btn-light border d-flex justify-content-center align-items-center"
-                                        style="width: 60px; height: 60px;">
+                                        <a href="{{ Storage::url($evidencia->evidencia_url) }}" target="_blank"
+                                            class="btn btn-light border d-flex justify-content-center align-items-center"
+                                            style="width: 60px; height: 60px;">
                                             <i class="fa-solid fa-video fs-3 text-muted"></i>
                                         </a>
 
                                     @elseif ($evidencia->tipo === 'pdf')
-                                        <a href="{{ Storage::url($evidencia->evidencia_url) }}" 
-                                        target="_blank"
-                                        class="btn btn-light border d-flex justify-content-center align-items-center"
-                                        style="width: 60px; height: 60px;">
+                                        <a href="{{ Storage::url($evidencia->evidencia_url) }}" target="_blank"
+                                            class="btn btn-light border d-flex justify-content-center align-items-center"
+                                            style="width: 60px; height: 60px;">
                                             <i class="fa-solid fa-file-pdf fs-3 text-danger"></i>
                                         </a>
 
                                     @else
-                                        <a href="{{ Storage::url($evidencia->evidencia_url) }}" 
-                                        target="_blank"
-                                        class="btn btn-light border d-flex justify-content-center align-items-center"
-                                        style="width: 60px; height: 60px;">
+                                        <a href="{{ Storage::url($evidencia->evidencia_url) }}" target="_blank"
+                                            class="btn btn-light border d-flex justify-content-center align-items-center"
+                                            style="width: 60px; height: 60px;">
                                             <i class="fa-solid fa-file fs-3 text-muted"></i>
                                         </a>
                                     @endif
@@ -369,25 +364,25 @@
                         try {
                             submitButton.disabled = true;
                             submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Subiendo archivos...';
-                            
+
                             const formData = new FormData();
                             for (const [key, value] of new FormData(this)) {
                                 if (key !== 'evidencias[]') {
                                     formData.append(key, value);
                                 }
                             }
-                            
+
                             const files = Array.from(fileInput.files);
                             console.log(`Procesando ${files.length} archivos...`);
 
                             // 1. Añadimos el .pdf a la lista de extensiones permitidas
                             const validExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.mp4', '.mov', '.pdf'];
-                            
+
                             const compressedFilesPromises = [];
 
                             files.forEach(file => {
                                 const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-                                
+
                                 if (!validExtensions.includes(fileExt)) {
                                     throw new Error(`El archivo ${file.name} no tiene un formato permitido.`);
                                 }
@@ -431,7 +426,7 @@
                             if (csrfToken) {
                                 headers['X-CSRF-TOKEN'] = csrfToken;
                             }
-                            
+
                             const response = await fetch(this.action, {
                                 method: 'POST',
                                 body: formData,
@@ -454,9 +449,9 @@
                             const alertDiv = document.createElement('div');
                             alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3 mb-0';
                             alertDiv.innerHTML = `
-                                <strong>Error:</strong> ${errorMessage}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            `;
+                                    <strong>Error:</strong> ${errorMessage}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                `;
                             errorContainer.appendChild(alertDiv);
 
                         } finally {

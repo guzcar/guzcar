@@ -343,7 +343,7 @@ class TrabajoController extends Controller
         return $pdf->stream('Evidencias ' . $trabajo->codigo . '.pdf');
     }
 
-    public function informe($id)
+public function informe($id)
     {
         $trabajo = Trabajo::with([
             'vehiculo.clientes',
@@ -359,11 +359,31 @@ class TrabajoController extends Controller
             ($trabajo->vehiculo->marca->nombre ?? '') . " " .
             ($trabajo->vehiculo->modelo->nombre ?? '');
 
+        // 1. Lógica para la fecha de salida (Solo fecha, sin hora)
+        if (!empty($trabajo->fecha_salida)) {
+            // Formateamos para que solo muestre Día/Mes/Año
+            $fechaSalida = \Carbon\Carbon::parse($trabajo->fecha_salida)->format('d/m/Y');
+        } else {
+            $fechaSalida = 'TALLER';
+        }
+
+        // 2. Lógica para la firma en Base64
+        $pathFirma = public_path('images/firma-elard.jpeg');
+        $firmaBase64 = null;
+
+        if (file_exists($pathFirma)) {
+            $type = pathinfo($pathFirma, PATHINFO_EXTENSION);
+            $data = file_get_contents($pathFirma);
+            $firmaBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
         $pdf = App::make('dompdf.wrapper');
         return $pdf->loadView('pdf.informe', [
             'trabajo' => $trabajo,
             'informes' => $trabajo->informes,
-            'titulo' => $titulo
+            'titulo' => $titulo,
+            'fechaSalida' => $fechaSalida,
+            'firmaBase64' => $firmaBase64
         ])->setPaper('A4', 'portrait')
             ->stream("Informe {$trabajo->codigo}.pdf");
     }

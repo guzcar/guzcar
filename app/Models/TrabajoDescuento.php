@@ -14,4 +14,10 @@ class TrabajoDescuento extends Model
         'detalle',
         'descuento',
     ];
+
+    // Agrega esto dentro de la clase TrabajoDescuento
+    public function trabajo()
+    {
+        return $this->belongsTo(Trabajo::class, 'trabajo_id');
+    }
 }

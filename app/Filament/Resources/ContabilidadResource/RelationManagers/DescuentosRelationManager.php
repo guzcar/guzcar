@@ -11,6 +11,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Get; // <-- Necesario para obtener el estado actual
+use Filament\Forms\Set; // <-- Necesario para modificar el otro campo
 
 class DescuentosRelationManager extends RelationManager
 {
@@ -22,12 +24,55 @@ class DescuentosRelationManager extends RelationManager
             ->schema([
                 TextInput::make('detalle')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpanFull(), // Hace que el detalle ocupe toda la fila
+
+                // Campo Real (Porcentaje) que se guarda en Base de Datos
                 TextInput::make('descuento')
+                    ->label('Porcentaje (%)')
                     ->numeric()
                     ->required()
                     ->suffix('%')
-                    ->maxValue(42949672.95),
+                    ->maxValue(100) // Lo limitamos a 100% lógicamente
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function (Get $get, Set $set, $state, $livewire) {
+                        $trabajo = $livewire->getOwnerRecord();
+                        $subtotal = $trabajo->getSubtotal();
+                        
+                        // Si actualizan el %, recalculamos el monto fijo
+                        if ($subtotal > 0 && is_numeric($state)) {
+                            $set('monto_fijo', round(($subtotal * $state) / 100, 2));
+                        } else {
+                            $set('monto_fijo', 0);
+                        }
+                    }),
+
+                // Campo Virtual (Monto Fijo) para comodidad del usuario
+                TextInput::make('monto_fijo')
+                    ->label('Monto Descuento')
+                    ->numeric()
+                    ->prefix('S/') // Símbolo de moneda
+                    ->dehydrated(false) // NO se envía a la base de datos
+                    ->live(onBlur: true)
+                    ->afterStateHydrated(function (TextInput $component, $record, $livewire) {
+                        // Cuando se edita el registro, calculamos cuánto es el equivalente en moneda
+                        if ($record && $record->descuento) {
+                            $trabajo = $livewire->getOwnerRecord();
+                            $subtotal = $trabajo->getSubtotal();
+                            $component->state(round(($subtotal * $record->descuento) / 100, 2));
+                        }
+                    })
+                    ->afterStateUpdated(function (Get $get, Set $set, $state, $livewire) {
+                        $trabajo = $livewire->getOwnerRecord();
+                        $subtotal = $trabajo->getSubtotal();
+                        
+                        // Si actualizan el monto fijo, calculamos a qué porcentaje equivale y llenamos el input real
+                        if ($subtotal > 0 && is_numeric($state)) {
+                            $set('descuento', round(($state / $subtotal) * 100, 4));
+                        } else {
+                            $set('descuento', 0);
+                        }
+                    }),
             ]);
     }
 
@@ -37,8 +82,20 @@ class DescuentosRelationManager extends RelationManager
             ->recordTitleAttribute('detalle')
             ->columns([
                 TextColumn::make('detalle'),
+                
                 TextColumn::make('descuento')
+                    ->label('Porcentaje')
                     ->suffix('%'),
+                    
+                TextColumn::make('monto_fijo_virtual')
+                    ->label('Monto Descontado')
+                    ->prefix('S/ ')
+                    ->getStateUsing(function ($record) {
+                        if (!$record->trabajo) return 0;
+                        
+                        $subtotal = $record->trabajo->getSubtotal();
+                        return number_format(($subtotal * $record->descuento) / 100, 2);
+                    }),
             ])
             ->filters([
                 //
