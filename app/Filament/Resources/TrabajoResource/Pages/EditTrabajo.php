@@ -26,6 +26,104 @@ class EditTrabajo extends EditRecord
             Actions\ViewAction::make()
                 ->icon('heroicon-o-eye'),
 
+            Actions\Action::make('historialVehiculo')
+                ->label('Historial')
+                ->icon('heroicon-o-clock')
+                ->color('success')
+                ->modalHeading('Filtros y Aceites utilizados anteriormente')
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Cerrar')
+                ->modalWidth('4xl')
+                ->modalContent(function (Trabajo $record) {
+                    $trabajosAnteriores = Trabajo::with([
+                        'trabajoArticulos.articulo.categoria',
+                        'trabajoArticulos.articulo.marca',
+                        'trabajoArticulos.articulo.subCategoria',
+                        'trabajoArticulos.articulo.presentacion',
+                        'trabajoArticulos.articulo.unidad',
+                        'otros'
+                    ])
+                        ->where('vehiculo_id', $record->vehiculo_id)
+                        ->where('id', '!=', $record->id)
+                        ->orderBy('fecha_ingreso', 'desc')
+                        ->get();
+
+                    $historialArticulos = [];
+                    $historialOtros = [];
+                    $palabrasClave = ['filtro', 'aceite'];
+
+                    foreach ($trabajosAnteriores as $trabajo) {
+                        $fechaTrabajo = $trabajo->fecha_ingreso ? $trabajo->fecha_ingreso->format('d/m/Y') : 'Sin fecha';
+
+                        // Artículos
+                        foreach ($trabajo->trabajoArticulos as $ta) {
+                            $articulo = $ta->articulo;
+                            if (!$articulo || !$articulo->categoria)
+                                continue;
+
+                            $categoriaNombre = strtolower($articulo->categoria->nombre);
+                            $pasaFiltro = false;
+
+                            foreach ($palabrasClave as $palabra) {
+                                if (str_contains($categoriaNombre, $palabra)) {
+                                    $pasaFiltro = true;
+                                    break;
+                                }
+                            }
+
+                            if ($pasaFiltro) {
+                                $parts = array_filter([
+                                    $articulo->categoria->nombre ?? null,
+                                    $articulo->marca->nombre ?? null,
+                                    $articulo->subCategoria->nombre ?? null,
+                                    $articulo->especificacion ?? null,
+                                    $articulo->presentacion->nombre ?? null,
+                                    $articulo->medida ?? null,
+                                    $articulo->unidad->nombre ?? null,
+                                    $articulo->color ?? null,
+                                ]);
+                                $nombreCompleto = implode(' ', $parts);
+
+                                // Agrupamos usando la fecha como llave
+                                $historialArticulos[$fechaTrabajo][] = [
+                                    'nombre' => $nombreCompleto ?: 'Artículo sin nombre',
+                                    'cantidad' => $ta->cantidad,
+                                    'stock' => $articulo->stock,
+                                ];
+                            }
+                        }
+
+                        // Otros
+                        foreach ($trabajo->otros as $otro) {
+                            if (!$otro->descripcion)
+                                continue;
+
+                            $descripcion = strtolower($otro->descripcion);
+                            $pasaFiltro = false;
+
+                            foreach ($palabrasClave as $palabra) {
+                                if (str_contains($descripcion, $palabra)) {
+                                    $pasaFiltro = true;
+                                    break;
+                                }
+                            }
+
+                            if ($pasaFiltro) {
+                                // Agrupamos usando la fecha como llave
+                                $historialOtros[$fechaTrabajo][] = [
+                                    'nombre' => $otro->descripcion,
+                                    'cantidad' => $otro->cantidad,
+                                ];
+                            }
+                        }
+                    }
+
+                    return view('filament.resources.trabajo.modals.historial-vehiculo', [
+                        'articulosAgrupados' => $historialArticulos,
+                        'otrosAgrupados' => $historialOtros,
+                    ]);
+                }),
+
             // TODO: Buscar una mejor terminologia
             Action::make('Ver Inventario')
                 ->icon('heroicon-o-truck')
