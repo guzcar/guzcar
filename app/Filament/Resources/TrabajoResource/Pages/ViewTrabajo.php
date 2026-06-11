@@ -131,7 +131,7 @@ class ViewTrabajo extends ViewRecord
                 ->label('Historial')
                 ->icon('heroicon-o-clock')
                 ->color('success')
-                ->modalHeading('Filtros y Aceites utilizados anteriormente')
+                ->modalHeading('Historial de Mantenimientos, Filtros y Aceites')
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Cerrar')
                 ->modalWidth('4xl')
@@ -149,14 +149,18 @@ class ViewTrabajo extends ViewRecord
                         ->orderBy('fecha_ingreso', 'desc')
                         ->get();
 
-                    $historialArticulos = [];
-                    $historialOtros = [];
-                    $palabrasClave = ['filtro', 'aceite'];
+                    $historialAgrupado = [];
+                    $palabrasClave = ['filtro', 'aceite', 'arandela'];
 
                     foreach ($trabajosAnteriores as $trabajo) {
                         $fechaTrabajo = $trabajo->fecha_ingreso ? $trabajo->fecha_ingreso->format('d/m/Y') : 'Sin fecha';
 
-                        // Artículos
+                        // Evaluamos si el string de descripción contiene 'mantenimiento'
+                        $esMantenimiento = !empty($trabajo->descripcion_servicio) && str_contains(strtolower($trabajo->descripcion_servicio), 'mantenimiento');
+
+                        $elementosDelTrabajo = [];
+
+                        // Evaluamos Artículos
                         foreach ($trabajo->trabajoArticulos as $ta) {
                             $articulo = $ta->articulo;
                             if (!$articulo || !$articulo->categoria)
@@ -185,8 +189,8 @@ class ViewTrabajo extends ViewRecord
                                 ]);
                                 $nombreCompleto = implode(' ', $parts);
 
-                                // Agrupamos usando la fecha como llave
-                                $historialArticulos[$fechaTrabajo][] = [
+                                $elementosDelTrabajo[] = [
+                                    'tipo' => 'articulo',
                                     'nombre' => $nombreCompleto ?: 'Artículo sin nombre',
                                     'cantidad' => $ta->cantidad,
                                     'stock' => $articulo->stock,
@@ -194,7 +198,7 @@ class ViewTrabajo extends ViewRecord
                             }
                         }
 
-                        // Otros
+                        // Evaluamos Otros
                         foreach ($trabajo->otros as $otro) {
                             if (!$otro->descripcion)
                                 continue;
@@ -210,18 +214,41 @@ class ViewTrabajo extends ViewRecord
                             }
 
                             if ($pasaFiltro) {
-                                // Agrupamos usando la fecha como llave
-                                $historialOtros[$fechaTrabajo][] = [
+                                $elementosDelTrabajo[] = [
+                                    'tipo' => 'otro',
                                     'nombre' => $otro->descripcion,
                                     'cantidad' => $otro->cantidad,
+                                    'stock' => null,
                                 ];
+                            }
+                        }
+
+                        $tieneElementos = count($elementosDelTrabajo) > 0;
+
+                        // Si el trabajo tuvo "mantenimiento" O si arrojó resultados de artículos/otros
+                        if ($esMantenimiento || $tieneElementos) {
+                            if (!isset($historialAgrupado[$fechaTrabajo])) {
+                                $historialAgrupado[$fechaTrabajo] = [
+                                    'info_trabajos' => [],
+                                    'elementos' => []
+                                ];
+                            }
+
+                            // Guardamos SIEMPRE la descripción y kilometraje del trabajo relevante
+                            $historialAgrupado[$fechaTrabajo]['info_trabajos'][] = [
+                                'descripcion' => $trabajo->descripcion_servicio ?? 'Sin descripción registrada.',
+                                'kilometraje' => $trabajo->kilometraje,
+                            ];
+
+                            // Guardamos los elementos (si los hay)
+                            foreach ($elementosDelTrabajo as $el) {
+                                $historialAgrupado[$fechaTrabajo]['elementos'][] = $el;
                             }
                         }
                     }
 
                     return view('filament.resources.trabajo.modals.historial-vehiculo', [
-                        'articulosAgrupados' => $historialArticulos,
-                        'otrosAgrupados' => $historialOtros,
+                        'historialAgrupado' => $historialAgrupado,
                     ]);
                 }),
             ActionGroup::make([
