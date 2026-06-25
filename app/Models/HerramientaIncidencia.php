@@ -23,6 +23,7 @@ class HerramientaIncidencia extends Model
         'prev_estado',
         'prev_deleted_at',
         'observacion',
+        'evidencias'
     ];
 
     protected $casts = [
@@ -32,6 +33,7 @@ class HerramientaIncidencia extends Model
         'prev_estado' => 'string',
         'prev_deleted_at' => 'datetime',
         'cantidad' => 'integer',
+        'evidencias' => 'array'
     ];
 
     public function herramienta()

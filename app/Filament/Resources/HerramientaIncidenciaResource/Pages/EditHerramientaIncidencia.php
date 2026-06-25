@@ -54,7 +54,7 @@ class EditHerramientaIncidencia extends EditRecord
         // no se permite editar ciertos campos de las incidencias.
         // Por seguridad, mantener solo los campos editables
 
-        $allowedFields = ['motivo', 'observacion'];
+        $allowedFields = ['motivo', 'observacion', 'evidencias'];
 
         // Filtrar solo campos permitidos
         $filteredData = array_intersect_key($data, array_flip($allowedFields));
